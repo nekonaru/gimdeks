@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GimDeks.App/GimDeks.App.csproj" />
+    <Project Path="src/GimDeks.Core/GimDeks.Core.csproj" />
+    <Project Path="src/GimDeks.Data/GimDeks.Data.csproj" />
+    <Project Path="src/GimDeks.Excel/GimDeks.Excel.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/GimDeks.Tests/GimDeks.Tests.csproj" />
+  </Folder>
+</Solution>

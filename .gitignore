@@ -1,0 +1,25 @@
+# Build output
+bin/
+obj/
+out/
+publish/
+*.user
+*.suo
+.vs/
+.idea/
+.vscode/
+
+# Test results and coverage
+TestResults/
+coverage/
+*.coverage
+*.trx
+
+# Rider / VS caches
+*.nupkg
+project.lock.json
+artifacts/
+
+# Windows
+Thumbs.db
+desktop.ini
