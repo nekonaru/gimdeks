@@ -1,11 +1,38 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>12</LangVersion>
     <UseWPF>true</UseWPF>
+    <RootNamespace>GimDeks.App</RootNamespace>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <FileVersion>1.0.0.1</FileVersion>
+    <ApplicationIcon>assets\gimdeks.ico</ApplicationIcon>
+    <Company>Nicolas Dwi Dharma</Company>
+    <Product>GimDeks</Product>
+    <Description>Pengganti file Excel koleksi game: kelola koleksi game lintas drive dengan hitungan otomatis.</Description>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GimDeks.Core\GimDeks.Core.csproj" />
+    <ProjectReference Include="..\GimDeks.Data\GimDeks.Data.csproj" />
+    <ProjectReference Include="..\GimDeks.Excel\GimDeks.Excel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="assets\gimdeks-mark.png" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>
+
+
+

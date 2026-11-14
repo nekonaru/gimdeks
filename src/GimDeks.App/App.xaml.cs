@@ -1,13 +1,92 @@
-﻿using System.Configuration;
-using System.Data;
+using System.IO;
 using System.Windows;
+using GimDeks.App.Services;
+using GimDeks.App.ViewModels;
+using GimDeks.Core.Interfaces;
+using GimDeks.Data;
+using GimDeks.Data.Repositories;
+using GimDeks.Excel;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GimDeks.App;
 
-/// <summary>
-/// Interaction logic for App.xaml
-/// </summary>
 public partial class App : Application
 {
-}
+    private const string LogFileName = "gimdeks.log";
 
+    public static IServiceProvider Services { get; private set; } = null!;
+
+    private static string LogPath => Path.Combine(DatabasePaths.AppDataDirectory, LogFileName);
+
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+
+        DispatcherUnhandledException += (_, args) =>
+        {
+            WriteLog(args.Exception);
+            MessageBox.Show(
+                "Terjadi kesalahan tak terduga. Detail tersimpan di gimdeks.log. " + args.Exception.Message,
+                "GimDeks",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            args.Handled = true;
+        };
+
+        try
+        {
+            Services = BuildServices();
+            var initializer = Services.GetRequiredService<DatabaseInitializer>();
+            initializer.EnsureCreated();
+        }
+        catch (Exception exception)
+        {
+            WriteLog(exception);
+            MessageBox.Show(
+                "Database tidak bisa dibuka atau dibuat. Detail tersimpan di gimdeks.log.\n\n" + exception.Message,
+                "GimDeks",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            Shutdown(1);
+        }
+    }
+
+    private static ServiceProvider BuildServices()
+    {
+        var services = new ServiceCollection();
+
+        var databasePath = DatabasePaths.ResolveDatabasePath();
+        services.AddSingleton(new SqliteConnectionFactory(databasePath));
+        services.AddSingleton<DatabaseInitializer>();
+        services.AddSingleton(new DatabaseBackupService(
+            new SqliteConnectionFactory(databasePath),
+            DatabasePaths.ResolveBackupsDirectory()));
+        services.AddSingleton<ReplaceAllService>();
+        services.AddSingleton<IStorageRepository, StorageRepository>();
+        services.AddSingleton<IGameRepository, GameRepository>();
+        services.AddSingleton<IHistoryRepository, HistoryRepository>();
+        services.AddSingleton<ExcelImporter>();
+        services.AddSingleton<ExcelImportService>();
+        services.AddSingleton<AppSettingsService>();
+
+        services.AddSingleton<MainViewModel>();
+        services.AddSingleton<DashboardViewModel>();
+        services.AddSingleton<GameListViewModel>();
+
+        return services.BuildServiceProvider();
+    }
+
+    private static void WriteLog(Exception exception)
+    {
+        try
+        {
+            Directory.CreateDirectory(DatabasePaths.AppDataDirectory);
+            File.AppendAllText(LogPath,
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {exception}\n\n");
+        }
+        catch
+        {
+            // Never crash while reporting a crash.
+        }
+    }
+}
