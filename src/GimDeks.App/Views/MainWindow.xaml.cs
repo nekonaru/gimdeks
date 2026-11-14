@@ -29,6 +29,7 @@ public partial class MainWindow : Window
 
         _viewModel = App.Services.GetRequiredService<MainViewModel>();
         DataContext = _viewModel;
+        App.Services.GetRequiredService<Services.ThemingService>().Apply(_viewModel.IsLightTheme);
         _viewModel.NavigateTo(Page.Dashboard);
         Closing += OnClosing;
     }
@@ -44,6 +45,9 @@ public partial class MainWindow : Window
         _settings.Save(settings);
     }
 }
+
+
+
 
 
 

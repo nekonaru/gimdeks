@@ -8,4 +8,6 @@ public enum Page
     Dikecualikan,
     Dieliminasi,
     ImportExport,
+    Duplicates,
+    SaranHdd,
 }

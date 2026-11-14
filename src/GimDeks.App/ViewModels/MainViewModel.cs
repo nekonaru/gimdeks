@@ -19,7 +19,10 @@ public partial class MainViewModel : ObservableObject
         StorageViewModel storage,
         ExcludedViewModel excluded,
         EliminatedViewModel eliminated,
-        ImportExportViewModel importExport)
+        ImportExportViewModel importExport,
+        DuplicatesViewModel duplicates,
+        HddSuggestionViewModel hddSuggestion,
+        Services.ThemingService theming)
     {
         Dashboard = dashboard;
         GameList = gameList;
@@ -27,6 +30,10 @@ public partial class MainViewModel : ObservableObject
         Excluded = excluded;
         Eliminated = eliminated;
         ImportExport = importExport;
+        Duplicates = duplicates;
+        HddSuggestion = hddSuggestion;
+        _theming = theming;
+        IsLightTheme = theming.IsLightTheme;
         NavItems = new[]
         {
             new NavItem(Page.Dashboard, "Dashboard", "ViewDashboard"),
@@ -34,12 +41,19 @@ public partial class MainViewModel : ObservableObject
             new NavItem(Page.Storage, "Storage", "Harddisk"),
             new NavItem(Page.Dikecualikan, "Dikecualikan", "Block"),
             new NavItem(Page.Dieliminasi, "Dieliminasi", "DeleteSweep"),
+            new NavItem(Page.Duplicates, "Duplikat", "ContentDuplicate"),
+            new NavItem(Page.SaranHdd, "Saran HDD", "ChartBar"),
             new NavItem(Page.ImportExport, "Import / Export", "ImportExport"),
         };
         CurrentViewModel = dashboard;
         dashboard.OpenStorageGamesRequested += storageId => NavigateTo(Page.GameList, storageId);
         importExport.DataChanged += RefreshAll;
     }
+
+    private readonly Services.ThemingService _theming;
+
+    [ObservableProperty]
+    private bool _isLightTheme;
 
     public IReadOnlyList<NavItem> NavItems { get; }
     public DashboardViewModel Dashboard { get; }
@@ -48,10 +62,12 @@ public partial class MainViewModel : ObservableObject
     public ExcludedViewModel Excluded { get; }
     public EliminatedViewModel Eliminated { get; }
     public ImportExportViewModel ImportExport { get; }
+    public DuplicatesViewModel Duplicates { get; }
+    public HddSuggestionViewModel HddSuggestion { get; }
 
     private void RefreshAll()
     {
-        foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated })
+        foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated, Duplicates, HddSuggestion })
         {
             _ = SafeRefresh(vm);
         }
@@ -73,6 +89,8 @@ public partial class MainViewModel : ObservableObject
             Page.Dikecualikan => Excluded,
             Page.Dieliminasi => Eliminated,
             Page.ImportExport => ImportExport,
+            Page.Duplicates => Duplicates,
+            Page.SaranHdd => HddSuggestion,
             _ => Dashboard,
         };
 
@@ -84,6 +102,12 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void Navigate(Page page) => NavigateTo(page);
+
+    [RelayCommand]
+    private void ToggleTheme()
+    {
+        IsLightTheme = _theming.Toggle();
+    }
 
     private static async Task SafeRefresh(IRefreshable refreshable)
     {

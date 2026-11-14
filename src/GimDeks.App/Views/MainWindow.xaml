@@ -33,6 +33,12 @@
         <DataTemplate DataType="{x:Type vm:ImportExportViewModel}">
             <views:ImportExportPage />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:DuplicatesViewModel}">
+            <views:DuplicatesPage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:HddSuggestionViewModel}">
+            <views:HddSuggestionPage />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
@@ -103,7 +109,19 @@
                 </ListBox>
 
                 <StackPanel Grid.Row="2" Margin="8,12">
-                    <TextBlock Text="GimDeks v1.0.0" FontSize="11" Opacity="0.5" />
+                    <Button Command="{Binding ToggleThemeCommand}"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            HorizontalAlignment="Left"
+                            Padding="8,4"
+                            ToolTip="Ganti tema gelap/terang">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Width="18" Height="18" VerticalAlignment="Center"
+                                                     Kind="WeatherNight" />
+                            <TextBlock FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"
+                                       Text="Ganti Tema" />
+                        </StackPanel>
+                    </Button>
+                    <TextBlock Text="GimDeks v1.0.0" FontSize="11" Opacity="0.5" Margin="0,6,0,0" />
                     <TextBlock Text="Offline | Data di %LOCALAPPDATA%\GimDeks" FontSize="10" Opacity="0.4" TextWrapping="Wrap" />
                 </StackPanel>
             </Grid>

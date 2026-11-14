@@ -9,6 +9,7 @@ public sealed class AppSettings
     public double WindowWidth { get; set; } = 1280;
     public double WindowHeight { get; set; } = 800;
     public bool IsMaximized { get; set; }
+    public bool IsLightTheme { get; set; }
 }
 
 /// <summary>Persists window geometry and small UI preferences as JSON next to the database.</summary>
