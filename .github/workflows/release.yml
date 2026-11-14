@@ -66,7 +66,7 @@ jobs:
           $install = @"
           ## Install / Update
 
-          Download ``GimDeks-win-x64.zip`` from Assets below, extract ``GimDeks.exe`` and run it. Verify the zip with ``Get-FileHash -Algorithm SHA256`` against ``SHA256SUMS.txt``. Requires Windows 10 version 1809 or later, or Windows 11 (x64).
+          Download ``GimDeks-win-x64.zip`` from Assets below, extract it anywhere (it contains ``GimDeks.exe`` and an ``assets`` folder; keep both together), then run ``GimDeks.exe``. Verify the zip with ``Get-FileHash -Algorithm SHA256`` against ``SHA256SUMS.txt``. Requires Windows 10 version 1809 or later, or Windows 11 (x64).
 
           <br>
 
@@ -76,7 +76,7 @@ jobs:
 
           ## Instalasi / Update
 
-          Unduh ``GimDeks-win-x64.zip`` dari Assets di bawah, ekstrak ``GimDeks.exe``, lalu jalankan. Verifikasi zip dengan ``Get-FileHash -Algorithm SHA256`` terhadap ``SHA256SUMS.txt``. Membutuhkan Windows 10 versi 1809 atau lebih baru, atau Windows 11 (x64).
+          Unduh ``GimDeks-win-x64.zip`` dari Assets di bawah, ekstrak ke mana pun (berisi ``GimDeks.exe`` dan folder ``assets``; simpan keduanya bersama-sama), lalu jalankan ``GimDeks.exe``. Verifikasi zip dengan ``Get-FileHash -Algorithm SHA256`` terhadap ``SHA256SUMS.txt``. Membutuhkan Windows 10 versi 1809 atau lebih baru, atau Windows 11 (x64).
           "@
           $body = "# English`n`n$enBody`n`n<br>`n`n---`n`n<br>`n`n# Bahasa Indonesia`n`n$idBody`n`n<br>`n`n---`n`n<br>`n`n$install"
           Set-Content -Path out/release-notes.md -Value $body -Encoding utf8
