@@ -14,4 +14,5 @@ public interface IGameRepository
     Task DeleteAllAsync(CancellationToken ct = default);
     Task MoveToStorageAsync(IReadOnlyList<long> gameIds, long? targetStorageId, CancellationToken ct = default);
     Task<int> CountByStorageAsync(long storageId, CancellationToken ct = default);
+    Task<bool> ExistsByNameInStorageAsync(string nama, long? storageId, CancellationToken ct = default);
 }

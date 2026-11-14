@@ -98,6 +98,17 @@ public sealed class GameRepository : IGameRepository
         }
     }
 
+    public async Task<bool> ExistsByNameInStorageAsync(string nama, long? storageId, CancellationToken ct = default)
+    {
+        const string sql = """
+            SELECT COUNT(1) FROM game
+            WHERE lower(nama) = lower(@Nama) AND storage_id IS @StorageId;
+            """;
+        using var connection = _factory.CreateConnection();
+        var count = await connection.ExecuteScalarAsync<long>(new CommandDefinition(sql, new { Nama = nama, StorageId = storageId }, cancellationToken: ct));
+        return count > 0;
+    }
+
     public async Task<int> CountByStorageAsync(long storageId, CancellationToken ct = default)
     {
         using var connection = _factory.CreateConnection();
