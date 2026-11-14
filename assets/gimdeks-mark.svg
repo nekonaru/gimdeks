@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- GimDeks mark. Teal tile, tinta controller, amber index tab. -->
+  <rect x="0" y="0" width="512" height="512" rx="112" fill="#2EE6C5"/>
+  <rect x="279" y="150" width="72" height="21" rx="10.5" fill="#FFB020"/>
+  <rect x="82" y="215" width="348" height="151" rx="75.5" fill="#0F1226"/>
+  <rect x="139" y="258" width="30" height="68" rx="7" fill="#2EE6C5"/>
+  <rect x="116" y="276.5" width="78" height="30" rx="7" fill="#2EE6C5"/>
+  <circle cx="315" cy="258" r="12" fill="#2EE6C5"/>
+  <circle cx="343" cy="282" r="10" fill="#2EE6C5"/>
+  <circle cx="351" cy="315" r="15" fill="#FFB020"/>
+</svg>
