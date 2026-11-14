@@ -11,7 +11,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GimDeks.Core\GimDeks.Core.csproj" />
+    <ProjectReference Include="..\GimDeks.Data\GimDeks.Data.csproj" />
     <PackageReference Include="ClosedXML" Version="0.105.0" />
   </ItemGroup>
 
 </Project>
+
