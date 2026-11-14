@@ -68,6 +68,10 @@
                 </Button>
                 <Button Content="Ubah" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding EditGameCommand}" Margin="0,0,8,0" />
+                <Button Content="Pindah ke..." Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Command="{Binding MoveToStorageCommand}" Margin="0,0,8,0" />
+                <Button Content="Ubah Status..." Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Command="{Binding ChangeStatusCommand}" Margin="0,0,8,0" />
                 <Button Content="Hapus" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding DeleteGamesCommand}" Foreground="#FF8A8A" BorderBrush="#FF8A8A" />
             </StackPanel>

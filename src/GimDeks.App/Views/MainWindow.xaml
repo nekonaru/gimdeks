@@ -21,6 +21,18 @@
         <DataTemplate DataType="{x:Type vm:GameListViewModel}">
             <views:GameListPage />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:StorageViewModel}">
+            <views:StoragePage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ExcludedViewModel}">
+            <views:StatusListPage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:EliminatedViewModel}">
+            <views:StatusListPage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ImportExportViewModel}">
+            <views:ImportExportPage />
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
