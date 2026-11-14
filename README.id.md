@@ -123,7 +123,7 @@ GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan S
 ### Opsi A: Unduh executable (paling mudah)
 
 1. Buka halaman [rilis terbaru](https://github.com/nekonaru/gimdeks/releases/latest).
-2. Unduh `GimDeks-win-x64.zip` lalu ekstrak.
+2. Unduh `GimDeks-win-x64.zip` lalu ekstrak ke mana pun (berisi `GimDeks.exe` dan folder `assets`; simpan keduanya bersama-sama).
 3. Jalankan `GimDeks.exe`. Tidak perlu instalasi.
 4. Data kamu berada di `%LOCALAPPDATA%\GimDeks`. Salin folder itu untuk backup manual.
 

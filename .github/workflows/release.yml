@@ -38,12 +38,14 @@ jobs:
           --self-contained true
           -p:PublishSingleFile=true
           -p:PublishTrimmed=false
+          -p:IncludeNativeLibrariesForSelfExtract=true
           --output out/publish
 
       - name: Package artifact and checksum
         shell: pwsh
         run: |
-          Compress-Archive -Path out/publish/GimDeks.exe -DestinationPath out/GimDeks-win-x64.zip
+          if (-not (Test-Path out/publish/GimDeks.exe)) { throw "GimDeks.exe not found in publish output" }
+          Compress-Archive -Path out/publish/GimDeks.exe, out/publish/assets -DestinationPath out/GimDeks-win-x64.zip
           $hash = (Get-FileHash out/GimDeks-win-x64.zip -Algorithm SHA256).Hash.ToLower()
           "GimDeks-win-x64.zip  $hash" | Out-File out/SHA256SUMS.txt -Encoding ascii
 
