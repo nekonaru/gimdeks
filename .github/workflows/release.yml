@@ -56,7 +56,7 @@ jobs:
           $en = Get-Content CHANGELOG.md -Raw -Encoding utf8
           $id = Get-Content CHANGELOG.id.md -Raw -Encoding utf8
           function Get-Section($content, $ver) {
-            $pattern = "(?ms)^## v$([regex]::Escape($ver))\s*$(.*?)(?=^## v|\z)"
+            $pattern = '(?ms)^## v' + [regex]::Escape($ver) + '\s*$(.*?)(?=^## v|\z)'
             $m = [regex]::Match($content, $pattern)
             if (-not $m.Success) { throw "Section v$ver not found in changelog" }
             return $m.Groups[1].Value.Trim()
