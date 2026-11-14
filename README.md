@@ -123,7 +123,7 @@ GimDeks manages a game collection across multiple drives (external HDDs, laptop 
 ### Option A: Download the executable (easiest)
 
 1. Go to the [latest release](https://github.com/nekonaru/gimdeks/releases/latest).
-2. Download `GimDeks-win-x64.zip` and extract it.
+2. Download `GimDeks-win-x64.zip` and extract it anywhere (it contains `GimDeks.exe` and an `assets` folder; keep both together).
 3. Run `GimDeks.exe`. No installation wizard needed.
 4. Your data lives in `%LOCALAPPDATA%\GimDeks`. Copy the folder to back up everything manually.
 

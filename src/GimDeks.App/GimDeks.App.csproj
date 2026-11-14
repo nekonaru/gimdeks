@@ -12,6 +12,7 @@
     <AssemblyVersion>1.0.0.1</AssemblyVersion>
     <FileVersion>1.0.0.1</FileVersion>
     <ApplicationIcon>assets\gimdeks.ico</ApplicationIcon>
+    <AssemblyName>GimDeks</AssemblyName>
     <Company>Nicolas Dwi Dharma</Company>
     <Product>GimDeks</Product>
     <Description>Pengganti file Excel koleksi game: kelola koleksi game lintas drive dengan hitungan otomatis.</Description>
@@ -33,6 +34,9 @@
     <Content Include="assets\gimdeks-mark.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
+
+
+
 
 
 
