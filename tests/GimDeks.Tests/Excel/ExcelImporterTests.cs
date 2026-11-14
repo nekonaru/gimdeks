@@ -197,7 +197,7 @@ public sealed class ExcelImporterTests : IDisposable
         var gameRepo = new GameRepository(factory);
         var storageRepo = new StorageRepository(factory);
         var backup = new DatabaseBackupService(factory, Path.Combine(Path.GetDirectoryName(dbPath)!, "backups"));
-        var service = new ExcelImportService(new ExcelImporter(), gameRepo, storageRepo, new ReplaceAllService(factory), backup);
+        var service = new ExcelImportService(new ExcelImporter(), factory, storageRepo, backup);
         return (service, gameRepo, storageRepo, factory);
     }
 

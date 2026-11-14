@@ -21,17 +21,17 @@ public static class NumberParser
 
         var text = raw.Trim();
 
-        if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var invariant))
+        if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var invariant) && double.IsFinite(invariant))
         {
             return invariant;
         }
 
-        if (double.TryParse(text, NumberStyles.Float, IndonesianCulture, out var indonesian))
+        if (double.TryParse(text, NumberStyles.Float, IndonesianCulture, out var indonesian) && double.IsFinite(indonesian))
         {
             return indonesian;
         }
 
-        if (double.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out var current))
+        if (double.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out var current) && double.IsFinite(current))
         {
             return current;
         }

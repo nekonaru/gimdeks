@@ -20,6 +20,13 @@ public sealed partial class ExcelImporter
             throw new FileNotFoundException("File Excel tidak ditemukan.", filePath);
         }
 
+        const long maxBytes = 50L * 1024 * 1024; // 50 MB is far above any sane collection file
+        var fileSize = new FileInfo(filePath).Length;
+        if (fileSize > maxBytes)
+        {
+            throw new InvalidDataException($"File Excel terlalu besar ({fileSize / (1024 * 1024)} MB). Batas maksimal 50 MB.");
+        }
+
         using var workbook = new XLWorkbook(filePath);
 
         var games = new List<GamePreview>();

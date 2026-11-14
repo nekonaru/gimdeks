@@ -37,6 +37,13 @@ public class NumberParserTests
         }
     }
 
+    [Fact]
+    public void RejectsNonFiniteValue()
+    {
+        Assert.Null(NumberParser.ParseGb("1e999"));
+        Assert.Null(NumberParser.ParseGb("-1e999"));
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
