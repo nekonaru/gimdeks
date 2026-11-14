@@ -72,6 +72,10 @@ public partial class App : Application
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<DashboardViewModel>();
         services.AddSingleton<GameListViewModel>();
+        services.AddSingleton<StorageViewModel>();
+        services.AddSingleton<ExcludedViewModel>();
+        services.AddSingleton<EliminatedViewModel>();
+        services.AddSingleton<ImportExportViewModel>();
 
         return services.BuildServiceProvider();
     }

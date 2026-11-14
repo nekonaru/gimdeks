@@ -245,5 +245,57 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
 
         await ReloadAsync();
     }
+
+    [RelayCommand]
+    private async Task MoveToStorageAsync()
+    {
+        if (SelectedRows.Count == 0)
+        {
+            return;
+        }
+
+        var storages = await _storageRepository.GetAllAsync();
+        var target = Views.StoragePickerDialog.Show(storages, "Pindahkan ke Storage");
+        if (target is null)
+        {
+            return;
+        }
+
+        var ids = SelectedRows.Select(r => r.Game.Id).ToList();
+        await _gameRepository.MoveToStorageAsync(ids, target.Id);
+        await ReloadAsync();
+    }
+
+    [RelayCommand]
+    private async Task ChangeStatusAsync()
+    {
+        if (SelectedRows.Count == 0)
+        {
+            return;
+        }
+
+        var current = SelectedRows[0].Game.Status;
+        var result = Views.StatusChangeDialog.Show(current);
+        if (result is not { } changed)
+        {
+            return;
+        }
+
+        foreach (var row in SelectedRows.ToList())
+        {
+            var game = row.Game;
+            game.Status = changed.Status;
+            game.Alasan = changed.Alasan;
+            if (changed.Status is GameStatus.Dikecualikan or GameStatus.Dieliminasi)
+            {
+                // Excluded statuses belong to no storage by definition.
+                game.StorageId = null;
+            }
+
+            await _gameRepository.UpdateAsync(game);
+        }
+
+        await ReloadAsync();
+    }
 }
 

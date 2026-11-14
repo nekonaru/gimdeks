@@ -15,22 +15,47 @@ public partial class MainViewModel : ObservableObject
 
     public MainViewModel(
         DashboardViewModel dashboard,
-        GameListViewModel gameList)
+        GameListViewModel gameList,
+        StorageViewModel storage,
+        ExcludedViewModel excluded,
+        EliminatedViewModel eliminated,
+        ImportExportViewModel importExport)
     {
         Dashboard = dashboard;
         GameList = gameList;
+        Storage = storage;
+        Excluded = excluded;
+        Eliminated = eliminated;
+        ImportExport = importExport;
         NavItems = new[]
         {
             new NavItem(Page.Dashboard, "Dashboard", "ViewDashboard"),
             new NavItem(Page.GameList, "Daftar Game", "ControllerClassic"),
+            new NavItem(Page.Storage, "Storage", "Harddisk"),
+            new NavItem(Page.Dikecualikan, "Dikecualikan", "Block"),
+            new NavItem(Page.Dieliminasi, "Dieliminasi", "DeleteSweep"),
+            new NavItem(Page.ImportExport, "Import / Export", "ImportExport"),
         };
         CurrentViewModel = dashboard;
         dashboard.OpenStorageGamesRequested += storageId => NavigateTo(Page.GameList, storageId);
+        importExport.DataChanged += RefreshAll;
     }
 
     public IReadOnlyList<NavItem> NavItems { get; }
     public DashboardViewModel Dashboard { get; }
     public GameListViewModel GameList { get; }
+    public StorageViewModel Storage { get; }
+    public ExcludedViewModel Excluded { get; }
+    public EliminatedViewModel Eliminated { get; }
+    public ImportExportViewModel ImportExport { get; }
+
+    private void RefreshAll()
+    {
+        foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated })
+        {
+            _ = SafeRefresh(vm);
+        }
+    }
 
     public void NavigateTo(Page page, long? storageFilter = null)
     {
@@ -44,6 +69,10 @@ public partial class MainViewModel : ObservableObject
         {
             Page.Dashboard => Dashboard,
             Page.GameList => GameList,
+            Page.Storage => Storage,
+            Page.Dikecualikan => Excluded,
+            Page.Dieliminasi => Eliminated,
+            Page.ImportExport => ImportExport,
             _ => Dashboard,
         };
 
@@ -52,6 +81,9 @@ public partial class MainViewModel : ObservableObject
             _ = SafeRefresh(refreshable);
         }
     }
+
+    [RelayCommand]
+    private void Navigate(Page page) => NavigateTo(page);
 
     private static async Task SafeRefresh(IRefreshable refreshable)
     {
@@ -64,7 +96,4 @@ public partial class MainViewModel : ObservableObject
             // Refresh failures surface as the last known-good page content; the next action retries.
         }
     }
-
-    [RelayCommand]
-    private void Navigate(Page page) => NavigateTo(page);
 }
