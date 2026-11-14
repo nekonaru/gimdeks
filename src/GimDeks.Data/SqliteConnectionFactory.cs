@@ -20,5 +20,13 @@ public sealed class SqliteConnectionFactory
 
     public string DatabasePath { get; }
 
-    public SqliteConnection CreateConnection() => new(_connectionString);
+    public SqliteConnection CreateConnection()
+    {
+        var connection = new SqliteConnection(_connectionString);
+        connection.Open();
+        using var pragma = connection.CreateCommand();
+        pragma.CommandText = "PRAGMA foreign_keys = ON;";
+        pragma.ExecuteNonQuery();
+        return connection;
+    }
 }

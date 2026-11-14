@@ -24,9 +24,8 @@ public sealed class ExcelExporterTests : IDisposable
         var backupDir = Path.Combine(_tempDir, "backups-" + Guid.NewGuid().ToString("N"));
         var service = new ExcelImportService(
             new ExcelImporter(),
-            new GameRepository(factory),
+            factory,
             new StorageRepository(factory),
-            new ReplaceAllService(factory),
             new DatabaseBackupService(factory, backupDir));
         await service.ImportAsync(source, ImportMode.GantiSemua);
     }
@@ -93,9 +92,8 @@ public sealed class ExcelExporterTests : IDisposable
         var backupDir = Path.Combine(_tempDir, "backups-roundtrip");
         var service = new ExcelImportService(
             new ExcelImporter(),
-            new GameRepository(reFactory),
+            reFactory,
             new StorageRepository(reFactory),
-            new ReplaceAllService(reFactory),
             new DatabaseBackupService(reFactory, backupDir));
 
         var preview = service.Preview(exportPath);

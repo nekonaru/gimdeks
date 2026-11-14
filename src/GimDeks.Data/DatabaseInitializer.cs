@@ -65,8 +65,7 @@ public sealed class DatabaseInitializer
             Directory.CreateDirectory(directory);
         }
 
-        using var connection = _factory.CreateConnection();
-        connection.Open();
+        using var connection = _factory.CreateConnection(); // already open; foreign keys enabled in the factory
 
         var version = GetUserVersion(connection);
         for (var index = version; index < Migrations.Length; index++)

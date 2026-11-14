@@ -61,7 +61,6 @@ public partial class App : Application
         services.AddSingleton(new DatabaseBackupService(
             new SqliteConnectionFactory(databasePath),
             DatabasePaths.ResolveBackupsDirectory()));
-        services.AddSingleton<ReplaceAllService>();
         services.AddSingleton<IStorageRepository, StorageRepository>();
         services.AddSingleton<IGameRepository, GameRepository>();
         services.AddSingleton<IHistoryRepository, HistoryRepository>();
@@ -88,6 +87,11 @@ public partial class App : Application
         try
         {
             Directory.CreateDirectory(DatabasePaths.AppDataDirectory);
+            if (File.Exists(LogPath) && new FileInfo(LogPath).Length > 1_000_000)
+            {
+                File.Move(LogPath, LogPath + ".old", overwrite: true);
+            }
+
             File.AppendAllText(LogPath,
                 $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {exception}\n\n");
         }

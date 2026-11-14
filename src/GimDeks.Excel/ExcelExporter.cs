@@ -36,26 +36,64 @@ public sealed class ExcelExporter
             .OrderBy(g => g.Urutan).ThenBy(g => g.Nama, StringComparer.CurrentCultureIgnoreCase).ToList();
 
         var orderedStorages = storages.OrderBy(s => s.Urutan).ThenBy(s => s.Nama, StringComparer.CurrentCultureIgnoreCase).ToList();
+        var sheetNames = BuildSheetNames(orderedStorages);
         foreach (var storage in orderedStorages)
         {
             gamesByStorage.TryGetValue(storage.Id, out var storageGames);
             storageGames ??= new List<Game>();
-            WriteStorageSheet(workbook, storage, storageGames);
+            WriteStorageSheet(workbook, storage, storageGames, sheetNames[storage.Id]);
         }
 
         WriteExcludedSheet(workbook, excluded);
         WriteEliminatedSheet(workbook, eliminated);
-        WriteRingkasanSheet(workbook, orderedStorages, gamesByStorage, excluded);
+        WriteRingkasanSheet(workbook, orderedStorages, gamesByStorage, excluded, sheetNames);
 
         workbook.SaveAs(filePath, new SaveOptions { EvaluateFormulasBeforeSaving = true });
     }
 
-    private static string SheetName(string name) =>
-        name.Length <= 31 ? name : name[..31];
-
-    private static (int FirstDataRow, int TotalRow) WriteStorageSheet(XLWorkbook workbook, Storage storage, IReadOnlyList<Game> games)
+    private static string SanitizeSheetName(string name)
     {
-        var sheetName = SheetName(storage.Nama);
+        var invalid = new[] { ':', '\\', '/', '?', '*', '[', ']' };
+        var builder = new System.Text.StringBuilder(name.Length);
+        foreach (var ch in name.Trim())
+        {
+            builder.Append(invalid.Contains(ch) ? '-' : ch);
+        }
+
+        var cleaned = builder.ToString().Trim(' ', '\'').Trim();
+        if (cleaned.Length == 0)
+        {
+            cleaned = "Sheet";
+        }
+
+        return cleaned.Length <= 31 ? cleaned : cleaned[..31];
+    }
+
+    private static Dictionary<long, string> BuildSheetNames(IReadOnlyList<Storage> storages)
+    {
+        var used = new HashSet<string>(StringComparer.Ordinal);
+        var names = new Dictionary<long, string>();
+        foreach (var storage in storages)
+        {
+            var candidate = SanitizeSheetName(storage.Nama);
+            var baseName = candidate;
+            var suffix = 2;
+            while (!used.Add(candidate))
+            {
+                var tail = $" {suffix++}";
+                candidate = (baseName.Length + tail.Length > 31 ? baseName[..(31 - tail.Length)] : baseName) + tail;
+            }
+
+            names[storage.Id] = candidate;
+        }
+
+        return names;
+    }
+
+    private static string SheetRef(string sheetName) => "'" + sheetName.Replace("'", "''") + "'";
+
+    private static (int FirstDataRow, int TotalRow) WriteStorageSheet(XLWorkbook workbook, Storage storage, IReadOnlyList<Game> games, string sheetName)
+    {
         var sheet = workbook.Worksheets.Add(sheetName);
         var isHdd = storage.Tipe == StorageType.HddEksternal;
         var totalRow = games.Count + 4;
@@ -223,7 +261,8 @@ public sealed class ExcelExporter
         XLWorkbook workbook,
         IReadOnlyList<Storage> storages,
         IReadOnlyDictionary<long, List<Game>> gamesByStorage,
-        IReadOnlyList<Game> excluded)
+        IReadOnlyList<Game> excluded,
+        IReadOnlyDictionary<long, string> sheetNames)
     {
         var sheet = workbook.Worksheets.Add("Ringkasan");
         sheet.Cell(1, 1).Value = "HDD / Kategori";
@@ -252,7 +291,7 @@ public sealed class ExcelExporter
             var count = list.Count;
             var dataEnd = count + 3;
             var totalRow = count + 4;
-            var sheetRef = $"'{SheetName(storage.Nama)}'";
+            var sheetRef = SheetRef(sheetNames[storage.Id]);
 
             sheet.Cell(row, 1).Value = $"{storage.Nama} {labelSuffix}".TrimEnd();
             sheet.Cell(row, 2).FormulaA1 = $"COUNTA({sheetRef}!B4:B{dataEnd})";
