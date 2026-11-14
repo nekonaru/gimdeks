@@ -267,6 +267,33 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     }
 
     [RelayCommand]
+    private async Task SplitVersionsAsync()
+    {
+        if (SelectedRows.Count == 0)
+        {
+            return;
+        }
+
+        var changed = 0;
+        foreach (var row in SelectedRows.ToList())
+        {
+            var (name, versi) = GameNameVersionSplitter.Split(row.Game.Nama);
+            if (versi is null || (name == row.Game.Nama && row.Game.Versi == versi))
+            {
+                continue;
+            }
+
+            var game = row.Game;
+            game.Nama = name;
+            game.Versi = versi;
+            await _gameRepository.UpdateAsync(game);
+            changed++;
+        }
+
+        await ReloadAsync();
+    }
+
+    [RelayCommand]
     private async Task ChangeStatusAsync()
     {
         if (SelectedRows.Count == 0)

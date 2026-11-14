@@ -68,6 +68,7 @@ public partial class App : Application
         services.AddSingleton<ExcelImporter>();
         services.AddSingleton<ExcelImportService>();
         services.AddSingleton<AppSettingsService>();
+        services.AddSingleton<ThemingService>();
 
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<DashboardViewModel>();
@@ -76,6 +77,8 @@ public partial class App : Application
         services.AddSingleton<ExcludedViewModel>();
         services.AddSingleton<EliminatedViewModel>();
         services.AddSingleton<ImportExportViewModel>();
+        services.AddSingleton<DuplicatesViewModel>();
+        services.AddSingleton<HddSuggestionViewModel>();
 
         return services.BuildServiceProvider();
     }

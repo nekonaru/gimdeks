@@ -72,6 +72,9 @@
                         Command="{Binding MoveToStorageCommand}" Margin="0,0,8,0" />
                 <Button Content="Ubah Status..." Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding ChangeStatusCommand}" Margin="0,0,8,0" />
+                <Button Content="Pisahkan Versi" Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Command="{Binding SplitVersionsCommand}" Margin="0,0,8,0"
+                        ToolTip="Pisahkan nomor versi dari nama game terpilih, contoh 'v1.7'" />
                 <Button Content="Hapus" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding DeleteGamesCommand}" Foreground="#FF8A8A" BorderBrush="#FF8A8A" />
             </StackPanel>
