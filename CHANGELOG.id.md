@@ -4,6 +4,37 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v1.1.0
+
+GimDeks sekarang bisa berbicara Bahasa Inggris selain Bahasa Indonesia, meminta izin sebelum setiap aksi online, dan lebih aman terhadap kerusakan data: restore yang lebih aman, mode portabel yang lebih aman, gerbang rilis yang lebih jelas.
+
+## Fitur baru
+
+- **Antarmuka dua bahasa.** Bahasa Indonesia tetap bahasa bawaan; seluruh aplikasi bisa diganti ke bahasa Inggris dari tombol sidebar, dan pilihannya diingat. Angka mengikuti bahasa yang aktif.
+- **Halaman Statistik.** Total koleksi, porsi per storage, 10 game terbesar, rata-rata ukuran, dan kemajuan penyelesaian.
+- **Tag dan penyelesaian.** Tag buatan sendiri, dipisah koma, dan tanda selesai per game; keduanya bisa difilter; statistik penyelesaian ada di halaman statistik.
+- **Cover Steam (opsional).** Satu klik mencari game di Steam dan mengunduh header art sebagai cover. Yang dikirim hanya judul game, dan tidak ada yang terjadi tanpa klik kamu.
+- **Mode portabel.** Satu tombol memindahkan folder data ke sebelah aplikasi; database dan pengaturan ikut berpindah bersama drive eksternal.
+- **Tautan drive.** Hubungkan storage ke huruf drive; dashboard menampilkan lencana saat drive tidak terhubung.
+- **Pemantau import.** Spanduk menawarkan import ulang saat file Excel yang diimport berubah di disk.
+- **Pintasan keyboard.** Ctrl+1 sampai Ctrl+9 ganti halaman, Ctrl+F cari, Ctrl+N tambah game, Ctrl+E export, Ctrl+T ganti tema.
+
+## Peningkatan
+
+- **Polesan antarmuka.** Transisi halaman memudar, sidebar lebih gelap dengan bilah aksen pada item aktif, dan status bar berisi petunjuk pintasan.
+- **Format angka dan tanggal** kini mengikuti bahasa UI yang aktif di seluruh tempat, termasuk layar storage.
+- **Restore bersifat atomik.** Database disalin ke file sementara lalu diganti, sehingga restore yang gagal tidak meninggalkan file setengah tertulis.
+- **Mode portabel mati lebih aman.** Salinan profil yang ada disimpan sebagai backup bertanda waktu (dipulihkan otomatis saat gagal) dan jumlah serta ukuran file tersalin diverifikasi sebelum sumber dihapus.
+- **Pelindung import Excel.** Batas dekompresi (256 MB) sebelum parsing; arsip rusak ditolak sebelum dibuka.
+- **CI dan workflow rilis** kini gagal di atas paket yang rentan, di-parse dari laporan machine-readable, bukan pencocokan teks, dan workflow rilis menjalankan audit yang sama sebelum packaging.
+
+## Perbaikan bug
+
+- **Pengaturan saat jendela ditutup** tidak lagi menghapus bahasa, tema, dan path file hasil import.
+- **Dashboard termuat saat pertama dibuka**, bukan menampilkan keadaan kosong sampai navigasi pertama.
+- **Label navigasi tampil dengan benar** setelah mengganti bahasa.
+- **Pemantau file** tidak lagi berisiko menabrakkan aplikasi saat ditutup.
+
 ## v1.0.0
 
 Rilis publik pertama. GimDeks menggantikan spreadsheet Koleksi_Game.xlsx dengan aplikasi Windows offline yang mengimport file yang sama, melacak kapasitas otomatis, dan mengexportnya kembali.
