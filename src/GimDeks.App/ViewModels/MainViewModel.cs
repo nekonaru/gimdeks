@@ -23,6 +23,7 @@ public partial class MainViewModel : ObservableObject
         ImportExportViewModel importExport,
         DuplicatesViewModel duplicates,
         HddSuggestionViewModel hddSuggestion,
+        StatisticsViewModel statistics,
         Services.ThemingService theming,
         Services.AppSettingsService settings)
     {
@@ -36,6 +37,7 @@ public partial class MainViewModel : ObservableObject
         ImportExport = importExport;
         Duplicates = duplicates;
         HddSuggestion = hddSuggestion;
+        Statistics = statistics;
         _theming = theming;
         IsLightTheme = theming.IsLightTheme;
         NavItems = new[]
@@ -47,6 +49,7 @@ public partial class MainViewModel : ObservableObject
             new NavItem(Page.Dieliminasi, "Dieliminasi", "DeleteSweep"),
             new NavItem(Page.Duplicates, "Duplikat", "ContentDuplicate"),
             new NavItem(Page.SaranHdd, "Saran HDD", "ChartBar"),
+            new NavItem(Page.Statistics, "Statistik", "ChartLine"),
             new NavItem(Page.ImportExport, "Import / Export", "ImportExport"),
         };
         CurrentViewModel = dashboard;
@@ -88,10 +91,11 @@ public partial class MainViewModel : ObservableObject
     public ImportExportViewModel ImportExport { get; }
     public DuplicatesViewModel Duplicates { get; }
     public HddSuggestionViewModel HddSuggestion { get; }
+    public StatisticsViewModel Statistics { get; }
 
     private void RefreshAll()
     {
-        foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated, Duplicates, HddSuggestion })
+        foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated, Duplicates, HddSuggestion, Statistics })
         {
             _ = SafeRefresh(vm);
         }
@@ -149,6 +153,7 @@ public partial class MainViewModel : ObservableObject
             Page.ImportExport => ImportExport,
             Page.Duplicates => Duplicates,
             Page.SaranHdd => HddSuggestion,
+            Page.Statistics => Statistics,
             _ => Dashboard,
         };
 

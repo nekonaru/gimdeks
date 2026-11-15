@@ -10,4 +10,5 @@ public enum Page
     ImportExport,
     Duplicates,
     SaranHdd,
+    Statistics,
 }
