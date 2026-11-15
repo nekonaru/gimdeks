@@ -10,8 +10,27 @@
         Background="{DynamicResource MaterialDesign.Brush.Background}"
         ShowInTaskbar="False">
     <StackPanel Margin="20">
-        <TextBlock Text="Nama Game *" Style="{StaticResource MaterialDesignBody2TextBlock}" Opacity="0.8" />
-        <TextBox x:Name="NamaTextBox" materialDesign:HintAssist.Hint="Contoh: God of War Ragnarok" Margin="0,4,0,12" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="190" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Nama Game *" Style="{StaticResource MaterialDesignBody2TextBlock}" Opacity="0.8" />
+                <TextBox x:Name="NamaTextBox" materialDesign:HintAssist.Hint="Contoh: God of War Ragnarok" Margin="0,4,0,12" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="10,0,0,0" HorizontalAlignment="Center">
+                <Border BorderBrush="#243B34" BorderThickness="1" CornerRadius="8" Padding="2" Width="180" Height="84"
+                        Background="#121A18">
+                    <Image x:Name="CoverImage" Stretch="Uniform" />
+                </Border>
+                <Button x:Name="FetchCoverButton" Content="Ambil Cover (Internet)"
+                        Style="{StaticResource MaterialDesignOutlinedButton}" Padding="6,2" FontSize="11"
+                        Margin="0,6,0,0" Click="FetchCoverButton_OnClick"
+                        ToolTip="Online: mencari game di Steam dan mengunduh header art-nya. Hanya judul game yang dikirim." />
+                <TextBlock x:Name="CoverHintText" Text="Aktif hanya untuk game yang sudah tersimpan." FontSize="10" Opacity="0.5" Margin="0,4,0,0" TextAlignment="Center" />
+            </StackPanel>
+        </Grid>
 
         <Grid>
             <Grid.ColumnDefinitions>

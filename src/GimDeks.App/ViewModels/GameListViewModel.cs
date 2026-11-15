@@ -64,6 +64,9 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     [ObservableProperty]
     private string _summaryText = "";
 
+    [ObservableProperty]
+    private string _statusText = "";
+
     public GameListViewModel(IGameRepository gameRepository, IStorageRepository storageRepository, ITagRepository tagRepository)
     {
         _gameRepository = gameRepository;
@@ -246,6 +249,47 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
 
         var selesaiCount = filtered.Count(g => g.SelesaiMain);
         SummaryText = $"{rows.Count} game ditampilkan | {selesaiCount} sudah selesai";
+    }
+
+    [RelayCommand]
+    private async Task DownloadCoversAsync()
+    {
+        var rows = SelectedRows.ToList();
+        if (rows.Count == 0)
+        {
+            StatusText = "Pilih game yang ingin diunduh cover-nya (Ctrl+klik atau klik).";
+            return;
+        }
+
+        if (!DialogService.Confirm(
+                "Unduh Cover (Internet)",
+                $"{rows.Count} game akan dicari di Steam dan cover-nya diunduh dari CDN Steam.\n" +
+                "Data yang dikirim ke internet hanya judul game. Lanjutkan?"))
+        {
+            return;
+        }
+
+        var service = new Services.SteamCoverService();
+        var ok = 0;
+        foreach (var (row, index) in rows.Select((r, i) => (r, i)))
+        {
+            StatusText = $"Mengunduh cover... ({index + 1}/{rows.Count}) {row.Game.Nama}";
+            try
+            {
+                var result = await service.FetchCoverAsync(row.Game.Nama, row.Game.Id);
+                if (result is not null)
+                {
+                    ok++;
+                }
+            }
+            catch
+            {
+                // Continue with the next one.
+            }
+        }
+
+        StatusText = $"Cover diunduh untuk {ok} dari {rows.Count} game.";
+        await ReloadAsync();
     }
 
     [RelayCommand]

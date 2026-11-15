@@ -17,6 +17,7 @@
             <views:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
             <views:CountToVisibilityInverseConverter x:Key="CountToVisibilityInverseConverter" />
             <views:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+            <views:GameIdToCoverConverter x:Key="GameIdToCoverConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </Application.Resources>
