@@ -7,6 +7,7 @@
   <a href="https://github.com/nekonaru/gimdeks/releases/latest"><img src="https://img.shields.io/badge/.NET-8-512BD4?style=flat-square" alt=".NET" /></a>
   <a href="https://github.com/nekonaru/gimdeks/releases/latest"><img src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D6?style=flat-square" alt="Platform" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="Lisensi" /></a>
+  <img src="https://img.shields.io/badge/status-active-brightgreen?style=flat-square" alt="Status" />
 </div>
 
 <br />
@@ -21,6 +22,7 @@
 ## Daftar Isi
 
 - [Tentang](#tentang)
+- [Tangkapan Layar](#tangkapan-layar)
 - [Fitur](#fitur)
 - [Kebutuhan](#kebutuhan)
 - [Instalasi](#instalasi)
@@ -29,6 +31,7 @@
 - [Struktur Proyek](#struktur-proyek)
 - [Pengembangan](#pengembangan)
 - [Pengujian](#pengujian)
+- [Keamanan](#keamanan)
 - [Continuous Integration](#continuous-integration)
 - [FAQ](#faq)
 - [Penulis](#penulis)
@@ -41,6 +44,18 @@
 GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan SSD laptop) dan menghitung ulang setiap total secara otomatis. File Excel lama kamu (Koleksi_Game.xlsx) bisa diimport sekali klik dengan pratinjau lengkap, lalu diexport kembali dengan tata letak yang sama dan rumus total yang aktif.
 
 > _"Rak game kamu, tanpa spreadsheet."_
+
+---
+
+## Tangkapan Layar
+
+![Dashboard saat pertama dibuka](assets/screenshots/dashboard.png)
+
+*Dashboard saat pertama dibuka, sebelum koleksi diimport.*
+
+![Layar Import / Export](assets/screenshots/importexport.png)
+
+*Mengimport Koleksi_Game.xlsx dengan pratinjau, plus export, backup, dan restore.*
 
 ---
 
@@ -270,6 +285,15 @@ dotnet test GimDeks.slnx
 | Gerbang coverage di CI | Minimal 60% line coverage pada Core/Data/Excel |
 
 Konfigurasi lint memakai set default C#; solution ter-build tanpa warning.
+
+---
+
+## Keamanan
+
+GimDeks sepenuhnya offline: tidak membuat panggilan jaringan sama sekali dan tidak mengirim apa pun ke luar. Koleksi game kamu tetap di PC dalam satu file SQLite di `%LOCALAPPDATA%\GimDeks`, dan setiap import selalu didahului backup database otomatis. Dependensi diaudit di CI dan secret dipindai sebelum setiap perubahan di-merge. Binary rilis tidak ditandatangani; verifikasi unduhan `GimDeks-win-x64.zip` terhadap `SHA256SUMS.txt`, atau bangun sendiri dengan Opsi B di atas.
+
+> [!NOTE]
+> Untuk melaporkan kerentanan secara privat, gunakan jalur di [`SECURITY.md`](SECURITY.md).
 
 ---
 

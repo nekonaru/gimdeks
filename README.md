@@ -7,6 +7,7 @@
   <a href="https://github.com/nekonaru/gimdeks/releases/latest"><img src="https://img.shields.io/badge/.NET-8-512BD4?style=flat-square" alt=".NET" /></a>
   <a href="https://github.com/nekonaru/gimdeks/releases/latest"><img src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D6?style=flat-square" alt="Platform" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License" /></a>
+  <img src="https://img.shields.io/badge/status-active-brightgreen?style=flat-square" alt="Status" />
 </div>
 
 <br />
@@ -21,6 +22,7 @@
 ## Table of Contents
 
 - [About](#about)
+- [Screenshots](#screenshots)
 - [Features](#features)
 - [Requirements](#requirements)
 - [Installation](#installation)
@@ -29,6 +31,7 @@
 - [Project Structure](#project-structure)
 - [Development](#development)
 - [Testing](#testing)
+- [Security](#security)
 - [Continuous Integration](#continuous-integration)
 - [FAQ](#faq)
 - [Author](#author)
@@ -41,6 +44,18 @@
 GimDeks manages a game collection across multiple drives (external HDDs, laptop HDDs, and a laptop SSD) and recalculates every total automatically. Your old Excel file (Koleksi_Game.xlsx) imports in one click with a full preview, and exports back out with the same layout and live total formulas.
 
 > _"Your game shelf, without the spreadsheet."_
+
+---
+
+## Screenshots
+
+![Dashboard on first launch](assets/screenshots/dashboard.png)
+
+*Dashboard on first launch, before a collection is imported.*
+
+![Import / Export screen](assets/screenshots/importexport.png)
+
+*Importing Koleksi_Game.xlsx with preview, plus export, backup, and restore.*
 
 ---
 
@@ -270,6 +285,15 @@ dotnet test GimDeks.slnx
 | Coverage gate in CI | At least 60% line coverage on Core/Data/Excel |
 
 Lint configuration is the default C# recommended set; the solution builds warning-free.
+
+---
+
+## Security
+
+GimDeks is fully offline: it makes no network requests and sends nothing anywhere. Your game collection stays on your PC in a single SQLite file under `%LOCALAPPDATA%\GimDeks`, and every import is preceded by an automatic database backup. Dependencies are audited in CI and secrets are scanned before every change merges. The release binary is unsigned; verify the `GimDeks-win-x64.zip` download against `SHA256SUMS.txt`, or build from source with Option B above.
+
+> [!NOTE]
+> To report a vulnerability privately, use the route in [`SECURITY.md`](SECURITY.md).
 
 ---
 
