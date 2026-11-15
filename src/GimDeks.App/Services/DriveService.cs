@@ -18,7 +18,9 @@ public sealed class DriveService
             get
             {
                 var gb = FreeBytes / 1024.0 / 1024.0 / 1024.0;
-                return gb >= 1024 ? $"Kosong {gb / 1024:0.0} TB" : $"Kosong {gb:0.0} GB";
+                return gb >= 1024
+                    ? Services.Loc.Format("Ui_DriveFreeTb", (gb / 1024).ToString("0.0", Services.AppCulture.Current))
+                    : Services.Loc.Format("Ui_DriveFreeGb", gb.ToString("0.0", Services.AppCulture.Current));
             }
         }
     }

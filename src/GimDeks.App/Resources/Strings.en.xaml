@@ -298,6 +298,8 @@ Only the game title is sent to the internet. Continue?</sys:String>
   <sys:String x:Key="Ui_Import_ExportTitle">Export to Excel</sys:String>
   <sys:String x:Key="Ui_Import_RestoreTitle">Restore from Backup</sys:String>
   <sys:String x:Key="Ui_Storage_DriveNone">Not linked</sys:String>
+  <sys:String x:Key="Ui_DriveFreeGb">Free {0} GB</sys:String>
+  <sys:String x:Key="Ui_DriveFreeTb">Free {0} TB</sys:String>
   <sys:String x:Key="Ui_ExcludedSummary">{0} excluded | {1} eliminated | {2} completed</sys:String>
   <sys:String x:Key="Ui_Duplicates_EliminateTitle">Eliminate Duplicates</sys:String>
   <sys:String x:Key="Ui_FromLimit">of {0} GB limit</sys:String>

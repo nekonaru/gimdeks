@@ -154,7 +154,30 @@ public partial class MainViewModel : ObservableObject
 
     private void OnWatchedFileChanged(object sender, FileSystemEventArgs e)
     {
-        System.Windows.Application.Current.Dispatcher.Invoke(() => ShowExcelChangedBanner = true);
+        try
+        {
+            if (System.Windows.Application.Current?.Dispatcher is { } dispatcher)
+            {
+                dispatcher.BeginInvoke(() =>
+                {
+                    if (!ShowExcelChangedBanner)
+                    {
+                        ShowExcelChangedBanner = true;
+                    }
+                });
+            }
+        }
+        catch
+        {
+            // The watcher must never crash the process; the banner is best effort.
+        }
+    }
+
+    /// <summary>Stop watching the imported file; called when the window closes.</summary>
+    public void StopWatcher()
+    {
+        _watcher?.Dispose();
+        _watcher = null;
     }
 
     public void NavigateTo(Page page, long? storageFilter = null)

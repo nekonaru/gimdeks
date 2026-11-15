@@ -24,8 +24,10 @@ public sealed partial class ExcelImporter
         var fileSize = new FileInfo(filePath).Length;
         if (fileSize > maxBytes)
         {
-            throw new InvalidDataException($"File Excel terlalu besar ({fileSize / (1024 * 1024)} MB). Batas maksimal 50 MB.");
+            throw new InvalidDataException($"The Excel file is too large ({fileSize / (1024 * 1024)} MB). Maximum size is 50 MB.");
         }
+
+        CheckDecompressionBudget(filePath);
 
         using var workbook = new XLWorkbook(filePath);
 
@@ -100,6 +102,25 @@ public sealed partial class ExcelImporter
             Warnings = warnings,
             Ringkasan = ringkasan,
         };
+    }
+
+    /// <summary>
+    /// An .xlsx is a zip. Reject it up front if the decompressed payload would be
+    /// unreasonably large (decompression bomb) before ClosedXML expands it.
+    /// </summary>
+    private static void CheckDecompressionBudget(string filePath)
+    {
+        const long maxUncompressedBytes = 256L * 1024 * 1024; // 256 MB decompressed
+        using var zip = System.IO.Compression.ZipFile.OpenRead(filePath);
+        long total = 0;
+        foreach (var entry in zip.Entries)
+        {
+            total += entry.Length;
+            if (total > maxUncompressedBytes)
+            {
+                throw new InvalidDataException("The Excel file expands to too much data when decompressed. Maximum is 256 MB.");
+            }
+        }
     }
 
     private static bool IsRingkasan(string sheetName) =>

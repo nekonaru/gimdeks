@@ -298,6 +298,8 @@ Data yang dikirim ke internet hanya judul game. Lanjutkan?</sys:String>
   <sys:String x:Key="Ui_Import_ExportTitle">Ekspor ke Excel</sys:String>
   <sys:String x:Key="Ui_Import_RestoreTitle">Pulihkan dari Backup</sys:String>
   <sys:String x:Key="Ui_Storage_DriveNone">Tidak terhubung</sys:String>
+  <sys:String x:Key="Ui_DriveFreeGb">Kosong {0} GB</sys:String>
+  <sys:String x:Key="Ui_DriveFreeTb">Kosong {0} TB</sys:String>
   <sys:String x:Key="Ui_ExcludedSummary">{0} dikecualikan | {1} dieliminasi | {2} selesai</sys:String>
   <sys:String x:Key="Ui_Duplicates_EliminateTitle">Eliminasi Duplikat</sys:String>
   <sys:String x:Key="Ui_FromLimit">dari batas {0} GB</sys:String>

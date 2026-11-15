@@ -99,11 +99,14 @@ public partial class App : Application
             }
 
             File.AppendAllText(LogPath,
-                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {exception}\n\n");
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {RedactPaths(exception.ToString())}\n\n");
         }
         catch
         {
             // Never crash while reporting a crash.
         }
     }
+
+    private static string RedactPaths(string text) =>
+        System.Text.RegularExpressions.Regex.Replace(text, @"[A-Za-z]:\\[^\r\n""']*", "<path>");
 }
