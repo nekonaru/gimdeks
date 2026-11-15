@@ -15,6 +15,7 @@ public sealed class GameRow
 
     public required Game Game { get; init; }
     public required string StorageName { get; init; }
+    public string TagsText { get; init; } = "";
     public string UkuranText => $"{Game.UkuranGb.ToString("N1", IdId)} GB";
     public string StatusText => Game.Status switch
     {
@@ -35,6 +36,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
 {
     private readonly IGameRepository _gameRepository;
     private readonly IStorageRepository _storageRepository;
+    private readonly ITagRepository _tagRepository;
     private List<Game> _allGames = new();
     private List<Storage> _allStorages = new();
 
@@ -54,12 +56,19 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     private string _maxSize = "";
 
     [ObservableProperty]
+    private FilterOption _selectedTag = FilterOption.All;
+
+    [ObservableProperty]
+    private FilterOption _selectedSelesai = FilterOption.All;
+
+    [ObservableProperty]
     private string _summaryText = "";
 
-    public GameListViewModel(IGameRepository gameRepository, IStorageRepository storageRepository)
+    public GameListViewModel(IGameRepository gameRepository, IStorageRepository storageRepository, ITagRepository tagRepository)
     {
         _gameRepository = gameRepository;
         _storageRepository = storageRepository;
+        _tagRepository = tagRepository;
         StatusOptions = new[]
         {
             FilterOption.All,
@@ -68,7 +77,14 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             new FilterOption(GameStatus.Dikecualikan.ToDatabase(), "Dikecualikan"),
             new FilterOption(GameStatus.Dieliminasi.ToDatabase(), "Dieliminasi"),
         };
+        SelesaiOptions = new[]
+        {
+            FilterOption.All,
+            new FilterOption("ya", "Sudah Selesai"),
+            new FilterOption("tidak", "Belum Selesai"),
+        };
         StorageOptions = new ObservableCollection<FilterOption> { FilterOption.All };
+        TagOptions = new ObservableCollection<FilterOption> { FilterOption.All };
         Rows = new ObservableCollection<GameRow>();
         SelectedRows = new ObservableCollection<GameRow>();
         SelectedRows.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasSelection));
@@ -77,7 +93,9 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     public ObservableCollection<GameRow> Rows { get; }
     public ObservableCollection<GameRow> SelectedRows { get; }
     public IReadOnlyList<FilterOption> StatusOptions { get; }
+    public IReadOnlyList<FilterOption> SelesaiOptions { get; }
     public ObservableCollection<FilterOption> StorageOptions { get; }
+    public ObservableCollection<FilterOption> TagOptions { get; }
     public bool HasSelection => SelectedRows.Count > 0;
 
     public void SetStorageFilter(long? storageId)
@@ -96,6 +114,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         _allStorages = (await _storageRepository.GetAllAsync()).ToList();
 
         var current = SelectedStorage;
+        var currentTag = SelectedTag;
         StorageOptions.Clear();
         StorageOptions.Add(FilterOption.All);
         foreach (var storage in _allStorages)
@@ -106,14 +125,31 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         StorageOptions.Add(new FilterOption("null", "Tanpa Storage"));
         SelectedStorage = StorageOptions.FirstOrDefault(o => o.Value == current.Value) ?? FilterOption.All;
 
-        ApplyFilters();
+        var allTags = await _tagRepository.GetAllAsync();
+        TagOptions.Clear();
+        TagOptions.Add(FilterOption.All);
+        foreach (var tag in allTags)
+        {
+            TagOptions.Add(new FilterOption(tag.Id.ToString(CultureInfo.InvariantCulture), tag.Nama));
+        }
+
+        SelectedTag = TagOptions.FirstOrDefault(o => o.Value == currentTag.Value) ?? FilterOption.All;
+        await ApplyFiltersAsync();
     }
 
-    partial void OnSearchTextChanged(string value) => ApplyFilters();
-    partial void OnSelectedStatusChanged(FilterOption value) => ApplyFilters();
-    partial void OnSelectedStorageChanged(FilterOption value) => ApplyFilters();
-    partial void OnMinSizeChanged(string value) => ApplyFilters();
-    partial void OnMaxSizeChanged(string value) => ApplyFilters();
+    private async Task<Dictionary<long, string>> MapTagsByGameAsync(IReadOnlyList<long> gameIds)
+    {
+        var tags = await _tagRepository.GetTagsForGamesAsync(gameIds);
+        return tags.ToDictionary(kv => kv.Key, kv => string.Join(", ", kv.Value.Select(t => t.Nama)));
+    }
+
+    partial void OnSearchTextChanged(string value) => _ = ApplyFiltersAsync();
+    partial void OnSelectedStatusChanged(FilterOption value) => _ = ApplyFiltersAsync();
+    partial void OnSelectedStorageChanged(FilterOption value) => _ = ApplyFiltersAsync();
+    partial void OnSelectedTagChanged(FilterOption value) => _ = ApplyFiltersAsync();
+    partial void OnSelectedSelesaiChanged(FilterOption value) => _ = ApplyFiltersAsync();
+    partial void OnMinSizeChanged(string value) => _ = ApplyFiltersAsync();
+    partial void OnMaxSizeChanged(string value) => _ = ApplyFiltersAsync();
 
     [RelayCommand]
     private void ClearFilters()
@@ -121,16 +157,19 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         SearchText = "";
         SelectedStatus = FilterOption.All;
         SelectedStorage = FilterOption.All;
+        SelectedTag = FilterOption.All;
+        SelectedSelesai = FilterOption.All;
         MinSize = "";
         MaxSize = "";
     }
 
-    private void ApplyFilters()
+    private async Task ApplyFiltersAsync()
     {
         var search = SearchText.Trim();
         var min = NumberParser.ParseGb(MinSize);
         var max = NumberParser.ParseGb(MaxSize);
         var storageById = _allStorages.ToDictionary(s => s.Id, s => s.Nama);
+        var tagsByGame = await MapTagsByGameAsync(_allGames.Select(g => g.Id).ToList());
 
         IEnumerable<Game> filtered = _allGames;
 
@@ -169,6 +208,25 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             filtered = filtered.Where(g => g.UkuranGb <= max.Value);
         }
 
+        if (SelectedTag != FilterOption.All && long.TryParse(SelectedTag.Value, CultureInfo.InvariantCulture, out var tagId))
+        {
+            var memberIds = (await _tagRepository.GetGameIdsWithTagAsync(tagId)).ToHashSet();
+            filtered = filtered.Where(g => memberIds.Contains(g.Id));
+        }
+
+        if (SelectedSelesai == FilterOption.All)
+        {
+            // no selesai filter
+        }
+        else if (SelectedSelesai.Value == "ya")
+        {
+            filtered = filtered.Where(g => g.SelesaiMain);
+        }
+        else if (SelectedSelesai.Value == "tidak")
+        {
+            filtered = filtered.Where(g => !g.SelesaiMain);
+        }
+
         var rows = filtered
             .OrderBy(g => g.Nama, StringComparer.CurrentCultureIgnoreCase)
             .ThenBy(g => g.Urutan)
@@ -176,6 +234,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             {
                 Game = g,
                 StorageName = g.StorageId is { } id && storageById.TryGetValue(id, out var name) ? name : "Tanpa Storage",
+                TagsText = tagsByGame.TryGetValue(g.Id, out var tagText) ? tagText : "",
             })
             .ToList();
 
@@ -185,19 +244,21 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             Rows.Add(row);
         }
 
-        SummaryText = $"{rows.Count} game ditampilkan";
+        var selesaiCount = filtered.Count(g => g.SelesaiMain);
+        SummaryText = $"{rows.Count} game ditampilkan | {selesaiCount} sudah selesai";
     }
 
     [RelayCommand]
     private async Task AddGameAsync()
     {
-        var dialog = new Views.GameEditDialog(_allStorages, null);
+        var dialog = new Views.GameEditDialog(_allStorages, null, null);
         if (dialog.ShowDialog() != true || dialog.Result is not { } game)
         {
             return;
         }
 
-        await _gameRepository.AddAsync(game);
+        var id = await _gameRepository.AddAsync(game);
+        await SaveTagsAsync(id, dialog.ResultTagText);
         await ReloadAsync();
     }
 
@@ -210,7 +271,9 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         }
 
         var original = SelectedRows[0].Game;
-        var dialog = new Views.GameEditDialog(_allStorages, original);
+        var existingTags = string.Join(", ",
+            (await _tagRepository.GetTagsForGameAsync(original.Id)).Select(t => t.Nama));
+        var dialog = new Views.GameEditDialog(_allStorages, original, existingTags);
         if (dialog.ShowDialog() != true || dialog.Result is not { } game)
         {
             return;
@@ -219,7 +282,22 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         game.Id = original.Id;
         game.DibuatPada = original.DibuatPada;
         await _gameRepository.UpdateAsync(game);
+        await SaveTagsAsync(game.Id, dialog.ResultTagText);
         await ReloadAsync();
+    }
+
+    private async Task SaveTagsAsync(long gameId, string tagText)
+    {
+        var names = tagText.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        var tagIds = new List<long>();
+        foreach (var name in names)
+        {
+            tagIds.Add(await _tagRepository.EnsureAsync(name));
+        }
+
+        await _tagRepository.SetTagsForGameAsync(gameId, tagIds);
     }
 
     [RelayCommand]

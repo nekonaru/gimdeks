@@ -7,6 +7,7 @@ public sealed class Game
     public string? Versi { get; set; }
     public double UkuranGb { get; set; }
     public GameStatus Status { get; set; }
+    public bool SelesaiMain { get; set; }
     public long? StorageId { get; set; }
     public string? AsalStorage { get; set; }
     public string? Alasan { get; set; }

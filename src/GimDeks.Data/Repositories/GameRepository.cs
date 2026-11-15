@@ -32,8 +32,8 @@ public sealed class GameRepository : IGameRepository
     public async Task<long> AddAsync(Game game, CancellationToken ct = default)
     {
         const string sql = """
-            INSERT INTO game (nama, versi, ukuran_gb, status, storage_id, asal_storage, alasan, catatan, urutan)
-            VALUES (@Nama, @Versi, @UkuranGb, @Status, @StorageId, @AsalStorage, @Alasan, @Catatan, @Urutan);
+            INSERT INTO game (nama, versi, ukuran_gb, status, storage_id, asal_storage, alasan, catatan, urutan, selesai)
+            VALUES (@Nama, @Versi, @UkuranGb, @Status, @StorageId, @AsalStorage, @Alasan, @Catatan, @Urutan, @SelesaiMain);
             SELECT last_insert_rowid();
             """;
         using var connection = _factory.CreateConnection();
@@ -44,7 +44,7 @@ public sealed class GameRepository : IGameRepository
     {
         const string sql = """
             UPDATE game SET nama = @Nama, versi = @Versi, ukuran_gb = @UkuranGb, status = @Status,
-                storage_id = @StorageId, asal_storage = @AsalStorage, alasan = @Alasan, catatan = @Catatan, urutan = @Urutan
+                storage_id = @StorageId, asal_storage = @AsalStorage, alasan = @Alasan, catatan = @Catatan, urutan = @Urutan, selesai = @SelesaiMain
             WHERE id = @Id;
             """;
         using var connection = _factory.CreateConnection();
@@ -135,6 +135,7 @@ public sealed class GameRepository : IGameRepository
         Alasan = game.Alasan,
         Catatan = game.Catatan,
         Urutan = game.Urutan,
+        SelesaiMain = game.SelesaiMain ? 1 : 0,
     };
 
     private static Game Map(dynamic row) => new()
@@ -149,6 +150,7 @@ public sealed class GameRepository : IGameRepository
         Alasan = row.alasan is null ? null : (string)row.alasan,
         Catatan = row.catatan is null ? null : (string)row.catatan,
         Urutan = (int)row.urutan,
+        SelesaiMain = Convert.ToInt64(row.selesai, System.Globalization.CultureInfo.InvariantCulture) != 0,
         DibuatPada = DateTime.TryParse((string)row.dibuat_pada, System.Globalization.CultureInfo.InvariantCulture,
             System.Globalization.DateTimeStyles.AssumeUniversal, out var created) ? created : DateTime.UtcNow,
     };

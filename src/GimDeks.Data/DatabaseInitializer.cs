@@ -49,6 +49,29 @@ public sealed class DatabaseInitializer
 
         CREATE INDEX ix_riwayat_game ON riwayat(game_id);
         """,
+
+        // 2: per-game completion flag and tags
+        """
+        ALTER TABLE game ADD COLUMN selesai INTEGER NOT NULL DEFAULT 0;
+
+        CREATE TABLE tag (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          nama TEXT NOT NULL UNIQUE
+        );
+
+        CREATE TABLE game_tag (
+          game_id INTEGER NOT NULL REFERENCES game(id) ON DELETE CASCADE,
+          tag_id INTEGER NOT NULL REFERENCES tag(id) ON DELETE CASCADE,
+          PRIMARY KEY (game_id, tag_id)
+        );
+
+        CREATE INDEX ix_game_tag_tag ON game_tag(tag_id);
+
+        CREATE TABLE drive_link (
+          storage_id INTEGER PRIMARY KEY REFERENCES storage(id) ON DELETE CASCADE,
+          drive_letter TEXT
+        );
+        """,
     };
 
     private readonly SqliteConnectionFactory _factory;
