@@ -37,7 +37,7 @@ public sealed class SteamCoverService
             return null;
         }
 
-        var bytes = await DownloadBytesAsync($"https://cloudflare.steamstatic.com/steam/apps/{appId.Value}/header.jpg", ct);
+        var bytes = await DownloadBytesAsync($"https://cdn.cloudflare.steamstatic.com/steam/apps/{appId.Value}/header.jpg", ct);
         if (bytes is null || !LooksLikeImage(bytes))
         {
             return null;
