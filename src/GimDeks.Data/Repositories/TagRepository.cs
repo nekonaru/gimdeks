@@ -70,7 +70,7 @@ public sealed class TagRepository : ITagRepository
         var normalized = nama.Trim();
         if (normalized.Length == 0)
         {
-            throw new ArgumentException("Nama tag kosong.", nameof(nama));
+            throw new ArgumentException("Tag name is empty.", nameof(nama));
         }
 
         using var connection = _factory.CreateConnection();

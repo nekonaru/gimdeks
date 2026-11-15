@@ -11,7 +11,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="Daftar Game" FontSize="28" FontWeight="Bold" />
+        <TextBlock Grid.Row="0" Text="{DynamicResource Ui_GameList_Title}" FontSize="28" FontWeight="Bold" />
 
         <StackPanel Grid.Row="1" Margin="0,12,0,10">
             <Grid>
@@ -25,43 +25,43 @@
                     <ColumnDefinition Width="90" />
                     <ColumnDefinition Width="36" />
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0" x:Name="SearchBox" materialDesign:HintAssist.Hint="Cari nama game atau versi"
+                <TextBox Grid.Column="0" x:Name="SearchBox" materialDesign:HintAssist.Hint="{DynamicResource Ui_GameList_SearchHint}"
                          Style="{StaticResource MaterialDesignOutlinedTextBox}"
                          Margin="0,0,8,0"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
-                <ComboBox Grid.Column="1" materialDesign:HintAssist.Hint="Status"
+                <ComboBox Grid.Column="1" materialDesign:HintAssist.Hint="{DynamicResource Ui_Filter_Status}"
                           Style="{StaticResource MaterialDesignOutlinedComboBox}"
                           Margin="0,0,8,0"
                           ItemsSource="{Binding StatusOptions}"
                           SelectedItem="{Binding SelectedStatus}"
                           DisplayMemberPath="Label" />
-                <ComboBox Grid.Column="2" materialDesign:HintAssist.Hint="Storage"
+                <ComboBox Grid.Column="2" materialDesign:HintAssist.Hint="{DynamicResource Ui_Filter_Storage}"
                           Style="{StaticResource MaterialDesignOutlinedComboBox}"
                           Margin="0,0,8,0"
                           ItemsSource="{Binding StorageOptions}"
                           SelectedItem="{Binding SelectedStorage}"
                           DisplayMemberPath="Label" />
-                <ComboBox Grid.Column="3" materialDesign:HintAssist.Hint="Tag"
+                <ComboBox Grid.Column="3" materialDesign:HintAssist.Hint="{DynamicResource Ui_Filter_Tag}"
                           Style="{StaticResource MaterialDesignOutlinedComboBox}"
                           Margin="0,0,8,0"
                           ItemsSource="{Binding TagOptions}"
                           SelectedItem="{Binding SelectedTag}"
                           DisplayMemberPath="Label" />
-                <ComboBox Grid.Column="4" materialDesign:HintAssist.Hint="Selesai"
+                <ComboBox Grid.Column="4" materialDesign:HintAssist.Hint="{DynamicResource Ui_Filter_Selesai}"
                           Style="{StaticResource MaterialDesignOutlinedComboBox}"
                           Margin="0,0,8,0"
                           ItemsSource="{Binding SelesaiOptions}"
                           SelectedItem="{Binding SelectedSelesai}"
                           DisplayMemberPath="Label" />
-                <TextBox Grid.Column="5" materialDesign:HintAssist.Hint="Min GB"
+                <TextBox Grid.Column="5" materialDesign:HintAssist.Hint="{DynamicResource Ui_Filter_MinGb}"
                          Style="{StaticResource MaterialDesignOutlinedTextBox}"
                          Margin="0,0,8,0"
                          Text="{Binding MinSize, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBox Grid.Column="6" materialDesign:HintAssist.Hint="Maks GB"
+                <TextBox Grid.Column="6" materialDesign:HintAssist.Hint="{DynamicResource Ui_Filter_MaxGb}"
                          Style="{StaticResource MaterialDesignOutlinedTextBox}"
                          Margin="0,0,8,0"
                          Text="{Binding MaxSize, UpdateSourceTrigger=PropertyChanged}" />
-                <Button Grid.Column="7" ToolTip="Hapus semua filter"
+                <Button Grid.Column="7" ToolTip="{DynamicResource Ui_Filter_Clear}"
                         Style="{StaticResource MaterialDesignIconButton}"
                         Command="{Binding ClearFiltersCommand}">
                     <materialDesign:PackIcon Kind="FilterOff" />
@@ -69,7 +69,7 @@
             </Grid>
 
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                <Button Content="Tambah" Style="{StaticResource MaterialDesignRaisedButton}"
+                <Button Content="{DynamicResource Ui_Button_Add}" Style="{StaticResource MaterialDesignRaisedButton}"
                         Command="{Binding AddGameCommand}" Margin="0,0,8,0">
                     <Button.ContentTemplate>
                         <DataTemplate>
@@ -80,19 +80,19 @@
                         </DataTemplate>
                     </Button.ContentTemplate>
                 </Button>
-                <Button Content="Ubah" Style="{StaticResource MaterialDesignOutlinedButton}"
+                <Button Content="{DynamicResource Ui_Button_Edit}" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding EditGameCommand}" Margin="0,0,8,0" />
-                <Button Content="Pindah ke..." Style="{StaticResource MaterialDesignOutlinedButton}"
+                <Button Content="{DynamicResource Ui_Button_MoveTo}" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding MoveToStorageCommand}" Margin="0,0,8,0" />
-                <Button Content="Ubah Status..." Style="{StaticResource MaterialDesignOutlinedButton}"
+                <Button Content="{DynamicResource Ui_Button_ChangeStatus}" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding ChangeStatusCommand}" Margin="0,0,8,0" />
-                <Button Content="Pisahkan Versi" Style="{StaticResource MaterialDesignOutlinedButton}"
+                <Button Content="{DynamicResource Ui_Button_SplitVersion}" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding SplitVersionsCommand}" Margin="0,0,8,0"
-                        ToolTip="Pisahkan nomor versi dari nama game terpilih, contoh 'v1.7'" />
-                <Button Content="Unduh Cover..." Style="{StaticResource MaterialDesignOutlinedButton}"
+                        ToolTip="{DynamicResource Ui_Button_SplitVersionTooltip}" />
+                <Button Content="{DynamicResource Ui_Button_DownloadCover}" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding DownloadCoversCommand}" Margin="0,0,8,0"
-                        ToolTip="Online: unduh cover Steam untuk game terpilih" />
-                <Button Content="Hapus" Style="{StaticResource MaterialDesignOutlinedButton}"
+                        ToolTip="{DynamicResource Ui_Button_DownloadCoverTooltip}" />
+                <Button Content="{DynamicResource Ui_Button_Delete}" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding DeleteGamesCommand}" Foreground="#FF8A8A" BorderBrush="#FF8A8A" />
             </StackPanel>
         </StackPanel>
@@ -115,8 +115,8 @@
                   HeadersVisibility="Column"
                   SelectionChanged="DataGrid_OnSelectionChanged">
             <DataGrid.Columns>
-                <DataGridCheckBoxColumn Header="Selesai" Binding="{Binding Game.SelesaiMain}" IsReadOnly="True" Width="55" />
-                <DataGridTemplateColumn Header="Cover" Width="80">
+                <DataGridCheckBoxColumn Header="{DynamicResource Ui_Col_Selesai}" Binding="{Binding Game.SelesaiMain}" IsReadOnly="True" Width="55" />
+                <DataGridTemplateColumn Header="{DynamicResource Ui_Col_Cover}" Width="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Image Source="{Binding Game.Id, Converter={StaticResource GameIdToCoverConverter}}"
@@ -124,12 +124,12 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Nama Game" Binding="{Binding Game.Nama}" Width="*" />
-                <DataGridTextColumn Header="Versi" Binding="{Binding Game.Versi}" Width="100" />
-                <DataGridTextColumn Header="Ukuran (GB)" Binding="{Binding Game.UkuranGb, StringFormat=N1}" Width="110" />
-                <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="135" />
-                <DataGridTextColumn Header="Storage" Binding="{Binding StorageName}" Width="160" />
-                <DataGridTextColumn Header="Tag" Binding="{Binding TagsText}" Width="150" />
+                <DataGridTextColumn Header="{DynamicResource Ui_Col_Name}" Binding="{Binding Game.Nama}" Width="*" />
+                <DataGridTextColumn Header="{DynamicResource Ui_Col_Version}" Binding="{Binding Game.Versi}" Width="100" />
+                <DataGridTextColumn Header="{DynamicResource Ui_Col_Size}" Binding="{Binding Game.UkuranGb, StringFormat=N1}" Width="110" />
+                <DataGridTextColumn Header="{DynamicResource Ui_Col_Status}" Binding="{Binding StatusText}" Width="135" />
+                <DataGridTextColumn Header="{DynamicResource Ui_Col_Storage}" Binding="{Binding StorageName}" Width="160" />
+                <DataGridTextColumn Header="{DynamicResource Ui_Col_Tag}" Binding="{Binding TagsText}" Width="150" />
             </DataGrid.Columns>
         </DataGrid>
 

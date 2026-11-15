@@ -26,38 +26,40 @@ public sealed class StorageCardItem
     public bool DriveDisconnected { get; init; }
     public string DriveDisconnectedText { get; init; } = "";
 
-    private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
+    private static CultureInfo IdId => Services.AppCulture.Current;
+
+
 
     public string TotalText => $"{TotalGb.ToString("N1", IdId)} GB";
-    public string GameCountText => $"{GameCount} game";
+    public string GameCountText => Services.Loc.Format("Ui_GameCount", GameCount);
     public string CapacityText => Storage.KapasitasGb is { } cap
-        ? $"dari {cap.ToString("N0", IdId)} GB"
-        : "tanpa kapasitas";
+        ? Services.Loc.Format("Ui_CapacityFrom", cap.ToString("N0", IdId))
+        : Services.Loc.Get("Ui_CapacityNone");
     public string RemainingText
     {
         get
         {
             if (RemainingGb is not { } remaining)
             {
-                return "Tanpa batas ruang";
+                return Services.Loc.Get("Ui_NoLimit");
             }
 
             if (IsOverLimit)
             {
-                return $"Melebihi batas {Math.Abs(remaining).ToString("N1", IdId)} GB";
+                return Services.Loc.Format("Ui_OverBy", Math.Abs(remaining).ToString("N1", IdId));
             }
 
-            return $"Sisa ruang {remaining.ToString("N1", IdId)} GB";
+            return Services.Loc.Format("Ui_Remaining", remaining.ToString("N1", IdId));
         }
     }
 
     public string TipeLabel => Storage.Tipe switch
     {
-        StorageType.HddEksternal => "HDD EKSTERNAL",
-        StorageType.LaptopHdd => "LAPTOP HDD",
-        StorageType.LaptopSsd => "LAPTOP SSD",
-        StorageType.Virtual => "VIRTUAL",
-        _ => Storage.Tipe.ToString().ToUpperInvariant(),
+        StorageType.HddEksternal => Services.Loc.Get("Ui_StorageType_HddEksternal"),
+        StorageType.LaptopHdd => Services.Loc.Get("Ui_StorageType_LaptopHdd"),
+        StorageType.LaptopSsd => Services.Loc.Get("Ui_StorageType_LaptopSsd"),
+        StorageType.Virtual => Services.Loc.Get("Ui_StorageType_Virtual"),
+        _ => Services.Loc.Get("Ui_StorageType_Virtual"),
     };
 }
 
@@ -135,15 +137,18 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
                 IsOverLimit = CapacityCalculator.IsOverLimit(storage, total),
                 HasLimit = progress.HasValue,
                 DriveDisconnected = driveDisconnected,
-                DriveDisconnectedText = driveDisconnected ? $"Drive {driveLinks[storage.Id]} tidak terhubung" : "",
+                DriveDisconnectedText = driveDisconnected ? Services.Loc.Format("Ui_Storage_DriveNotConnected", driveLinks[storage.Id]) : "",
             });
         }
 
         var totalGames = counted.Count;
         var totalGb = counted.Sum(g => g.UkuranGb);
-        TotalGamesText = $"{totalGames} game";
-        TotalSizeText = $"{totalGb.ToString("N1", CultureInfo.GetCultureInfo("id-ID"))} GB";
-        ExcludedText = $"{games.Count(g => g.Status == GameStatus.Dikecualikan)} dikecualikan | {games.Count(g => g.Status == GameStatus.Dieliminasi)} dieliminasi | {games.Count(g => g.SelesaiMain)} selesai";
+        TotalGamesText = Services.Loc.Format("Ui_GameCount", totalGames);
+        TotalSizeText = $"{totalGb.ToString("N1", GimDeks.App.Services.AppCulture.Current)} GB";
+        ExcludedText = Services.Loc.Format("Ui_ExcludedSummary",
+            games.Count(g => g.Status == GameStatus.Dikecualikan),
+            games.Count(g => g.Status == GameStatus.Dieliminasi),
+            games.Count(g => g.SelesaiMain));
         StatusText = $"{Storages.Count} storage";
     }
 }

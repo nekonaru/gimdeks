@@ -19,7 +19,7 @@ public sealed class PortableModeService
             var exeDir = Path.GetDirectoryName(Environment.ProcessPath);
             if (string.IsNullOrEmpty(exeDir))
             {
-                throw new InvalidOperationException("Folder aplikasi tidak dapat ditentukan.");
+                throw new InvalidOperationException(Services.Loc.Get("Ui_Portable_ExeMissing"));
             }
 
             return Path.Combine(exeDir, "data");
@@ -36,13 +36,13 @@ public sealed class PortableModeService
     {
         if (IsPortable)
         {
-            throw new InvalidOperationException("Mode portabel sudah aktif.");
+            throw new InvalidOperationException(Services.Loc.Get("Ui_Portable_AlreadyOn"));
         }
 
         var target = PortableDirectory;
         if (Directory.Exists(target) && Directory.GetFileSystemEntries(target).Length > 0)
         {
-            throw new InvalidOperationException("Folder data di sebelah aplikasi sudah ada dan tidak kosong.");
+            throw new InvalidOperationException(Services.Loc.Get("Ui_Portable_TargetOccupied"));
         }
 
         await CopyDirectoryAsync(CurrentRoot, target);
@@ -54,7 +54,7 @@ public sealed class PortableModeService
     {
         if (!IsPortable)
         {
-            throw new InvalidOperationException("Mode portabel tidak aktif.");
+            throw new InvalidOperationException(Services.Loc.Get("Ui_Portable_AlreadyOff"));
         }
 
         var source = PortableDirectory;

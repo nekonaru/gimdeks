@@ -14,9 +14,9 @@ public sealed class StorageShare
     public int GameCount { get; init; }
     public double TotalGb { get; init; }
     public double ShareFraction { get; init; }
-    private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
+    private static CultureInfo IdId => Services.AppCulture.Current;
     public string TotalText => $"{TotalGb.ToString("N1", IdId)} GB";
-    public string CountText => $"{GameCount} game";
+    public string CountText => Services.Loc.Format("Ui_GameCount", GameCount);
     public string ShareText => $"{ShareFraction * 100:0}%";
 }
 
@@ -25,7 +25,7 @@ public sealed class BiggestGame
     public required string Nama { get; init; }
     public required string StorageName { get; init; }
     public double UkuranGb { get; init; }
-    private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
+    private static CultureInfo IdId => Services.AppCulture.Current;
     public string UkuranText => $"{UkuranGb.ToString("N1", IdId)} GB";
 }
 
@@ -72,12 +72,13 @@ public partial class StatisticsViewModel : ObservableObject, IRefreshable
         var average = counted.Count > 0 ? totalGb / counted.Count : 0;
         var selesai = counted.Count(g => g.SelesaiMain);
 
-        TotalGamesText = $"{counted.Count} game";
-        TotalSizeText = $"{totalGb.ToString("N1", CultureInfo.GetCultureInfo("id-ID"))} GB";
-        AverageSizeText = $"Rata-rata {average.ToString("N1", CultureInfo.GetCultureInfo("id-ID"))} GB per game";
+        TotalGamesText = Services.Loc.Format("Ui_GameCount", counted.Count);
+        TotalSizeText = $"{totalGb.ToString("N1", GimDeks.App.Services.AppCulture.Current)} GB";
+        AverageSizeText = Services.Loc.Format("Ui_Statistics_Average", average.ToString("N1", GimDeks.App.Services.AppCulture.Current));
         CompletionText = counted.Count > 0
-            ? $"{selesai} dari {counted.Count} selesai main ({selesai * 100.0 / counted.Count:0}%)"
-            : "0 dari 0 selesai main";
+            ? Services.Loc.Format("Ui_Statistics_Completion", selesai, counted.Count,
+                (selesai * 100.0 / counted.Count).ToString("0.#", GimDeks.App.Services.AppCulture.Current))
+            : Services.Loc.Get("Ui_Statistics_CompletionEmpty");
 
         StorageShares.Clear();
         var storageById = storages.ToDictionary(s => s.Id, s => s.Nama);
@@ -87,7 +88,7 @@ public partial class StatisticsViewModel : ObservableObject, IRefreshable
             var gb = group.Sum(g => g.UkuranGb);
             StorageShares.Add(new StorageShare
             {
-                Nama = group.Key is { } id && storageById.TryGetValue(id, out var name) ? name : "Tanpa Storage",
+                Nama = group.Key is { } id && storageById.TryGetValue(id, out var name) ? name : Services.Loc.Get("Ui_NoStorage"),
                 GameCount = group.Count(),
                 TotalGb = gb,
                 ShareFraction = totalGb > 0 ? gb / totalGb : 0,
@@ -100,11 +101,11 @@ public partial class StatisticsViewModel : ObservableObject, IRefreshable
             BiggestGames.Add(new BiggestGame
             {
                 Nama = game.Nama,
-                StorageName = game.StorageId is { } storageId && storageById.TryGetValue(storageId, out var name) ? name : "Tanpa Storage",
+                StorageName = game.StorageId is { } storageId && storageById.TryGetValue(storageId, out var name) ? name : Services.Loc.Get("Ui_NoStorage"),
                 UkuranGb = game.UkuranGb,
             });
         }
 
-        SummaryText = $"{storages.Count} storage, {games.Count(g => g.Status == GameStatus.Dikecualikan)} dikecualikan, {games.Count(g => g.Status == GameStatus.Dieliminasi)} dieliminasi";
+        SummaryText = Services.Loc.Format("Ui_Statistics_Summary", storages.Count, games.Count(g => g.Status == GameStatus.Dikecualikan), games.Count(g => g.Status == GameStatus.Dieliminasi));
     }
 }

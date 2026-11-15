@@ -45,7 +45,7 @@ public sealed class DriveService
 
     private static DriveLinkInfo ToInfo(System.IO.DriveInfo drive)
     {
-        var label = string.IsNullOrWhiteSpace(drive.VolumeLabel) ? "Tanpa label" : drive.VolumeLabel;
+        var label = string.IsNullOrWhiteSpace(drive.VolumeLabel) ? Services.Loc.Get("Ui_DriveNoLabel") : drive.VolumeLabel;
         return new DriveLinkInfo(drive.Name.TrimEnd('\\', ':'), label,
             (ulong)drive.AvailableFreeSpace, (ulong)drive.TotalSize);
     }

@@ -17,7 +17,7 @@ public sealed partial class ExcelImporter
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
         if (!File.Exists(filePath))
         {
-            throw new FileNotFoundException("File Excel tidak ditemukan.", filePath);
+            throw new FileNotFoundException("The Excel file was not found.", filePath);
         }
 
         const long maxBytes = 50L * 1024 * 1024; // 50 MB is far above any sane collection file
@@ -223,7 +223,7 @@ public sealed partial class ExcelImporter
 
         if (classification.Tipe == StorageType.HddEksternal && (!kapasitas.HasValue || !batas.HasValue))
         {
-            warnings.Add($"Sheet {sheetName}: judul tidak memuat kapasitas atau batas; dipakai default 1000 GB / 900 GB.");
+            warnings.Add($"Sheet {sheetName}: storage title does not include capacity or limit; defaulting to 1000 GB / 900 GB.");
             kapasitas ??= 1000;
             batas ??= 900;
         }
@@ -278,7 +278,7 @@ public sealed partial class ExcelImporter
                 var raw = ReadNumber(workbook, worksheet.Cell(row, ukCol));
                 if (raw is null && !worksheet.Cell(row, ukCol).IsEmpty())
                 {
-                    warnings.Add($"Sheet {sheetName} baris {row}: ukuran \"{worksheet.Cell(row, ukCol).GetString().Trim()}\" tidak terbaca; dianggap 0.");
+                    warnings.Add($"Sheet {sheetName} row {row}: size \"{worksheet.Cell(row, ukCol).GetString().Trim()}\" could not be read; treated as 0.");
                 }
 
                 uk = raw ?? 0;

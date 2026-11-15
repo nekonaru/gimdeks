@@ -17,9 +17,9 @@
         </StackPanel>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12,0,10">
-            <Button Content="Pulihkan ke Storage..." Style="{StaticResource MaterialDesignRaisedButton}"
+            <Button Content="{DynamicResource Ui_StatusList_Restore}" Style="{StaticResource MaterialDesignRaisedButton}"
                     Command="{Binding RestoreSelectedCommand}" Margin="0,0,8,0" />
-            <Button Content="Hapus" Style="{StaticResource MaterialDesignOutlinedButton}"
+            <Button Content="{DynamicResource Ui_Button_Delete}" Style="{StaticResource MaterialDesignOutlinedButton}"
                     Command="{Binding DeleteSelectedCommand}"
                     Foreground="#FF8A8A" BorderBrush="#FF8A8A" />
             <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" Opacity="0.8" Margin="12,0,0,0" />
@@ -42,9 +42,9 @@
                   HeadersVisibility="Column"
                   SelectionChanged="DataGrid_OnSelectionChanged">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Nama Game" Binding="{Binding Game.Nama}" Width="*" />
-                <DataGridTextColumn Header="Ukuran (GB)" Binding="{Binding Game.UkuranGb, StringFormat=N1}" Width="110" />
-                <DataGridTemplateColumn x:Name="AlasanColumn" Header="Detail" Width="*">
+                <DataGridTextColumn Header="{DynamicResource Ui_Col_Name}" Binding="{Binding Game.Nama}" Width="*" />
+                <DataGridTextColumn Header="{DynamicResource Ui_Col_Size}" Binding="{Binding Game.UkuranGb, StringFormat=N1}" Width="110" />
+                <DataGridTemplateColumn x:Name="AlasanColumn" Header="{DynamicResource Ui_Excluded_Reason}" Width="*">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding StorageName}" TextWrapping="Wrap" VerticalAlignment="Center" Padding="3,6" />

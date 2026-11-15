@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        Title="Pindahkan ke Storage"
+        Title="{DynamicResource Ui_StoragePicker_Title}"
         Width="420"
         SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
@@ -10,11 +10,11 @@
         Background="{DynamicResource MaterialDesign.Brush.Background}"
         ShowInTaskbar="False">
     <StackPanel Margin="20">
-        <TextBlock Text="Pilih storage tujuan:" Margin="0,0,0,8" />
+        <TextBlock Text="{DynamicResource Ui_StoragePicker_Label}" Margin="0,0,0,8" />
         <ComboBox x:Name="StorageComboBox" Padding="8,8" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
-            <Button x:Name="CancelButton" Content="Batal" Style="{StaticResource MaterialDesignFlatButton}" Click="CancelButton_OnClick" Margin="0,0,8,0" />
-            <Button x:Name="OkButton" Content="Pindahkan" Style="{StaticResource MaterialDesignRaisedButton}" Click="OkButton_OnClick" />
+            <Button x:Name="CancelButton" Content="{DynamicResource Ui_Button_Cancel}" Style="{StaticResource MaterialDesignFlatButton}" Click="CancelButton_OnClick" Margin="0,0,8,0" />
+            <Button x:Name="OkButton" Content="{DynamicResource Ui_Button_MoveConfirm}" Style="{StaticResource MaterialDesignRaisedButton}" Click="OkButton_OnClick" />
         </StackPanel>
     </StackPanel>
 </Window>

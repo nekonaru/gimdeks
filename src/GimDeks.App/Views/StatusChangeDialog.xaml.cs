@@ -15,10 +15,10 @@ public sealed partial class StatusChangeDialog : Window
         InitializeComponent();
         StatusComboBox.ItemsSource = new[]
         {
-            new StatusOption(GameStatus.BelumDownload, "Belum Download"),
-            new StatusOption(GameStatus.SudahAda, "Sudah Ada"),
-            new StatusOption(GameStatus.Dikecualikan, "Dikecualikan"),
-            new StatusOption(GameStatus.Dieliminasi, "Dieliminasi"),
+            new StatusOption(GameStatus.BelumDownload, Services.Loc.Get("Ui_Status_BelumDownload")),
+            new StatusOption(GameStatus.SudahAda, Services.Loc.Get("Ui_Status_SudahAda")),
+            new StatusOption(GameStatus.Dikecualikan, Services.Loc.Get("Ui_Status_Dikecualikan")),
+            new StatusOption(GameStatus.Dieliminasi, Services.Loc.Get("Ui_Status_Dieliminasi")),
         };
         StatusComboBox.SelectedItem = ((StatusOption[])StatusComboBox.ItemsSource).First(o => o.Status == current);
     }

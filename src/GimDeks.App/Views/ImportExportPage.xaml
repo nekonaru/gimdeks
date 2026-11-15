@@ -5,13 +5,13 @@
              xmlns:vm="clr-namespace:GimDeks.App.ViewModels">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="24,20">
-            <TextBlock Text="Import / Export" FontSize="28" FontWeight="Bold" />
-            <TextBlock Text="Import mengembalikan sheet Ringkasan sebagai pemeriksaan. Backup dibuat otomatis sebelum import."
+            <TextBlock Text="{DynamicResource Ui_Import_Title}" FontSize="28" FontWeight="Bold" />
+            <TextBlock Text="{DynamicResource Ui_Import_Subtitle}"
                        Opacity="0.7" Margin="0,2,0,16" />
 
             <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}" CornerRadius="12" Padding="18" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="IMPORT DARI EXCEL" FontSize="11" Opacity="0.6" />
+                    <TextBlock Text="{DynamicResource Ui_Import_Section}" FontSize="11" Opacity="0.6" />
                     <Grid Margin="0,8,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -19,11 +19,11 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBox Grid.Column="0" Text="{Binding FilePath, UpdateSourceTrigger=PropertyChanged}"
-                                 materialDesign:HintAssist.Hint="Path file .xlsx"
+                                 materialDesign:HintAssist.Hint="{DynamicResource Ui_Import_PathHint}"
                                  Style="{StaticResource MaterialDesignOutlinedTextBox}" Margin="0,0,10,0" />
-                        <Button Grid.Column="1" Content="Pilih File..." Style="{StaticResource MaterialDesignOutlinedButton}"
+                        <Button Grid.Column="1" Content="{DynamicResource Ui_Import_Browse}" Style="{StaticResource MaterialDesignOutlinedButton}"
                                 Command="{Binding BrowseCommand}" Margin="0,0,10,0" />
-                        <ComboBox Grid.Column="2" materialDesign:HintAssist.Hint="Mode Import"
+                        <ComboBox Grid.Column="2" materialDesign:HintAssist.Hint="{DynamicResource Ui_Import_Mode}"
                                   Style="{StaticResource MaterialDesignOutlinedComboBox}"
                                   Width="150"
                                   ItemsSource="{Binding ImportModes}"
@@ -31,9 +31,9 @@
                     </Grid>
 
                     <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-                        <Button Content="Lihat Pratinjau" Style="{StaticResource MaterialDesignOutlinedButton}"
+                        <Button Content="{DynamicResource Ui_Import_Preview}" Style="{StaticResource MaterialDesignOutlinedButton}"
                                 Command="{Binding PreviewCommand}" Margin="0,0,10,0" />
-                        <Button Content="Impor Sekarang" Style="{StaticResource MaterialDesignRaisedButton}"
+                        <Button Content="{DynamicResource Ui_ExcelChanged_ImportNow}" Style="{StaticResource MaterialDesignRaisedButton}"
                                 Command="{Binding ImportCommand}" />
                     </StackPanel>
 
@@ -69,10 +69,10 @@
                               MaxHeight="260"
                               Visibility="{Binding RingkasanRows.Count, Converter={StaticResource CountToVisibilityInverseConverter}}">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Sheet Ringkasan" Binding="{Binding Label}" Width="*" />
-                            <DataGridTextColumn Header="Seharusnya" Binding="{Binding ExpectedText}" Width="170" />
-                            <DataGridTextColumn Header="Terbaca" Binding="{Binding ActualText}" Width="170" />
-                            <DataGridTextColumn Header="Hasil" Binding="{Binding ResultText}" Width="90" />
+                            <DataGridTextColumn Header="{DynamicResource Ui_Import_SheetColumn}" Binding="{Binding Label}" Width="*" />
+                            <DataGridTextColumn Header="{DynamicResource Ui_Import_ExpectedColumn}" Binding="{Binding ExpectedText}" Width="170" />
+                            <DataGridTextColumn Header="{DynamicResource Ui_Import_ActualColumn}" Binding="{Binding ActualText}" Width="170" />
+                            <DataGridTextColumn Header="{DynamicResource Ui_Import_ResultColumn}" Binding="{Binding ResultText}" Width="90" />
                         </DataGrid.Columns>
                     </DataGrid>
                 </StackPanel>
@@ -80,13 +80,13 @@
 
             <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}" CornerRadius="12" Padding="18" Margin="0,0,0,16">
                 <StackPanel>
-                    <TextBlock Text="MODE PORTABEL" FontSize="11" Opacity="0.6" />
+                    <TextBlock Text="{DynamicResource Ui_Import_ModePortable}" FontSize="11" Opacity="0.6" />
                     <TextBlock Text="{Binding PortableStatusText}" Opacity="0.75" Margin="0,6,0,10" TextWrapping="Wrap" />
                     <StackPanel Orientation="Horizontal">
-                        <Button Content="Aktifkan Mode Portabel..." Style="{StaticResource MaterialDesignRaisedButton}"
+                        <Button Content="{DynamicResource Ui_Import_PortableEnable}" Style="{StaticResource MaterialDesignRaisedButton}"
                                 Command="{Binding EnablePortableCommand}" Margin="0,0,10,0"
                                 Visibility="{Binding IsPortable, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
-                        <Button Content="Kembali ke Mode Biasa..." Style="{StaticResource MaterialDesignRaisedButton}"
+                        <Button Content="{DynamicResource Ui_Import_PortableDisable}" Style="{StaticResource MaterialDesignRaisedButton}"
                                 Command="{Binding DisablePortableCommand}"
                                 Visibility="{Binding IsPortable, Converter={StaticResource BooleanToVisibilityConverter}}" />
                     </StackPanel>
@@ -95,15 +95,15 @@
 
             <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}" CornerRadius="12" Padding="18">
                 <StackPanel>
-                    <TextBlock Text="EXPORT, BACKUP, RESTORE" FontSize="11" Opacity="0.6" />
-                    <TextBlock Text="Ekspor menghasilkan file .xlsx dengan rumus total yang aktif. Backup menyalin database saat ini; restore menggantikannya."
+                    <TextBlock Text="{DynamicResource Ui_Import_SectionIO}" FontSize="11" Opacity="0.6" />
+                    <TextBlock Text="{DynamicResource Ui_Import_IoDescription}"
                                Opacity="0.75" TextWrapping="Wrap" Margin="0,6,0,12" />
                     <StackPanel Orientation="Horizontal">
-                        <Button Content="Ekspor ke Excel..." Style="{StaticResource MaterialDesignRaisedButton}"
+                        <Button Content="{DynamicResource Ui_Import_Export}" Style="{StaticResource MaterialDesignRaisedButton}"
                                 Command="{Binding ExportCommand}" Margin="0,0,10,0" />
-                        <Button Content="Backup Sekarang" Style="{StaticResource MaterialDesignOutlinedButton}"
+                        <Button Content="{DynamicResource Ui_Import_BackupNow}" Style="{StaticResource MaterialDesignOutlinedButton}"
                                 Command="{Binding BackupCommand}" Margin="0,0,10,0" />
-                        <Button Content="Pulihkan dari Backup..." Style="{StaticResource MaterialDesignOutlinedButton}"
+                        <Button Content="{DynamicResource Ui_Import_Restore}" Style="{StaticResource MaterialDesignOutlinedButton}"
                                 Command="{Binding RestoreCommand}" />
                     </StackPanel>
                 </StackPanel>

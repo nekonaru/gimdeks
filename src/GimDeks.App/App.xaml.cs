@@ -24,7 +24,7 @@ public partial class App : Application
         {
             WriteLog(args.Exception);
             MessageBox.Show(
-                "Terjadi kesalahan tak terduga. Detail tersimpan di gimdeks.log. " + args.Exception.Message,
+                GimDeks.App.Services.Loc.Get("Ui_Crash_Body") + " " + args.Exception.Message,
                 "GimDeks",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -34,6 +34,8 @@ public partial class App : Application
         try
         {
             Services = BuildServices();
+            var settings = Services.GetRequiredService<AppSettingsService>();
+            Services.GetRequiredService<LocalizationService>().Apply(settings.Load().UiLanguage);
             var initializer = Services.GetRequiredService<DatabaseInitializer>();
             initializer.EnsureCreated();
         }
@@ -41,7 +43,7 @@ public partial class App : Application
         {
             WriteLog(exception);
             MessageBox.Show(
-                "Database tidak bisa dibuka atau dibuat. Detail tersimpan di gimdeks.log.\n\n" + exception.Message,
+                GimDeks.App.Services.Loc.Get("Ui_Db_Body") + "\n\n" + exception.Message,
                 "GimDeks",
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
@@ -68,6 +70,7 @@ public partial class App : Application
         services.AddSingleton<ExcelImportService>();
         services.AddSingleton<AppSettingsService>();
         services.AddSingleton<ThemingService>();
+        services.AddSingleton<LocalizationService>();
         services.AddSingleton<DriveService>();
         services.AddSingleton<PortableModeService>();
 

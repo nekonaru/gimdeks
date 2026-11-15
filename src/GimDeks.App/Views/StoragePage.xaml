@@ -15,7 +15,7 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Text="Storage" FontSize="28" FontWeight="Bold" />
+            <TextBlock Grid.Row="0" Text="{DynamicResource Ui_Storage_Title}" FontSize="28" FontWeight="Bold" />
             <ListBox Grid.Row="1" Margin="0,12,0,8"
                      ItemsSource="{Binding Storages}"
                      SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
@@ -41,7 +41,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Button Grid.Row="2" Content="Tambah Storage" Style="{StaticResource MaterialDesignRaisedButton}"
+            <Button Grid.Row="2" Content="{DynamicResource Ui_Storage_Add}" Style="{StaticResource MaterialDesignRaisedButton}"
                     Command="{Binding AddStorageCommand}" />
         </Grid>
 
@@ -50,7 +50,7 @@
                 <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}" CornerRadius="12" Padding="16" Margin="0,0,0,12"
                         Visibility="{Binding HasSelection, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel>
-                        <TextBlock Text="DETAIL STORAGE" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Ui_Storage_Detail}" FontSize="11" Opacity="0.6" />
                         <Grid Margin="0,8,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -58,13 +58,13 @@
                                 <ColumnDefinition Width="150" />
                             </Grid.ColumnDefinitions>
                             <TextBox Grid.Column="0" Text="{Binding EditNama, UpdateSourceTrigger=PropertyChanged}"
-                                     materialDesign:HintAssist.Hint="Nama storage"
+                                     materialDesign:HintAssist.Hint="{DynamicResource Ui_Storage_NameHint}"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}" />
                             <ComboBox Grid.Column="2" ItemsSource="{Binding TipeOptions}"
                                       SelectedItem="{Binding EditTipe, Mode=TwoWay}"
                                       DisplayMemberPath="Label"
                                       Style="{StaticResource MaterialDesignOutlinedComboBox}"
-                                      materialDesign:HintAssist.Hint="Tipe" />
+                                      materialDesign:HintAssist.Hint="{DynamicResource Ui_Storage_Type}" />
                         </Grid>
                         <Grid Margin="0,10,0,0">
                             <Grid.ColumnDefinitions>
@@ -73,10 +73,10 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBox Grid.Column="0" Text="{Binding EditKapasitas, UpdateSourceTrigger=PropertyChanged}"
-                                     materialDesign:HintAssist.Hint="Kapasitas GB (opsional)"
+                                     materialDesign:HintAssist.Hint="{DynamicResource Ui_Storage_Capacity}"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}" />
                             <TextBox Grid.Column="2" Text="{Binding EditBatas, UpdateSourceTrigger=PropertyChanged}"
-                                     materialDesign:HintAssist.Hint="Batas GB (opsional, contoh 900)"
+                                     materialDesign:HintAssist.Hint="{DynamicResource Ui_Storage_Limit}"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}" />
                         </Grid>
                         <Grid Margin="0,10,0,0">
@@ -90,13 +90,13 @@
                                       SelectedValuePath="Letter"
                                       DisplayMemberPath="DisplayText"
                                       Style="{StaticResource MaterialDesignOutlinedComboBox}"
-                                      materialDesign:HintAssist.Hint="Drive" />
+                                      materialDesign:HintAssist.Hint="{DynamicResource Ui_Storage_Drive}" />
                             <TextBlock Grid.Column="2" Text="{Binding DriveStatusText}" VerticalAlignment="Center" Opacity="0.85" />
                         </Grid>
                         <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-                            <Button Content="Simpan Perubahan" Style="{StaticResource MaterialDesignRaisedButton}"
+                            <Button Content="{DynamicResource Ui_Storage_Save}" Style="{StaticResource MaterialDesignRaisedButton}"
                                     Command="{Binding SaveChangesCommand}" Margin="0,0,10,0" />
-                            <Button Content="Hapus Storage" Style="{StaticResource MaterialDesignOutlinedButton}"
+                            <Button Content="{DynamicResource Ui_Storage_Delete}" Style="{StaticResource MaterialDesignOutlinedButton}"
                                     Foreground="#FF8A8A" BorderBrush="#FF8A8A"
                                     Command="{Binding DeleteStorageCommand}" />
                         </StackPanel>
@@ -108,8 +108,8 @@
                         Visibility="{Binding HasSelection, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel>
                         <Grid>
-                            <TextBlock Text="GAME DI STORAGE INI" FontSize="11" Opacity="0.6" VerticalAlignment="Center" />
-                            <Button Content="Pindahkan Terpilih ke Storage Lain..." HorizontalAlignment="Right"
+                            <TextBlock Text="{DynamicResource Ui_Storage_Games}" FontSize="11" Opacity="0.6" VerticalAlignment="Center" />
+                            <Button Content="{DynamicResource Ui_Storage_MoveSelected}" HorizontalAlignment="Right"
                                     Style="{StaticResource MaterialDesignOutlinedButton}" Padding="10,4"
                                     Command="{Binding MoveSelectedGamesCommand}" />
                         </Grid>
@@ -129,9 +129,9 @@
                                   VirtualizingPanel.VirtualizationMode="Recycling"
                                   SelectionChanged="DataGrid_OnSelectionChanged">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Nama Game" Binding="{Binding Game.Nama}" Width="*" />
-                                <DataGridTextColumn Header="Ukuran (GB)" Binding="{Binding Game.UkuranGb, StringFormat=N1}" Width="110" />
-                                <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="140" />
+                                <DataGridTextColumn Header="{DynamicResource Ui_Col_Name}" Binding="{Binding Game.Nama}" Width="*" />
+                                <DataGridTextColumn Header="{DynamicResource Ui_Col_Size}" Binding="{Binding Game.UkuranGb, StringFormat=N1}" Width="110" />
+                                <DataGridTextColumn Header="{DynamicResource Ui_Col_Status}" Binding="{Binding StatusText}" Width="140" />
                             </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
@@ -140,7 +140,7 @@
                 <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}" CornerRadius="12" Padding="16"
                         Visibility="{Binding HasSelection, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel>
-                        <TextBlock Text="RIWAYAT PEMINDAHAN" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Ui_Storage_History}" FontSize="11" Opacity="0.6" />
                         <ItemsControl ItemsSource="{Binding Riwayat}" Margin="0,8,0,0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -151,7 +151,7 @@
                     </StackPanel>
                 </Border>
 
-                <TextBlock Text="Pilih storage di sebelah kiri untuk melihat detailnya."
+                <TextBlock Text="{DynamicResource Ui_Storage_PickLeft}"
                            Opacity="0.6" Margin="4,20,0,0"
                            Visibility="{Binding HasSelection, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
             </StackPanel>

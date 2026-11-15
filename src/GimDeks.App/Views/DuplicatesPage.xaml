@@ -13,8 +13,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock Text="Duplikat" FontSize="28" FontWeight="Bold" />
-            <TextBlock Text="Nama yang sama setelah huruf besar-kecil dan nomor versi diabaikan. Per grup, game pertama (urutan paling awal) dipertahankan."
+            <TextBlock Text="{DynamicResource Ui_Duplicates_Title}" FontSize="28" FontWeight="Bold" />
+            <TextBlock Text="{DynamicResource Ui_Duplicates_Subtitle}"
                        Opacity="0.7" Margin="0,2,0,0" />
         </StackPanel>
 
@@ -33,11 +33,11 @@
                                 <Grid>
                                     <TextBlock Text="{Binding Key}" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" />
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                        <Button Content="Hapus Duplikat" Style="{StaticResource MaterialDesignOutlinedButton}"
+                                        <Button Content="{DynamicResource Ui_Duplicates_Delete}" Style="{StaticResource MaterialDesignOutlinedButton}"
                                                 Foreground="#FF8A8A" BorderBrush="#FF8A8A" Padding="10,3"
                                                 Command="{Binding DataContext.DeleteDuplicatesCommand, ElementName=Root}"
                                                 CommandParameter="{Binding}" Margin="0,0,8,0" />
-                                        <Button Content="Eliminasi Duplikat" Style="{StaticResource MaterialDesignOutlinedButton}" Padding="10,3"
+                                        <Button Content="{DynamicResource Ui_Duplicates_Eliminate}" Style="{StaticResource MaterialDesignOutlinedButton}" Padding="10,3"
                                                 Command="{Binding DataContext.EliminateDuplicatesCommand, ElementName=Root}"
                                                 CommandParameter="{Binding}" />
                                     </StackPanel>
@@ -56,7 +56,7 @@
                                                 <Border Grid.Column="0" CornerRadius="4" Padding="4,1" Background="#20332E"
                                                         Visibility="{Binding IsKeeper, Converter={StaticResource BooleanToVisibilityConverter}}"
                                                         VerticalAlignment="Center" HorizontalAlignment="Left">
-                                                    <TextBlock Text="SIMPAN" FontSize="9" FontWeight="Bold" Foreground="#2EE6C5" />
+                                                    <TextBlock Text="{DynamicResource Ui_Duplicates_Keep}" FontSize="9" FontWeight="Bold" Foreground="#2EE6C5" />
                                                 </Border>
                                                 <TextBlock Grid.Column="1" Text="{Binding Game.Nama}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                                                 <TextBlock Grid.Column="2" Text="{Binding UkuranText}" VerticalAlignment="Center" />
@@ -73,7 +73,7 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <TextBlock Grid.Row="3" Text="Duplikat dihapus tidak masuk riwayat; backup sebelum import tetap ada di folder backups."
+        <TextBlock Grid.Row="3" Text="{DynamicResource Ui_Duplicates_Footnote}"
                    Opacity="0.5" FontSize="11" Margin="2,8,0,0" TextWrapping="Wrap" />
     </Grid>
 </UserControl>
