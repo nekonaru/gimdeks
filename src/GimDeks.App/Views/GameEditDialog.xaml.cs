@@ -32,6 +32,9 @@ public partial class GameEditDialog : Window
         if (original is not null)
         {
             NamaTextBox.Text = original.Nama;
+            UpdateCoverPreview(original.Id);
+            FetchCoverButton.IsEnabled = original.Id > 0;
+            CoverHintText.Text = "Cari ke Steam dan unduh cover (internet).";
             VersiTextBox.Text = original.Versi ?? "";
             UkuranTextBox.Text = original.UkuranGb.ToString("N1", IdId);
             StatusComboBox.SelectedItem = ((StatusOption[])StatusComboBox.ItemsSource)
@@ -49,6 +52,8 @@ public partial class GameEditDialog : Window
         {
             StatusComboBox.SelectedItem = ((StatusOption[])StatusComboBox.ItemsSource).First();
             StorageComboBox.SelectedIndex = 0;
+            FetchCoverButton.IsEnabled = false;
+            CoverHintText.Text = "Simpan game ini dulu, lalu buka lagi untuk mengunduh cover.";
         }
     }
 
@@ -124,6 +129,59 @@ public partial class GameEditDialog : Window
 
     private static string? NullIfEmpty(string text) =>
         string.IsNullOrWhiteSpace(text) ? null : text.Trim();
+
+    private void UpdateCoverPreview(long gameId)
+    {
+        var path = Services.SteamCoverService.FindCoverPath(gameId);
+        CoverImage.Source = path is null ? null : new System.Windows.Media.Imaging.BitmapImage(new Uri(path, UriKind.Absolute));
+    }
+
+    private async void FetchCoverButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_original is null || _original.Id <= 0)
+        {
+            return;
+        }
+
+        var title = NamaTextBox.Text.Trim();
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            ErrorTextBlock.Text = "Isi nama game dulu, lalu unduh cover.";
+            return;
+        }
+
+        if (System.Windows.MessageBox.Show(
+                $"Game \"{title}\" akan dicari di Steam (internet) dan cover-nya diunduh dari CDN Steam.\nData yang dikirim ke internet hanya judul game. Lanjutkan?",
+                "Ambil Cover (Internet)",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question) != MessageBoxResult.Yes)
+        {
+            return;
+        }
+
+        FetchCoverButton.IsEnabled = false;
+        CoverHintText.Text = "Mengunduh cover dari Steam...";
+        try
+        {
+            var result = await new Services.SteamCoverService().FetchCoverAsync(title, _original.Id) is { } r ? r : null;
+            if (result is null)
+            {
+                CoverHintText.Text = "Tidak menemukan game ini di Steam.";
+                return;
+            }
+
+            UpdateCoverPreview(_original.Id);
+            CoverHintText.Text = $"Cover tersimpan untuk \"{result.MatchedName}\".";
+        }
+        catch (Exception exception)
+        {
+            CoverHintText.Text = "Gagal mengunduh cover: " + exception.Message;
+        }
+        finally
+        {
+            FetchCoverButton.IsEnabled = true;
+        }
+    }
 
     private sealed record StatusOption(GameStatus Status, string Label)
     {

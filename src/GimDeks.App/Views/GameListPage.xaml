@@ -89,6 +89,9 @@
                 <Button Content="Pisahkan Versi" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding SplitVersionsCommand}" Margin="0,0,8,0"
                         ToolTip="Pisahkan nomor versi dari nama game terpilih, contoh 'v1.7'" />
+                <Button Content="Unduh Cover..." Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Command="{Binding DownloadCoversCommand}" Margin="0,0,8,0"
+                        ToolTip="Online: unduh cover Steam untuk game terpilih" />
                 <Button Content="Hapus" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding DeleteGamesCommand}" Foreground="#FF8A8A" BorderBrush="#FF8A8A" />
             </StackPanel>
@@ -112,7 +115,15 @@
                   HeadersVisibility="Column"
                   SelectionChanged="DataGrid_OnSelectionChanged">
             <DataGrid.Columns>
-                <DataGridCheckBoxColumn Header="Selesai" Binding="{Binding Game.SelesaiMain}" IsReadOnly="True" Width="60" />
+                <DataGridCheckBoxColumn Header="Selesai" Binding="{Binding Game.SelesaiMain}" IsReadOnly="True" Width="55" />
+                <DataGridTemplateColumn Header="Cover" Width="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding Game.Id, Converter={StaticResource GameIdToCoverConverter}}"
+                                   Height="44" Stretch="Uniform" HorizontalAlignment="Left" RenderOptions.BitmapScalingMode="HighQuality" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Nama Game" Binding="{Binding Game.Nama}" Width="*" />
                 <DataGridTextColumn Header="Versi" Binding="{Binding Game.Versi}" Width="100" />
                 <DataGridTextColumn Header="Ukuran (GB)" Binding="{Binding Game.UkuranGb, StringFormat=N1}" Width="110" />
@@ -122,7 +133,14 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <TextBlock Grid.Row="3" Text="{Binding SummaryText}" Opacity="0.7" Margin="2,8,0,0" FontSize="12" />
+        <Grid Grid.Row="3" Margin="2,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="{Binding SummaryText}" Opacity="0.7" FontSize="12" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1" Text="{Binding StatusText}" Opacity="0.85" FontSize="12" Margin="14,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+        </Grid>
     </Grid>
 </UserControl>
 
