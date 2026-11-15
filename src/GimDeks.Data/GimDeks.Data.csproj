@@ -1,18 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>12</LangVersion>
+    <LangVersion>latest</LangVersion>
     <RootNamespace>GimDeks.Data</RootNamespace>
     <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GimDeks.Core\GimDeks.Core.csproj" />
-    <PackageReference Include="Dapper" Version="2.1.66" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.34" />
+    <PackageReference Include="Dapper" Version="2.1.89" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.15" />
   </ItemGroup>
 
 </Project>
+
+
