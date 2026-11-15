@@ -24,7 +24,7 @@ public sealed partial class ExcelImporter
         var fileSize = new FileInfo(filePath).Length;
         if (fileSize > maxBytes)
         {
-            throw new InvalidDataException($"File Excel terlalu besar ({fileSize / (1024 * 1024)} MB). Batas maksimal 50 MB.");
+            throw new InvalidDataException($"The Excel file is too large ({fileSize / (1024 * 1024)} MB). Maximum size is 50 MB.");
         }
 
         using var workbook = new XLWorkbook(filePath);
