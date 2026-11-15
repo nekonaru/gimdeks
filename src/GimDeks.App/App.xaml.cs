@@ -64,6 +64,8 @@ public partial class App : Application
         services.AddSingleton<IStorageRepository, StorageRepository>();
         services.AddSingleton<IGameRepository, GameRepository>();
         services.AddSingleton<IHistoryRepository, HistoryRepository>();
+        services.AddSingleton<ITagRepository, TagRepository>();
+        services.AddSingleton<IDriveLinkRepository, DriveLinkRepository>();
         services.AddSingleton<ExcelImporter>();
         services.AddSingleton<ExcelImportService>();
         services.AddSingleton<AppSettingsService>();

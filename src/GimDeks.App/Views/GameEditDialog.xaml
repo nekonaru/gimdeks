@@ -54,6 +54,19 @@
         <TextBlock Text="Catatan" Style="{StaticResource MaterialDesignBody2TextBlock}" Opacity="0.8" />
         <TextBox x:Name="CatatanTextBox" materialDesign:HintAssist.Hint="Opsional" TextWrapping="Wrap" AcceptsReturn="True" MinHeight="56" Margin="0,4,0,12" />
 
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="14" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Tag" Style="{StaticResource MaterialDesignBody2TextBlock}" Opacity="0.8" />
+                <TextBox x:Name="TagTextBox" materialDesign:HintAssist.Hint="Pisahkan dengan koma, contoh: RPG, Open World" Margin="0,4,0,12" />
+            </StackPanel>
+            <CheckBox Grid.Column="2" x:Name="SelesaiCheckBox" Content="Sudah selesai main" VerticalAlignment="Center" Margin="0,22,0,0" />
+        </Grid>
+
         <TextBlock x:Name="ErrorTextBlock" Foreground="#FF5A5A" TextWrapping="Wrap" Margin="0,0,0,8" />
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
