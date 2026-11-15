@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <LangVersion>12</LangVersion>
+    <LangVersion>latest</LangVersion>
     <UseWPF>true</UseWPF>
     <RootNamespace>GimDeks.App</RootNamespace>
     <Version>1.0.0</Version>
@@ -27,13 +27,15 @@
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="MaterialDesignThemes" Version="5.4.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.15" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="assets\gimdeks-mark.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
+
+
 
 
 
