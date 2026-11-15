@@ -1,10 +1,10 @@
 <div align="center">
   <img src="assets/gimdeks-mark.png" width="120" alt="GimDeks logo" />
   <h1>GimDeks: Game Collection Manager for Excel Power Users</h1>
-  <p><b>Track a game collection across every drive with automatic capacity totals,<br/>storage limits, and one-click Excel import and export. Fully offline.</b></p>
+  <p><b>Track a game collection across every drive with automatic capacity totals,<br/>storage limits, and one-click Excel import and export. Offline by default.</b></p>
   <a href="https://github.com/nekonaru/gimdeks/releases/latest"><img src="https://img.shields.io/github/v/release/nekonaru/gimdeks?style=flat-square" alt="Release" /></a>
   <a href="https://github.com/nekonaru/gimdeks/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/nekonaru/gimdeks/ci.yml?branch=main&style=flat-square" alt="CI" /></a>
-  <a href="https://github.com/nekonaru/gimdeks/releases/latest"><img src="https://img.shields.io/badge/.NET-8-512BD4?style=flat-square" alt=".NET" /></a>
+  <a href="https://github.com/nekonaru/gimdeks/releases/latest"><img src="https://img.shields.io/badge/.NET-10-512BD4?style=flat-square" alt=".NET" /></a>
   <a href="https://github.com/nekonaru/gimdeks/releases/latest"><img src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D6?style=flat-square" alt="Platform" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License" /></a>
   <img src="https://img.shields.io/badge/status-active-brightgreen?style=flat-square" alt="Status" />
@@ -15,7 +15,7 @@
 **English** | [Bahasa Indonesia](README.id.md)
 
 > [!NOTE]
-> GimDeks is built for one person managing a personal game collection on a Windows PC. It replaces the Koleksi_Game.xlsx spreadsheet with an app that reads and writes the same file, and it never sends data anywhere.
+> GimDeks is built for one person managing a personal game collection on a Windows PC. It replaces the Koleksi_Game.xlsx spreadsheet with an app that reads and writes the same file. It works fully offline; the only network feature is the opt-in Steam cover fetch.
 
 ---
 
@@ -83,17 +83,22 @@ GimDeks manages a game collection across multiple drives (external HDDs, laptop 
 | **Excluded and eliminated** | Dedicated screens for online/mobile/free games and eliminated games, with restore to a storage. |
 | **Duplicate detection** | Finds duplicate games (case, punctuation and version numbers ignored) and resolves them per group. |
 | **Version split** | One action splits a trailing version like `v1.7` out of the game name into the Versi column. |
+| **Statistics page** | Collection totals, per-storage share, 10 biggest games, average size, and completion progress. |
+| **Tags and completion** | Custom comma-separated tags and a played-through flag per game, both filterable; completion stats on the statistics page. |
 | **HDD distribution suggestion** | Proposes a download order that packs Belum Download games into your HDDs without breaking the limit. |
 | **History** | Every move between storages is recorded and shown per storage. |
+| **Keyboard shortcuts** | `Ctrl+1` to `Ctrl+9` switch pages, `Ctrl+F` searches, `Ctrl+N` adds a game, `Ctrl+E` exports, `Ctrl+T` toggles the theme. |
 
 ### App experience
 
 | Feature | Description |
 | --- | --- |
-| **Fully offline** | Single SQLite file in `%LOCALAPPDATA%\GimDeks`. No account, no telemetry, no network calls. |
+| **Offline by default** | Single SQLite file in `%LOCALAPPDATA%\GimDeks`. No account, no telemetry, no required network calls. |
 | **Backup and restore** | One-click database backup (or automatic before import) and restore from a `.db` copy. |
 | **Dark and light theme** | Toggle in the sidebar; your choice is remembered. |
-| **Indonesian UI** | All labels and messages are in Bahasa Indonesia. Numbers use id-ID formatting on screen and invariant storage internally. |
+| **Portable mode** | Move the data folder next to the app with one toggle; the database and settings travel with an external drive. |
+| **Steam cover art (opt-in)** | Searches Steam for the game and downloads its header art as the cover; the game title is the only data sent, and nothing happens without an explicit click. |
+| **Bilingual UI** | Bahasa Indonesia or English, toggled from the sidebar; the choice is remembered. Numbers follow the active language on screen; the database stays culture-invariant. |
 | **Safe by default** | No change is overwritten without a backup and confirmation; deletes always ask first. |
 
 ---
@@ -127,7 +132,7 @@ GimDeks manages a game collection across multiple drives (external HDDs, laptop 
 | Dependency | Minimum Version | Notes |
 | --- | --- | --- |
 | **Windows** | 10/11 | Required for WPF |
-| **.NET SDK** | 10.0 | Builds the `net8.0` projects |
+| **.NET SDK** | 10.0 | Builds the `net10.0` projects |
 | **Git** | 2.x | To clone the repo |
 
 ---
@@ -168,7 +173,7 @@ cd gimdeks
 #### 2. Build and verify
 
 > [!IMPORTANT]
-> The solution builds against .NET 8 while the build tool is the .NET 10 SDK. Restore must finish without errors.
+> The solution targets .NET 10. Restore must finish without errors.
 
 ```bash
 dotnet restore GimDeks.slnx
@@ -207,6 +212,7 @@ dotnet run --project src/GimDeks.App
 - **Duplikat**: find near-identical games and delete or mark them eliminated per group.
 - **Saran HDD**: get a size-descending packing plan that keeps every HDD under its limit.
 - **Export**: write the collection back to `.xlsx` with the original layout and live formulas.
+- **Language**: click the `ID` / `EN` button in the lower-left sidebar to switch the whole UI between Bahasa Indonesia and English. The choice is remembered.
 
 ---
 
@@ -217,10 +223,11 @@ dotnet run --project src/GimDeks.App
 | Game collection data | Your `Koleksi_Game.xlsx` (local file, imported by you) |
 | App state | SQLite database at `%LOCALAPPDATA%\GimDeks\gimdeks.db` |
 | Backups | `%LOCALAPPDATA%\GimDeks\backups\gimdeks-backup-*.db` |
-| Settings | `%LOCALAPPDATA%\GimDeks\settings.json` (window size, theme) |
+| Settings | `%LOCALAPPDATA%\GimDeks\settings.json` (window size, theme, language) |
+| Cover art | `%LOCALAPPDATA%\GimDeks\covers\` (only if you fetch Steam covers) |
 
 > [!NOTE]
-> GimDeks never reads from the network. The only file it parses from outside its own folder is the `.xlsx` you pick in the import dialog.
+> GimDeks works fully offline. The only optional network call is the Steam cover fetch, and only when you explicitly ask for a cover for a game you own. The game title is the only data sent.
 
 ---
 
@@ -231,7 +238,7 @@ gimdeks/
   GimDeks.slnx                    # solution
   assets/                         # brand assets (mark, icon, lockups)
   src/
-    GimDeks.App/                  # WPF app (Views, ViewModels, DI)
+    GimDeks.App/                  # WPF app (Views, ViewModels, DI, Resources/)
     GimDeks.Core/                 # models, rules, interfaces (no WPF, no SQLite)
     GimDeks.Data/                 # SQLite, repositories, migrations, backup
     GimDeks.Excel/                # Excel importer/exporter
@@ -248,9 +255,9 @@ gimdeks/
 
 ### Adding a user-facing string
 
-1. Add or reuse the key in the view model.
-2. Write the Indonesian label next to it (UI language is fixed to Bahasa Indonesia; the README stays in both languages).
-3. Do not put logic in code-behind files; use the view model.
+1. Add or reuse a `Ui_` key. The same key, order and line goes into both `src/GimDeks.App/Resources/Strings.id.xaml` and `Strings.en.xaml`.
+2. Bind it in XAML with `{DynamicResource Ui_YourKey}`, or read it in code with `Services.Loc.Get("Ui_YourKey")` / `Services.Loc.Format`.
+3. Check the app in both languages before committing. Do not put logic in code-behind files; use the view model.
 
 ### Changing the schema
 
@@ -281,7 +288,7 @@ dotnet test GimDeks.slnx
 | Unit tests | All pass |
 | Analyzer / linter | Zero errors |
 | Build (Release) | Zero errors |
-| Coverage gate in CI | At least 60% line coverage on Core/Data/Excel |
+| Coverage gate in CI | At least 75% line coverage on Core/Data/Excel |
 
 Lint configuration is the default C# recommended set; the solution builds warning-free.
 
@@ -289,7 +296,7 @@ Lint configuration is the default C# recommended set; the solution builds warnin
 
 ## Security
 
-GimDeks is fully offline: it makes no network requests and sends nothing anywhere. Your game collection stays on your PC in a single SQLite file under `%LOCALAPPDATA%\GimDeks`, and every import is preceded by an automatic database backup. Dependencies are audited in CI and secrets are scanned before every change merges. The release binary is unsigned; verify the `GimDeks-win-x64.zip` download against `SHA256SUMS.txt`, or build from source with Option B above.
+GimDeks is offline by default: it makes no network requests unless you explicitly fetch a Steam cover, and that call sends only the game title you picked. Your game collection stays on your PC in a single SQLite file under `%LOCALAPPDATA%\GimDeks`, and every import is preceded by an automatic database backup. Dependencies are audited in CI and the release workflow; secrets are scanned before every change merges. The release binary is unsigned; verify the `GimDeks-win-x64.zip` download against `SHA256SUMS.txt`, or build from source with Option B above.
 
 > [!NOTE]
 > To report a vulnerability privately, use the route in [`SECURITY.md`](SECURITY.md).
@@ -335,13 +342,13 @@ Yes. Use the original file layout. The importer detects sheets by content and re
 
 <details><summary><b>Numbers show as 32,2 on screen but 32.2 in the file. Is that a bug?</b></summary>
 
-No. On screen, numbers use Indonesian formatting. In the file and the database, invariant culture is used. Parsing handles both.
+No. On screen, numbers use the culture of the active UI language (Indonesian formatting with a decimal comma in Bahasa Indonesia, English formatting in English). In the file and the database, invariant culture is used. Parsing handles both.
 
 </details>
 
 <details><summary><b>Why does it need a WebView/free fonts/network?</b></summary>
 
-It doesn't. GimDeks makes no network connections. Everything runs on your machine.
+It doesn't. GimDeks works fully offline. The only network call is the optional Steam cover fetch, and only when you click to fetch a cover. Everything else runs on your machine.
 
 </details>
 

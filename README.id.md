@@ -1,10 +1,10 @@
 <div align="center">
   <img src="assets/gimdeks-mark.png" width="120" alt="Logo GimDeks" />
   <h1>GimDeks: Pengelola Koleksi Game untuk Pengguna Excel</h1>
-  <p><b>Pantau koleksi game di semua drive dengan hitungan kapasitas otomatis,<br/>batas per HDD, dan import/export Excel sekali klik. Sepenuhnya offline.</b></p>
+  <p><b>Pantau koleksi game di semua drive dengan hitungan kapasitas otomatis,<br/>batas per HDD, dan import/export Excel sekali klik. Offline secara bawaan.</b></p>
   <a href="https://github.com/nekonaru/gimdeks/releases/latest"><img src="https://img.shields.io/github/v/release/nekonaru/gimdeks?style=flat-square" alt="Rilis" /></a>
   <a href="https://github.com/nekonaru/gimdeks/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/nekonaru/gimdeks/ci.yml?branch=main&style=flat-square" alt="CI" /></a>
-  <a href="https://github.com/nekonaru/gimdeks/releases/latest"><img src="https://img.shields.io/badge/.NET-8-512BD4?style=flat-square" alt=".NET" /></a>
+  <a href="https://github.com/nekonaru/gimdeks/releases/latest"><img src="https://img.shields.io/badge/.NET-10-512BD4?style=flat-square" alt=".NET" /></a>
   <a href="https://github.com/nekonaru/gimdeks/releases/latest"><img src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D6?style=flat-square" alt="Platform" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="Lisensi" /></a>
   <img src="https://img.shields.io/badge/status-active-brightgreen?style=flat-square" alt="Status" />
@@ -15,7 +15,7 @@
 [English](README.md) | **Bahasa Indonesia**
 
 > [!NOTE]
-> GimDeks dirancang untuk satu orang yang mengelola koleksi game pribadinya di sebuah PC Windows. Aplikasi ini menggantikan spreadsheet Koleksi_Game.xlsx: membaca dan menulis file yang sama persis, dan tidak pernah mengirim data ke mana pun.
+> GimDeks dirancang untuk satu orang yang mengelola koleksi game pribadinya di sebuah PC Windows. Aplikasi ini menggantikan spreadsheet Koleksi_Game.xlsx: membaca dan menulis file yang sama persis. Aplikasi ini bekerja sepenuhnya offline; satu-satunya fitur jaringan adalah pengambilan cover Steam yang bersifat opsional.
 
 ---
 
@@ -83,17 +83,22 @@ GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan S
 | **Dikecualikan dan Dieliminasi** | Layar khusus untuk game online/mobile/gratis dan game yang dieliminasi, dengan pemulihan ke storage. |
 | **Deteksi duplikat** | Menemukan game kembar (huruf besar-kecil, tanda baca, dan nomor versi diabaikan) dan menyelesaikan per grup. |
 | **Pemisahan versi** | Satu aksi memisahkan versi di akhir nama seperti `v1.7` ke kolom Versi. |
+| **Halaman Statistik** | Total koleksi, porsi per storage, 10 game terbesar, rata-rata ukuran, dan kemajuan penyelesaian. |
+| **Tag dan penyelesaian** | Tag buatan sendiri, dipisah koma, dan tanda selesai per game; keduanya bisa difilter; statistik penyelesaian ada di halaman statistik. |
 | **Saran pembagian HDD** | Mengusulkan urutan download yang memasukkan game Belum Download ke HDD tanpa melewati batas. |
 | **Riwayat** | Setiap perpindahan antar storage tercatat dan ditampilkan per storage. |
+| **Pintasan keyboard** | `Ctrl+1` sampai `Ctrl+9` ganti halaman, `Ctrl+F` cari, `Ctrl+N` tambah game, `Ctrl+E` export, `Ctrl+T` ganti tema. |
 
 ### Pengalaman aplikasi
 
 | Fitur | Deskripsi |
 | --- | --- |
-| **Sepenuhnya offline** | Satu file SQLite di `%LOCALAPPDATA%\GimDeks`. Tanpa akun, tanpa telemetri, tanpa panggilan jaringan. |
+| **Offline secara bawaan** | Satu file SQLite di `%LOCALAPPDATA%\GimDeks`. Tanpa akun, tanpa telemetri, tanpa panggilan jaringan wajib. |
 | **Backup dan restore** | Backup database sekali klik (atau otomatis sebelum import) dan restore dari salinan `.db`. |
 | **Tema gelap dan terang** | Bisa diganti dari sidebar; pilihan kamu diingat. |
-| **Antarmuka Bahasa Indonesia** | Semua label dan pesan dalam Bahasa Indonesia. Angka memakai format id-ID di layar dan penyimpanan invariant. |
+| **Mode portabel** | Satu tombol memindahkan folder data ke sebelah aplikasi; database dan pengaturan ikut berpindah bersama drive eksternal. |
+| **Cover Steam (opsional)** | Mencari game di Steam dan mengunduh header art-nya sebagai cover; yang dikirim hanya judul game, dan tidak ada yang terjadi tanpa klik kamu. |
+| **Antarmuka dua bahasa** | Bahasa Indonesia atau Inggris, diganti dari sidebar; pilihan kamu diingat. Angka mengikuti bahasa yang aktif di layar; database tetap memakai penyimpanan invariant. |
 | **Aman secara bawaan** | Tidak ada perubahan yang menimpa tanpa backup dan konfirmasi; hapus selalu minta izin dulu. |
 
 ---
@@ -127,7 +132,7 @@ GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan S
 | Dependensi | Versi Minimum | Catatan |
 | --- | --- | --- |
 | **Windows** | 10/11 | Dibutuhkan oleh WPF |
-| **.NET SDK** | 10.0 | Membangun proyek `net8.0` |
+| **.NET SDK** | 10.0 | Membangun proyek `net10.0` |
 | **Git** | 2.x | Untuk clone repo |
 
 ---
@@ -168,7 +173,7 @@ cd gimdeks
 #### 2. Build dan verifikasi
 
 > [!IMPORTANT]
-> Solution dibangun terhadap .NET 8 dengan alat build .NET 10 SDK. Restore harus selesai tanpa error.
+> Solution menargetkan .NET 10. Restore harus selesai tanpa error.
 
 ```bash
 dotnet restore GimDeks.slnx
@@ -207,6 +212,7 @@ dotnet run --project src/GimDeks.App
 - **Duplikat**: temukan game yang mirip dan hapus atau tandai sebagai Dieliminasi per grup.
 - **Saran HDD**: dapatkan plan urutan pengisian HDD yang menjaga tiap HDD di bawah batas.
 - **Export**: tulis koleksi kembali ke `.xlsx` dengan format asli dan rumus aktif.
+- **Bahasa**: klik tombol `ID` / `EN` di sidebar kiri bawah untuk mengganti seluruh antarmuka antara Bahasa Indonesia dan Inggris. Pilihan kamu diingat.
 
 ---
 
@@ -217,10 +223,11 @@ dotnet run --project src/GimDeks.App
 | Data koleksi game | `Koleksi_Game.xlsx` kamu (file lokal, diimport oleh kamu) |
 | Status aplikasi | Database SQLite di `%LOCALAPPDATA%\GimDeks\gimdeks.db` |
 | Backup | `%LOCALAPPDATA%\GimDeks\backups\gimdeks-backup-*.db` |
-| Pengaturan | `%LOCALAPPDATA%\GimDeks\settings.json` (ukuran jendela, tema) |
+| Pengaturan | `%LOCALAPPDATA%\GimDeks\settings.json` (ukuran jendela, tema, bahasa) |
+| Cover | `%LOCALAPPDATA%\GimDeks\covers\` (hanya jika kamu mengunduh cover Steam) |
 
 > [!NOTE]
-> GimDeks tidak pernah membaca dari jaringan. Satu-satunya file di luar foldernya sendiri yang diparsing adalah `.xlsx` yang kamu pilih di dialog import.
+> GimDeks bekerja sepenuhnya offline. Satu-satunya panggilan jaringan opsional adalah pengambilan cover Steam, dan hanya terjadi saat kamu secara eksplisit meminta cover untuk game yang kamu miliki. Yang dikirim hanya judul game.
 
 ---
 
@@ -231,7 +238,7 @@ gimdeks/
   GimDeks.slnx                    # solution
   assets/                         # aset merek (mark, icon, lockup)
   src/
-    GimDeks.App/                  # aplikasi WPF (Views, ViewModels, DI)
+    GimDeks.App/                  # aplikasi WPF (Views, ViewModels, DI, Resources/)
     GimDeks.Core/                 # model, aturan, interface (tanpa WPF, tanpa SQLite)
     GimDeks.Data/                 # SQLite, repository, migrasi, backup
     GimDeks.Excel/                # importer/exporter Excel
@@ -248,9 +255,9 @@ gimdeks/
 
 ### Menambah string antarmuka
 
-1. Tambahkan atau pakai kunci di view model.
-2. Tulis label Bahasa Indonesia di sebelahnya (bahasa UI tetap Bahasa Indonesia; README tetap dalam dua bahasa).
-3. Jangan letakkan logika di code-behind; gunakan view model.
+1. Tambahkan atau pakai kunci `Ui_`. Kunci yang sama, urutan yang sama, ada di `src/GimDeks.App/Resources/Strings.id.xaml` dan `Strings.en.xaml`.
+2. Pakai `{DynamicResource Ui_KunciKamu}` di XAML, atau baca di kode dengan `Services.Loc.Get("Ui_KunciKamu")` / `Services.Loc.Format`.
+3. Periksa aplikasi dalam dua bahasa sebelum commit. Jangan letakkan logika di code-behind; gunakan view model.
 
 ### Mengubah skema
 
@@ -281,7 +288,7 @@ dotnet test GimDeks.slnx
 | Unit test | Semua lulus |
 | Analyzer / linter | Nol error |
 | Build (Release) | Nol error |
-| Gerbang coverage di CI | Minimal 60% line coverage pada Core/Data/Excel |
+| Gerbang coverage di CI | Minimal 75% line coverage pada Core/Data/Excel |
 
 Konfigurasi lint memakai set default C#; solution ter-build tanpa warning.
 
@@ -289,7 +296,7 @@ Konfigurasi lint memakai set default C#; solution ter-build tanpa warning.
 
 ## Keamanan
 
-GimDeks sepenuhnya offline: tidak membuat panggilan jaringan sama sekali dan tidak mengirim apa pun ke luar. Koleksi game kamu tetap di PC dalam satu file SQLite di `%LOCALAPPDATA%\GimDeks`, dan setiap import selalu didahului backup database otomatis. Dependensi diaudit di CI dan secret dipindai sebelum setiap perubahan di-merge. Binary rilis tidak ditandatangani; verifikasi unduhan `GimDeks-win-x64.zip` terhadap `SHA256SUMS.txt`, atau bangun sendiri dengan Opsi B di atas.
+GimDeks offline secara bawaan: tidak membuat panggilan jaringan sama sekali kecuali kamu secara eksplisit mengambil cover Steam, dan panggilan itu hanya mengirim judul game yang kamu pilih. Koleksi game kamu tetap di PC dalam satu file SQLite di `%LOCALAPPDATA%\GimDeks`, dan setiap import selalu didahului backup database otomatis. Dependensi diaudit di CI dan workflow rilis; secret dipindai sebelum setiap perubahan di-merge. Binary rilis tidak ditandatangani; verifikasi unduhan `GimDeks-win-x64.zip` terhadap `SHA256SUMS.txt`, atau bangun sendiri dengan Opsi B di atas.
 
 > [!NOTE]
 > Untuk melaporkan kerentanan secara privat, gunakan jalur di [`SECURITY.md`](SECURITY.md).
@@ -335,13 +342,13 @@ Bisa. Gunakan file dengan format asli. Importer mendeteksi sheet berdasarkan pol
 
 <details><summary><b>Angka tampil 32,2 di layar tapi 32.2 di file. Apakah bug?</b></summary>
 
-Bukan. Di layar angka memakai format Indonesia. Di file dan database memakai budaya invariant. Parsing menangani keduanya.
+Bukan. Di layar angka memakai budaya bahasa UI yang aktif (format Indonesia dengan koma desimal di Bahasa Indonesia, format Inggris di bahasa Inggris). Di file dan database memakai budaya invariant. Parsing menangani keduanya.
 
 </details>
 
 <details><summary><b>Kenapa butuh WebView/font gratis/jaringan?</b></summary>
 
-Tidak butuh. GimDeks tidak membuat koneksi jaringan sama sekali. Semuanya berjalan di mesin kamu.
+Tidak butuh. GimDeks bekerja sepenuhnya offline. Satu-satunya panggilan jaringan adalah pengambilan cover Steam yang opsional, dan hanya saat kamu mengklik untuk mengambil cover. Semuanya berjalan di mesin kamu.
 
 </details>
 
