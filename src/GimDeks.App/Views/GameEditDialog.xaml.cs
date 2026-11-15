@@ -13,7 +13,7 @@ public partial class GameEditDialog : Window
     private readonly List<Storage> _storages;
     private readonly Game? _original;
 
-    public GameEditDialog(IReadOnlyList<Storage> storages, Game? original)
+    public GameEditDialog(IReadOnlyList<Storage> storages, Game? original, string? tagText = null)
     {
         InitializeComponent();
         _storages = storages.ToList();
@@ -42,6 +42,8 @@ public partial class GameEditDialog : Window
             AsalTextBox.Text = original.AsalStorage ?? "";
             AlasanTextBox.Text = original.Alasan ?? "";
             CatatanTextBox.Text = original.Catatan ?? "";
+            TagTextBox.Text = tagText ?? "";
+            SelesaiCheckBox.IsChecked = original.SelesaiMain;
         }
         else
         {
@@ -51,6 +53,7 @@ public partial class GameEditDialog : Window
     }
 
     public Game? Result { get; private set; }
+    public string ResultTagText => TagTextBox.Text.Trim();
 
     private static StorageOption[] BuildStorageItems(IEnumerable<Storage> storages) =>
         new[] { new StorageOption(null, "Tanpa Storage") }
@@ -113,6 +116,7 @@ public partial class GameEditDialog : Window
             AsalStorage = NullIfEmpty(AsalTextBox.Text),
             Alasan = NullIfEmpty(AlasanTextBox.Text),
             Catatan = NullIfEmpty(CatatanTextBox.Text),
+            SelesaiMain = SelesaiCheckBox.IsChecked == true,
         };
 
         DialogResult = true;

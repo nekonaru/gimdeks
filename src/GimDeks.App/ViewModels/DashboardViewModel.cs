@@ -143,7 +143,7 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
         var totalGb = counted.Sum(g => g.UkuranGb);
         TotalGamesText = $"{totalGames} game";
         TotalSizeText = $"{totalGb.ToString("N1", CultureInfo.GetCultureInfo("id-ID"))} GB";
-        ExcludedText = $"{games.Count(g => g.Status == GameStatus.Dikecualikan)} dikecualikan | {games.Count(g => g.Status == GameStatus.Dieliminasi)} dieliminasi";
+        ExcludedText = $"{games.Count(g => g.Status == GameStatus.Dikecualikan)} dikecualikan | {games.Count(g => g.Status == GameStatus.Dieliminasi)} dieliminasi | {games.Count(g => g.SelesaiMain)} selesai";
         StatusText = $"{Storages.Count} storage";
     }
 }
