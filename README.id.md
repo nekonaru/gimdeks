@@ -49,13 +49,12 @@ GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan S
 
 ## Tangkapan Layar
 
-![Dashboard saat pertama dibuka](assets/screenshots/dashboard.png)
+<div align="center">
+  <img src="assets/screenshots/dashboard.png" width="480" alt="Dashboard saat pertama dibuka" />
+  <img src="assets/screenshots/importexport.png" width="480" alt="Layar Import / Export" />
+</div>
 
-*Dashboard saat pertama dibuka, sebelum koleksi diimport.*
-
-![Layar Import / Export](assets/screenshots/importexport.png)
-
-*Mengimport Koleksi_Game.xlsx dengan pratinjau, plus export, backup, dan restore.*
+*Dashboard saat pertama dibuka, sebelum koleksi diimport (kiri), dan layar Import / Export (kanan).*
 
 ---
 
