@@ -49,13 +49,12 @@ GimDeks manages a game collection across multiple drives (external HDDs, laptop 
 
 ## Screenshots
 
-![Dashboard on first launch](assets/screenshots/dashboard.png)
+<div align="center">
+  <img src="assets/screenshots/dashboard.png" width="480" alt="Dashboard on first launch" />
+  <img src="assets/screenshots/importexport.png" width="480" alt="Import / Export screen" />
+</div>
 
-*Dashboard on first launch, before a collection is imported.*
-
-![Import / Export screen](assets/screenshots/importexport.png)
-
-*Importing Koleksi_Game.xlsx with preview, plus export, backup, and restore.*
+*Dashboard on first launch, before a collection is imported (left), and the Import / Export screen (right).*
 
 ---
 
