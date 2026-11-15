@@ -80,6 +80,7 @@ public partial class App : Application
         services.AddSingleton<ImportExportViewModel>();
         services.AddSingleton<DuplicatesViewModel>();
         services.AddSingleton<HddSuggestionViewModel>();
+        services.AddSingleton<StatisticsViewModel>();
 
         return services.BuildServiceProvider();
     }

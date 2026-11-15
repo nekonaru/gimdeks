@@ -28,6 +28,7 @@
         <KeyBinding Modifiers="Ctrl" Key="D6" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.Duplicates}" />
         <KeyBinding Modifiers="Ctrl" Key="D7" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.SaranHdd}" />
         <KeyBinding Modifiers="Ctrl" Key="D8" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.ImportExport}" />
+        <KeyBinding Modifiers="Ctrl" Key="D9" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.Statistics}" />
     </Window.InputBindings>
 
     <Window.Resources>
@@ -51,6 +52,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:DuplicatesViewModel}">
             <views:DuplicatesPage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:StatisticsViewModel}">
+            <views:StatisticsPage />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:HddSuggestionViewModel}">
             <views:HddSuggestionPage />
