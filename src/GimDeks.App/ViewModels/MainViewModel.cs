@@ -69,6 +69,12 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _showExcelChangedBanner;
 
+    [ObservableProperty]
+    private string _statusBarText = "GimDeks v1.1.0";
+
+    [ObservableProperty]
+    private string _shortcutHintText = "Ctrl+1..9 navigasi | Ctrl+F cari | Ctrl+T tema";
+
     [RelayCommand]
     private void FocusSearch()
     {
@@ -143,6 +149,19 @@ public partial class MainViewModel : ObservableObject
         RegisterWatcher();
 
         CurrentPage = page;
+        StatusBarText = page switch
+        {
+            Page.Dashboard => "GimDeks v1.1.0 | Dashboard",
+            Page.GameList => "GimDeks v1.1.0 | Daftar Game",
+            Page.Storage => "GimDeks v1.1.0 | Storage",
+            Page.Dikecualikan => "GimDeks v1.1.0 | Dikecualikan",
+            Page.Dieliminasi => "GimDeks v1.1.0 | Dieliminasi",
+            Page.Duplicates => "GimDeks v1.1.0 | Duplikat",
+            Page.SaranHdd => "GimDeks v1.1.0 | Saran HDD",
+            Page.Statistics => "GimDeks v1.1.0 | Statistik",
+            Page.ImportExport => "GimDeks v1.1.0 | Import / Export",
+            _ => "GimDeks v1.1.0",
+        };
         CurrentViewModel = page switch
         {
             Page.Dashboard => Dashboard,

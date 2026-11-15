@@ -14,11 +14,24 @@
             <SolidColorBrush x:Key="GimDeksTileTeal" Color="#2EE6C5" />
             <SolidColorBrush x:Key="GimDeksInk" Color="#0F1226" />
             <SolidColorBrush x:Key="GimDeksAmber" Color="#FFB020" />
+            <SolidColorBrush x:Key="GimDeksSidebar" Color="#151C1A" />
             <views:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
             <views:CountToVisibilityInverseConverter x:Key="CountToVisibilityInverseConverter" />
             <views:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
             <views:GameIdToCoverConverter x:Key="GameIdToCoverConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+            <Style TargetType="UserControl">
+                <Style.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Duration="0:0:0.18" From="0" To="1" Storyboard.TargetProperty="Opacity" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Style.Triggers>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -7,8 +7,8 @@
         Title="GimDeks"
         Width="1280"
         Height="800"
-        MinWidth="1080"
-        MinHeight="640"
+        MinWidth="1200"
+        MinHeight="720"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource MaterialDesign.Brush.Background}"
         TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
@@ -68,7 +68,7 @@
         </Grid.ColumnDefinitions>
 
         <Border Grid.Column="0"
-                Background="{DynamicResource MaterialDesign.Brush.Card.Background}"
+                Background="{StaticResource GimDeksSidebar}"
                 BorderBrush="{DynamicResource MaterialDesign.Brush.Separator}"
                 BorderThickness="0,0,1,0">
             <Grid Margin="16">
@@ -110,12 +110,21 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ListBoxItem">
-                                        <Border x:Name="Root" CornerRadius="8" Background="Transparent" Padding="{TemplateBinding Padding}">
-                                            <ContentPresenter />
-                                        </Border>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="4" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border x:Name="Accent" Grid.Column="0" CornerRadius="2"
+                                                    Background="Transparent" Margin="0,6" VerticalAlignment="Stretch" />
+                                            <Border x:Name="Root" Grid.Column="1" CornerRadius="8" Background="Transparent" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter />
+                                            </Border>
+                                        </Grid>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsSelected" Value="True">
                                                 <Setter TargetName="Root" Property="Background" Value="#20332E" />
+                                                <Setter TargetName="Accent" Property="Background" Value="#2EE6C5" />
                                             </Trigger>
                                             <Trigger Property="IsMouseOver" Value="True">
                                                 <Setter TargetName="Root" Property="Background" Value="#243B34" />
@@ -141,7 +150,7 @@
                                        Text="Ganti Tema" />
                         </StackPanel>
                     </Button>
-                    <TextBlock Text="GimDeks v1.0.0" FontSize="11" Opacity="0.5" Margin="0,6,0,0" />
+                    <TextBlock Text="GimDeks v1.1.0" FontSize="11" Opacity="0.5" Margin="0,6,0,0" />
                     <TextBlock Text="Offline | Data di %LOCALAPPDATA%\GimDeks" FontSize="10" Opacity="0.4" TextWrapping="Wrap" />
                 </StackPanel>
             </Grid>
@@ -151,6 +160,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Border Grid.Row="0" Background="#2A2210"
@@ -168,6 +178,20 @@
             </Border>
 
             <ContentControl Grid.Row="1" Content="{Binding CurrentViewModel}" Margin="0" />
+
+            <Border Grid.Row="2" Background="{StaticResource GimDeksSidebar}"
+                    BorderBrush="{DynamicResource MaterialDesign.Brush.Separator}" BorderThickness="0,1,0,0">
+                <Grid Margin="14,4" Height="26">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding StatusBarText}" Opacity="0.6" FontSize="11" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="Data di %LOCALAPPDATA% / folder aplikasi" Opacity="0.35" FontSize="10" VerticalAlignment="Center" Margin="0,0,16,0" />
+                    <TextBlock Grid.Column="2" Text="{Binding ShortcutHintText}" Opacity="0.6" FontSize="10" VerticalAlignment="Center" />
+                </Grid>
+            </Border>
         </Grid>
     </Grid>
 </Window>
