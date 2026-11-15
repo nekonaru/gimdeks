@@ -5,25 +5,25 @@
              xmlns:vm="clr-namespace:GimDeks.App.ViewModels">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="24,20">
-            <TextBlock Text="Statistik" FontSize="28" FontWeight="Bold" />
-            <TextBlock Text="Ringkasan koleksi dari data yang ada saat ini." Opacity="0.7" Margin="0,2,0,16" />
+            <TextBlock Text="{DynamicResource Ui_Statistics_Title}" FontSize="28" FontWeight="Bold" />
+            <TextBlock Text="{DynamicResource Ui_Statistics_Subtitle}" Opacity="0.7" Margin="0,2,0,16" />
 
             <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
                 <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}" CornerRadius="12" Padding="18,14" Margin="0,0,12,0" MinWidth="150">
                     <StackPanel>
-                        <TextBlock Text="TOTAL GAME" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Ui_Dashboard_TotalGames}" FontSize="11" Opacity="0.6" />
                         <TextBlock Text="{Binding TotalGamesText}" FontSize="24" FontWeight="Bold" Margin="0,2,0,0" />
                     </StackPanel>
                 </Border>
                 <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}" CornerRadius="12" Padding="18,14" Margin="0,0,12,0" MinWidth="170">
                     <StackPanel>
-                        <TextBlock Text="TOTAL UKURAN" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Ui_Dashboard_TotalSize}" FontSize="11" Opacity="0.6" />
                         <TextBlock Text="{Binding TotalSizeText}" FontSize="24" FontWeight="Bold" Margin="0,2,0,0" />
                     </StackPanel>
                 </Border>
                 <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}" CornerRadius="12" Padding="18,14" MinWidth="220">
                     <StackPanel>
-                        <TextBlock Text="KEMAJUAN" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Ui_Statistics_Progress}" FontSize="11" Opacity="0.6" />
                         <TextBlock Text="{Binding CompletionText}" FontSize="15" FontWeight="SemiBold" Margin="0,4,0,0" TextWrapping="Wrap" />
                     </StackPanel>
                 </Border>
@@ -40,7 +40,7 @@
 
                 <Border Grid.Column="0" Background="{DynamicResource MaterialDesign.Brush.Card.Background}" CornerRadius="12" Padding="16">
                     <StackPanel>
-                        <TextBlock Text="PER STORAGE" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Ui_Statistics_PerStorage}" FontSize="11" Opacity="0.6" />
                         <ItemsControl ItemsSource="{Binding StorageShares}" Margin="0,8,0,0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:StorageShare}">
@@ -61,7 +61,7 @@
 
                 <Border Grid.Column="2" Background="{DynamicResource MaterialDesign.Brush.Card.Background}" CornerRadius="12" Padding="16">
                     <StackPanel>
-                        <TextBlock Text="10 GAME TERBESAR" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Ui_Statistics_TopGames}" FontSize="11" Opacity="0.6" />
                         <ItemsControl ItemsSource="{Binding BiggestGames}" Margin="0,8,0,0">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:BiggestGame}">

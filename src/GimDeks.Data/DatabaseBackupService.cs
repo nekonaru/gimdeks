@@ -41,7 +41,7 @@ public sealed class DatabaseBackupService
     {
         if (!File.Exists(backupFilePath))
         {
-            throw new FileNotFoundException("File backup tidak ditemukan.", backupFilePath);
+            throw new FileNotFoundException("The backup file was not found.", backupFilePath);
         }
 
         ValidateBackup(backupFilePath);
@@ -95,7 +95,7 @@ public sealed class DatabaseBackupService
         var result = integrity.ExecuteScalar() as string;
         if (!string.Equals(result, "ok", StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidDataException("File backup rusak (integrity_check gagal). Restore dibatalkan.");
+            throw new InvalidDataException("The backup file is damaged (integrity_check failed). Restore was cancelled.");
         }
 
         using var tables = check.CreateCommand();
@@ -103,7 +103,7 @@ public sealed class DatabaseBackupService
         var count = Convert.ToInt32(tables.ExecuteScalar(), System.Globalization.CultureInfo.InvariantCulture);
         if (count != 3)
         {
-            throw new InvalidDataException("File ini bukan database GimDeks. Restore dibatalkan.");
+            throw new InvalidDataException("This file is not a GimDeks database. Restore was cancelled.");
         }
     }
 }

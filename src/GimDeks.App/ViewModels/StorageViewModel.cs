@@ -15,22 +15,33 @@ public sealed class StorageListItem
     public int GameCount { get; init; }
     public double TotalGb { get; init; }
 
-    private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
+    private static CultureInfo IdId => Services.AppCulture.Current;
 
-    public string GameCountText => $"{GameCount} game";
+    public string GameCountText => Services.Loc.Format("Ui_GameCount", GameCount);
     public string TotalText => $"{TotalGb.ToString("N1", IdId)} GB";
     public string TipeLabel => Storage.Tipe switch
     {
-        StorageType.HddEksternal => "HDD EKSTERNAL",
-        StorageType.LaptopHdd => "LAPTOP HDD",
-        StorageType.LaptopSsd => "LAPTOP SSD",
-        StorageType.Virtual => "VIRTUAL",
-        _ => "VIRTUAL",
+        StorageType.HddEksternal => Services.Loc.Get("Ui_StorageType_HddEksternal"),
+        StorageType.LaptopHdd => Services.Loc.Get("Ui_StorageType_LaptopHdd"),
+        StorageType.LaptopSsd => Services.Loc.Get("Ui_StorageType_LaptopSsd"),
+        StorageType.Virtual => Services.Loc.Get("Ui_StorageType_Virtual"),
+        _ => Services.Loc.Get("Ui_StorageType_Virtual"),
     };
 }
 
-public sealed record StorageTypeOption(StorageType Type, string Label)
+public sealed class StorageTypeOption
 {
+    public StorageType Type { get; }
+    private readonly string _labelKey;
+
+    public StorageTypeOption(StorageType type, string labelKey)
+    {
+        Type = type;
+        _labelKey = labelKey;
+    }
+
+    public string Label => Services.Loc.Get(_labelKey);
+
     public override string ToString() => Label;
 }
 
@@ -55,7 +66,7 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
     private string _editNama = "";
 
     [ObservableProperty]
-    private StorageTypeOption _editTipe = new(StorageType.HddEksternal, "HDD Eksternal");
+    private StorageTypeOption _editTipe = new(StorageType.HddEksternal, "Ui_StorageType_HddEksternalLong");
 
     [ObservableProperty]
     private string _editKapasitas = "";
@@ -88,10 +99,10 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         Riwayat = new ObservableCollection<string>();
         TipeOptions = new[]
         {
-            new StorageTypeOption(StorageType.HddEksternal, "HDD Eksternal"),
-            new StorageTypeOption(StorageType.LaptopHdd, "Laptop HDD"),
-            new StorageTypeOption(StorageType.LaptopSsd, "Laptop SSD"),
-            new StorageTypeOption(StorageType.Virtual, "Virtual"),
+            new StorageTypeOption(StorageType.HddEksternal, "Ui_StorageType_HddEksternalLong"),
+            new StorageTypeOption(StorageType.LaptopHdd, "Ui_StorageType_LaptopHddLong"),
+            new StorageTypeOption(StorageType.LaptopSsd, "Ui_StorageType_LaptopSsdLong"),
+            new StorageTypeOption(StorageType.Virtual, "Ui_StorageType_VirtualLong"),
         };
     }
 
@@ -124,8 +135,8 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
 
         EditNama = value.Storage.Nama;
         EditTipe = TipeOptions.FirstOrDefault(o => o.Type == value.Storage.Tipe) ?? TipeOptions[0];
-        EditKapasitas = value.Storage.KapasitasGb?.ToString("0.#", CultureInfo.GetCultureInfo("id-ID")) ?? "";
-        EditBatas = value.Storage.BatasGb?.ToString("0.#", CultureInfo.GetCultureInfo("id-ID")) ?? "";
+        EditKapasitas = value.Storage.KapasitasGb?.ToString("0.#", GimDeks.App.Services.AppCulture.Current) ?? "";
+        EditBatas = value.Storage.BatasGb?.ToString("0.#", GimDeks.App.Services.AppCulture.Current) ?? "";
         _ = LoadDriveOptionsAsync(value.Storage.Id);
         _ = ReloadGamesAsync(value.Storage.Id);
         _ = ReloadRiwayatAsync(value.Storage.Id);
@@ -163,7 +174,7 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         try
         {
             DriveOptions.Clear();
-            DriveOptions.Add(new DriveOption("", "Tidak terhubung"));
+            DriveOptions.Add(new DriveOption("", Services.Loc.Get("Ui_Storage_NotConnected")));
             foreach (var drive in _driveService.GetReadyDrives())
             {
                 DriveOptions.Add(new DriveOption(drive.Letter, $"{drive.Letter} ({drive.Label}) - {drive.FreeText}"));
@@ -185,12 +196,12 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
     {
         if (string.IsNullOrEmpty(letter))
         {
-            DriveStatusText = "Tidak terhubung.";
+            DriveStatusText = Services.Loc.Get("Ui_Storage_NotConnected");
             return;
         }
 
         var drive = _driveService.FindDrive(letter);
-        DriveStatusText = drive is null ? $"Drive {letter} tidak tersedia." : $"{drive.Letter} ({drive.Label}) - {drive.FreeText}";
+        DriveStatusText = drive is null ? Services.Loc.Format("Ui_Storage_DriveUnavailable", letter) : $"{drive.Letter} ({drive.Label}) - {drive.FreeText}";
     }
 
     partial void OnSelectedDriveLetterChanged(string? value)
@@ -222,7 +233,7 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         var gameNames = (await _gameRepository.GetAllAsync()).ToDictionary(g => g.Id, g => g.Nama);
         var storageNames = (await _storageRepository.GetAllAsync()).ToDictionary(s => s.Id, s => s.Nama);
         string NameOf(long? id) =>
-            id is { } i && storageNames.TryGetValue(i, out var name) ? name : "Tanpa Storage";
+            id is { } i && storageNames.TryGetValue(i, out var name) ? name : Services.Loc.Get("Ui_NoStorage");
 
         Riwayat.Clear();
         foreach (var entry in entries.Take(20))
@@ -233,7 +244,7 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
 
         if (Riwayat.Count == 0)
         {
-            Riwayat.Add("Belum ada riwayat.");
+            Riwayat.Add(Services.Loc.Get("Ui_History_Empty"));
         }
     }
 
@@ -242,17 +253,17 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
     {
         var storages = await _storageRepository.GetAllAsync();
         var order = storages.Count == 0 ? 0 : storages.Max(s => s.Urutan) + 1;
-        var nama = "Storage Baru";
+        var nama = Services.Loc.Get("Ui_Storage_NewName");
         var counter = 2;
         while (await _storageRepository.ExistsByNameAsync(nama))
         {
-            nama = $"Storage Baru {counter++}";
+            nama = Services.Loc.Format("Ui_Storage_NewNameCount", counter++);
         }
 
         var id = await _storageRepository.AddAsync(new Storage { Nama = nama, Tipe = StorageType.Virtual, KapasitasGb = null, BatasGb = null, Urutan = order });
         await ReloadAsync();
         SelectedItem = Storages.FirstOrDefault(s => s.Storage.Id == id);
-        StatusText = "Storage baru dibuat. Isi detailnya lalu klik Simpan.";
+        StatusText = Services.Loc.Get("Ui_Storage_Created");
     }
 
     [RelayCommand]
@@ -266,13 +277,13 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         var nama = EditNama.Trim();
         if (string.IsNullOrWhiteSpace(nama))
         {
-            DialogService.Error("Storage", "Nama storage wajib diisi.");
+            DialogService.Error("Storage", Services.Loc.Get("Ui_Storage_NameRequired"));
             return;
         }
 
         if (await _storageRepository.ExistsByNameAsync(nama, SelectedItem.Storage.Id))
         {
-            DialogService.Error("Storage", $"Sudah ada storage bernama \"{nama}\".");
+            DialogService.Error("Storage", Services.Loc.Format("Ui_Storage_NameTaken", nama));
             return;
         }
 
@@ -280,13 +291,13 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         var batas = ParseNullableGb(EditBatas);
         if (!kapasitas.Ok)
         {
-            DialogService.Error("Storage", "Kapasitas harus berupa angka GB positif, contoh 1000 atau 960,5.");
+            DialogService.Error("Storage", Services.Loc.Get("Ui_Storage_CapacityInvalid"));
             return;
         }
 
         if (!batas.Ok)
         {
-            DialogService.Error("Storage", "Batas harus berupa angka GB positif, contoh 900 atau 850.");
+            DialogService.Error("Storage", Services.Loc.Get("Ui_Storage_LimitInvalid"));
             return;
         }
 
@@ -296,7 +307,7 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         updated.KapasitasGb = kapasitas.Value;
         updated.BatasGb = batas.Value;
         await _storageRepository.UpdateAsync(updated);
-        StatusText = $"Tersimpan: {nama}.";
+        StatusText = Services.Loc.Format("Ui_Storage_Saved", nama);
         await ReloadAsync();
     }
 
@@ -311,18 +322,18 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         var count = await _gameRepository.CountByStorageAsync(SelectedItem.Storage.Id);
         if (count > 0)
         {
-            DialogService.Error("Storage", $"Storage ini masih memegang {count} game. Pindahkan dulu game-nya.");
+            DialogService.Error("Storage", Services.Loc.Format("Ui_Storage_InUse", count));
             return;
         }
 
-        if (!DialogService.Confirm("Hapus Storage", $"Hapus storage \"{SelectedItem.Storage.Nama}\"?"))
+        if (!DialogService.Confirm(Services.Loc.Get("Ui_Storage_DeleteTitle"), Services.Loc.Format("Ui_Storage_DeleteConfirm", SelectedItem.Storage.Nama)))
         {
             return;
         }
 
         await _storageRepository.DeleteAsync(SelectedItem.Storage.Id);
         SelectedItem = null;
-        StatusText = "Storage dihapus.";
+        StatusText = Services.Loc.Get("Ui_Storage_Deleted");
         await ReloadAsync();
     }
 
@@ -335,7 +346,7 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         }
 
         var storages = await _storageRepository.GetAllAsync();
-        var target = Views.StoragePickerDialog.Show(storages, "Pindahkan ke Storage");
+        var target = Views.StoragePickerDialog.Show(storages, Services.Loc.Get("Ui_Move_To"));
         if (target is null)
         {
             return;
@@ -343,7 +354,7 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
 
         var ids = SelectedGames.Select(g => g.Game.Id).ToList();
         await _gameRepository.MoveToStorageAsync(ids, target.Id);
-        StatusText = $"{ids.Count} game dipindahkan ke {target.Nama}.";
+        StatusText = Services.Loc.Format("Ui_Storage_Moved", ids.Count, target.Nama);
         await ReloadAsync();
     }
 

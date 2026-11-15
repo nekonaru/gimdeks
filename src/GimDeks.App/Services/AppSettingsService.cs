@@ -11,6 +11,7 @@ public sealed class AppSettings
     public bool IsMaximized { get; set; }
     public bool IsLightTheme { get; set; }
     public string? LastImportedPath { get; set; }
+    public string UiLanguage { get; set; } = "id";
 }
 
 /// <summary>Persists window geometry and small UI preferences as JSON next to the database.</summary>

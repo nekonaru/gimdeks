@@ -5,29 +5,29 @@
              xmlns:vm="clr-namespace:GimDeks.App.ViewModels">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="28,24">
-            <TextBlock Text="Dashboard" FontSize="28" FontWeight="Bold" />
-            <TextBlock Text="Ringkasan kapasitas semua storage. Klik kartu untuk membuka daftar gamenya."
+            <TextBlock Text="{DynamicResource Ui_Dashboard_Title}" FontSize="28" FontWeight="Bold" />
+            <TextBlock Text="{DynamicResource Ui_Dashboard_Subtitle}"
                        Opacity="0.7" Margin="0,2,0,18" />
 
             <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
                 <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}"
                         CornerRadius="12" Padding="18,14" Margin="0,0,12,0" MinWidth="170">
                     <StackPanel>
-                        <TextBlock Text="TOTAL GAME" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Ui_Dashboard_TotalGames}" FontSize="11" Opacity="0.6" />
                         <TextBlock Text="{Binding TotalGamesText}" FontSize="26" FontWeight="Bold" Margin="0,2,0,0" />
                     </StackPanel>
                 </Border>
                 <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}"
                         CornerRadius="12" Padding="18,14" Margin="0,0,12,0" MinWidth="170">
                     <StackPanel>
-                        <TextBlock Text="TOTAL UKURAN" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Ui_Dashboard_TotalSize}" FontSize="11" Opacity="0.6" />
                         <TextBlock Text="{Binding TotalSizeText}" FontSize="26" FontWeight="Bold" Margin="0,2,0,0" />
                     </StackPanel>
                 </Border>
                 <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}"
                         CornerRadius="12" Padding="18,14" MinWidth="230">
                     <StackPanel>
-                        <TextBlock Text="STATUS LAIN" FontSize="11" Opacity="0.6" />
+                        <TextBlock Text="{DynamicResource Ui_Dashboard_OtherStatus}" FontSize="11" Opacity="0.6" />
                         <TextBlock Text="{Binding ExcludedText}" FontSize="15" FontWeight="SemiBold" Margin="0,6,0,0" />
                     </StackPanel>
                 </Border>
@@ -70,7 +70,7 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </Border.Style>
-                                            <TextBlock Text="Melebihi batas" FontSize="10" FontWeight="Bold" Foreground="#1F1300" />
+                                            <TextBlock Text="{DynamicResource Ui_Dashboard_OverBadge}" FontSize="10" FontWeight="Bold" Foreground="#1F1300" />
                                         </Border>
                                     </Grid>
 
@@ -103,7 +103,7 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <TextBlock Text="Belum ada storage. Import file Excel kamu dari menu Import / Export."
+            <TextBlock Text="{DynamicResource Ui_Dashboard_Empty}"
                        Opacity="0.6" FontSize="13" Margin="4,8,0,0"
                        Visibility="{Binding Storages.Count, Converter={StaticResource CountToVisibilityConverter}}" />
         </StackPanel>

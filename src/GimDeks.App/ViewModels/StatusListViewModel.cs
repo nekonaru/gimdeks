@@ -54,7 +54,7 @@ public abstract partial class StatusListViewModelBase : ObservableObject, IRefre
                 Game = game,
                 StorageName = game.Status is GameStatus.Dikecualikan or GameStatus.Dieliminasi
                     ? (game.Status == GameStatus.Dikecualikan ? game.Alasan ?? "" : game.AsalStorage ?? "")
-                    : "Tanpa Storage",
+                    : Services.Loc.Get("Ui_NoStorage"),
             });
         }
 
@@ -72,11 +72,11 @@ public abstract partial class StatusListViewModelBase : ObservableObject, IRefre
         var storages = await _storageRepository.GetAllAsync();
         if (storages.Count == 0)
         {
-            DialogService.Error("Pulihkan", "Belum ada storage. Buat atau import storage dulu.");
+            DialogService.Error(Services.Loc.Get("Ui_Dialog_Restore"), Services.Loc.Get("Ui_Restore_NoStorage"));
             return;
         }
 
-        var target = Views.StoragePickerDialog.Show(storages, "Pulihkan ke Storage");
+        var target = Views.StoragePickerDialog.Show(storages, Services.Loc.Get("Ui_Move_RestoreTitle"));
         if (target is null)
         {
             return;
@@ -92,7 +92,7 @@ public abstract partial class StatusListViewModelBase : ObservableObject, IRefre
             await _gameRepository.UpdateAsync(game);
         }
 
-        StatusText = $"{SelectedRows.Count} game dipulihkan ke {target.Nama}.";
+        StatusText = Services.Loc.Format("Ui_Restore_Done", SelectedRows.Count, target.Nama);
         await ReloadAsync();
     }
 
@@ -104,7 +104,7 @@ public abstract partial class StatusListViewModelBase : ObservableObject, IRefre
             return;
         }
 
-        if (!DialogService.Confirm("Hapus", $"Hapus {SelectedRows.Count} game dari daftar? Tindakan ini tidak bisa dibatalkan."))
+        if (!DialogService.Confirm(Services.Loc.Get("Ui_Delete_Title"), Services.Loc.Format("Ui_Delete_Confirm", SelectedRows.Count)))
         {
             return;
         }
@@ -123,9 +123,9 @@ public sealed class ExcludedViewModel : StatusListViewModelBase
     public ExcludedViewModel(IGameRepository gameRepository, IStorageRepository storageRepository)
         : base(gameRepository, storageRepository, GameStatus.Dikecualikan) { }
 
-    public override string Title => "Dikecualikan";
-    public override string Subtitle => "Game online, mobile, atau free yang tidak dihitung ke storage manapun.";
-    public override string AlasanHeader => "Alasan";
+    public override string Title => Services.Loc.Get("Ui_Excluded_Title");
+    public override string Subtitle => Services.Loc.Get("Ui_Excluded_Subtitle");
+    public override string AlasanHeader => Services.Loc.Get("Ui_Excluded_Reason");
 }
 
 public sealed class EliminatedViewModel : StatusListViewModelBase
@@ -133,7 +133,7 @@ public sealed class EliminatedViewModel : StatusListViewModelBase
     public EliminatedViewModel(IGameRepository gameRepository, IStorageRepository storageRepository)
         : base(gameRepository, storageRepository, GameStatus.Dieliminasi) { }
 
-    public override string Title => "Dieliminasi";
-    public override string Subtitle => "Game yang dikeluarkan dari rencana download.";
-    public override string AlasanHeader => "Asal HDD / Alasan";
+    public override string Title => Services.Loc.Get("Ui_Eliminated_Title");
+    public override string Subtitle => Services.Loc.Get("Ui_Eliminated_Subtitle");
+    public override string AlasanHeader => Services.Loc.Get("Ui_Eliminated_Reason");
 }

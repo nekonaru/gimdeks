@@ -35,7 +35,7 @@ public static class EnumDatabaseNames
         "LAPTOP_HDD" => StorageType.LaptopHdd,
         "LAPTOP_SSD" => StorageType.LaptopSsd,
         "VIRTUAL" => StorageType.Virtual,
-        _ => throw new FormatException($"Tipe storage tidak dikenal: {value}"),
+        _ => throw new FormatException($"Unknown storage type: {value}"),
     };
 
     public static string ToDatabase(this GameStatus status) => status switch
@@ -53,6 +53,6 @@ public static class EnumDatabaseNames
         "SUDAH_ADA" => GameStatus.SudahAda,
         "DIKECUALIKAN" => GameStatus.Dikecualikan,
         "DIELIMINASI" => GameStatus.Dieliminasi,
-        _ => throw new FormatException($"Status game tidak dikenal: {value}"),
+        _ => throw new FormatException($"Unknown game status: {value}"),
     };
 }

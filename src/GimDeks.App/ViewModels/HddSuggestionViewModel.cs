@@ -15,12 +15,12 @@ public sealed class HddSuggestionSlot
     public double TotalGb { get; init; }
     public double? LimitGb { get; init; }
 
-    private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
+    private static CultureInfo IdId => Services.AppCulture.Current;
 
     public string TotalText => $"{TotalGb.ToString("N1", IdId)} GB";
-    public string LimitText => LimitGb is { } limit ? $"dari batas {limit.ToString("N0", IdId)} GB" : "tanpa batas";
+    public string LimitText => LimitGb is { } limit ? Services.Loc.Format("Ui_FromLimit", limit.ToString("N0", IdId)) : Services.Loc.Get("Ui_NoLimitText");
     public double FillFraction => LimitGb is { } limit && limit > 0 ? Math.Clamp(TotalGb / limit, 0.0, 1.0) : 1.0;
-    public string GameCountText => $"{Games.Count} game";
+    public string GameCountText => Services.Loc.Format("Ui_GameCount", Games.Count);
 }
 
 public partial class HddSuggestionViewModel : ObservableObject, IRefreshable
@@ -105,24 +105,24 @@ public partial class HddSuggestionViewModel : ObservableObject, IRefreshable
         UnassignedGames.Clear();
         foreach (var game in unassigned)
         {
-            UnassignedGames.Add($"{game.Nama} ({game.UkuranGb.ToString("N1", CultureInfo.GetCultureInfo("id-ID"))} GB)");
+            UnassignedGames.Add($"{game.Nama} ({game.UkuranGb.ToString("N1", GimDeks.App.Services.AppCulture.Current)} GB)");
         }
 
         if (storages.Count == 0)
         {
-            SummaryText = "Belum ada storage HDD Eksternal.";
+            SummaryText = Services.Loc.Get("Ui_HddNoExternal");
         }
         else if (games.Count == 0)
         {
-            SummaryText = "Tidak ada game berstatus Belum Download.";
+            SummaryText = Services.Loc.Get("Ui_HddNoGames");
         }
         else if (unassigned.Count == 0)
         {
-            SummaryText = $"Semua {games.Count} game muat di {storages.Count} HDD Eksternal.";
+            SummaryText = Services.Loc.Format("Ui_HddAllFit", games.Count, storages.Count);
         }
         else
         {
-            SummaryText = $"{games.Count - unassigned.Count} dari {games.Count} game muat; {unassigned.Count} tidak ada tempatnya.";
+            SummaryText = Services.Loc.Format("Ui_HddPartialFit", games.Count - unassigned.Count, games.Count);
         }
     }
 }

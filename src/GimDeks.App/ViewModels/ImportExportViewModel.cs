@@ -16,9 +16,9 @@ public sealed class RingkasanRowView
     public required RingkasanRow Row { get; init; }
 
     public string Label => Row.Label;
-    public string ExpectedText => Row.ExpectedCount is null ? "-" : $"{Row.ExpectedCount} game / {Row.ExpectedGb?.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("id-ID")) ?? "-"} GB";
-    public string ActualText => $"{Row.ActualCount} game / {Row.ActualGb.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("id-ID"))} GB";
-    public string ResultText => Row.Matches ? "Cocok" : "Selisih";
+    public string ExpectedText => Row.ExpectedCount is null ? "-" : Services.Loc.Format("Ui_Import_Expected", Row.ExpectedCount, Row.ExpectedGb?.ToString("0.0", GimDeks.App.Services.AppCulture.Current) ?? "-");
+    public string ActualText => Services.Loc.Format("Ui_Import_Actual", Row.ActualCount, Row.ActualGb.ToString("0.0", GimDeks.App.Services.AppCulture.Current));
+    public string ResultText => Row.Matches ? Services.Loc.Get("Ui_Import_ResultMatch") : Services.Loc.Get("Ui_Import_ResultMismatch");
     public bool Mismatch => !Row.Matches;
 }
 
@@ -36,13 +36,13 @@ public partial class ImportExportViewModel : ObservableObject
     private string _filePath = "";
 
     [ObservableProperty]
-    private string _selectedMode = "Gabung";
+    private string _selectedMode = Services.Loc.Get("Ui_Import_ModeGabung");
 
     [ObservableProperty]
     private bool _isBusy;
 
     [ObservableProperty]
-    private string _statusText = "Pilih file Excel, lihat pratinjau, lalu impor.";
+    private string _statusText = Services.Loc.Get("Ui_Import_PickFile");
 
     [ObservableProperty]
     private string _previewSummary = "";
@@ -50,8 +50,8 @@ public partial class ImportExportViewModel : ObservableObject
     public bool IsPortable => _portable.IsPortable;
 
     public string PortableStatusText => IsPortable
-        ? "Mode portabel aktif: data tersimpan di folder aplikasi."
-        : "Mode portabel nonaktif: data tersimpan di profil pengguna.";
+        ? Services.Loc.Get("Ui_Import_PortableActive")
+        : Services.Loc.Get("Ui_Import_PortableInactive");
 
     public ImportExportViewModel(
         ExcelImportService importService,
@@ -68,7 +68,7 @@ public partial class ImportExportViewModel : ObservableObject
         _backup = backup;
         _settings = settings;
         _portable = portable;
-        ImportModes = new[] { "Gabung", "Ganti Semua" };
+        ImportModes = new[] { Services.Loc.Get("Ui_Import_ModeGabung"), Services.Loc.Get("Ui_Import_ModeGantiSemua") };
         Warnings = new ObservableCollection<string>();
         RingkasanRows = new ObservableCollection<RingkasanRowView>();
         SkippedSheets = new ObservableCollection<string>();
@@ -90,7 +90,7 @@ public partial class ImportExportViewModel : ObservableObject
         var dialog = new OpenFileDialog
         {
             Filter = "File Excel (*.xlsx)|*.xlsx",
-            Title = "Pilih Koleksi Game",
+            Title = Services.Loc.Get("Ui_Import_OpenTitle"),
         };
         if (dialog.ShowDialog() == true)
         {
@@ -108,14 +108,14 @@ public partial class ImportExportViewModel : ObservableObject
         }
 
         IsBusy = true;
-        StatusText = "Membaca file...";
+        StatusText = Services.Loc.Get("Ui_Import_ReadingFile");
         Warnings.Clear();
         RingkasanRows.Clear();
         SkippedSheets.Clear();
         try
         {
             var preview = await Task.Run(() => _importService.Preview(FilePath));
-            PreviewSummary = $"{preview.TotalStorages} storage, {preview.TotalGames} game terdeteksi.";
+            PreviewSummary = Services.Loc.Format("Ui_Import_Detected", preview.TotalStorages, preview.TotalGames);
             foreach (var warning in preview.Warnings)
             {
                 Warnings.Add(warning);
@@ -134,18 +134,18 @@ public partial class ImportExportViewModel : ObservableObject
                 }
 
                 StatusText = preview.Ringkasan.AllMatch
-                    ? "Pratinjau cocok dengan sheet Ringkasan."
-                    : "Pratinjau selesai; ada selisih dengan sheet Ringkasan.";
+                    ? Services.Loc.Get("Ui_Import_RingkasanMatch")
+                    : Services.Loc.Get("Ui_Import_RingkasanMismatch");
             }
             else
             {
-                StatusText = "Pratinjau selesai. Sheet Ringkasan tidak ditemukan; verifikasi dilewati.";
+                StatusText = Services.Loc.Get("Ui_Import_NoRingkasan");
             }
         }
         catch (Exception exception)
         {
-            StatusText = "Pratinjau gagal: " + exception.Message;
-            DialogService.Error("Pratinjau Gagal", exception.Message);
+            StatusText = Services.Loc.Format("Ui_Import_PreviewFailed", exception.Message);
+            DialogService.Error(Services.Loc.Get("Ui_Dialog_ImportPreview"), exception.Message);
         }
         finally
         {
@@ -161,31 +161,31 @@ public partial class ImportExportViewModel : ObservableObject
             return;
         }
 
-        var mode = SelectedMode == "Ganti Semua" ? ImportMode.GantiSemua : ImportMode.Gabung;
+        var mode = SelectedMode == Services.Loc.Get("Ui_Import_ModeGantiSemua") ? ImportMode.GantiSemua : ImportMode.Gabung;
         var warning = mode == ImportMode.GantiSemua
-            ? "Mode Ganti Semua akan MENGOSONGKAN semua data yang ada dan menggantinya dengan isi file. Backup otomatis tetap dibuat. Lanjutkan?"
-            : "Mode Gabung melewati game dengan nama dan storage yang sama. Lanjutkan?";
+            ? Services.Loc.Get("Ui_Import_GantiSemuaConfirm")
+            : Services.Loc.Get("Ui_Import_GabungConfirm");
 
-        if (!DialogService.Confirm("Import Excel", warning))
+        if (!DialogService.Confirm(Services.Loc.Get("Ui_Dialog_ImportTitle"), warning))
         {
             return;
         }
 
         IsBusy = true;
-        StatusText = "Mengimpor...";
+        StatusText = Services.Loc.Get("Ui_Import_Importing");
         try
         {
             var result = await _importService.ImportAsync(FilePath, mode);
             _settings.SaveLastImportedPath(FilePath);
-            var skippedText = result.GamesSkippedAsDuplicate > 0 ? $", {result.GamesSkippedAsDuplicate} dilewati (duplikat)" : "";
-            StatusText = $"Import selesai: {result.StoragesAdded} storage baru, {result.GamesAdded} game masuk{skippedText}.";
+            var skippedText = result.GamesSkippedAsDuplicate > 0 ? Services.Loc.Format("Ui_Import_SkippedDup", result.GamesSkippedAsDuplicate) : "";
+            StatusText = Services.Loc.Format("Ui_Import_Done", result.StoragesAdded, result.GamesAdded, skippedText);
             DataChanged?.Invoke();
             await PreviewAsync(); // refresh the preview panel with the new state
         }
         catch (Exception exception)
         {
-            StatusText = "Import gagal: " + exception.Message;
-            DialogService.Error("Import Gagal", exception.Message);
+            StatusText = Services.Loc.Format("Ui_Import_ImportFailed", exception.Message);
+            DialogService.Error(Services.Loc.Get("Ui_Dialog_ImportFailed"), exception.Message);
         }
         finally
         {
@@ -200,7 +200,7 @@ public partial class ImportExportViewModel : ObservableObject
         {
             Filter = "File Excel (*.xlsx)|*.xlsx",
             FileName = "Koleksi_Game.xlsx",
-            Title = "Ekspor ke Excel",
+            Title = Services.Loc.Get("Ui_Import_ExportTitle"),
         };
         if (dialog.ShowDialog() != true)
         {
@@ -208,18 +208,18 @@ public partial class ImportExportViewModel : ObservableObject
         }
 
         IsBusy = true;
-        StatusText = "Mengekspor...";
+        StatusText = Services.Loc.Get("Ui_Import_Exporting");
         try
         {
             var storages = await _storageRepository.GetAllAsync();
             var games = await _gameRepository.GetAllAsync();
             await Task.Run(() => _exporter.Export(dialog.FileName, storages, games));
-            StatusText = $"Diekspor ke {dialog.FileName}.";
+            StatusText = Services.Loc.Format("Ui_Import_ExportDone", dialog.FileName);
         }
         catch (Exception exception)
         {
-            StatusText = "Export gagal: " + exception.Message;
-            DialogService.Error("Export Gagal", exception.Message);
+            StatusText = Services.Loc.Format("Ui_Import_ExportFailed", exception.Message);
+            DialogService.Error(Services.Loc.Get("Ui_Dialog_ExportFailed"), exception.Message);
         }
         finally
         {
@@ -234,12 +234,12 @@ public partial class ImportExportViewModel : ObservableObject
         try
         {
             var destination = await _backup.BackupAsync();
-            StatusText = $"Backup tersimpan di {destination}.";
+            StatusText = Services.Loc.Format("Ui_Import_BackupDone", destination);
         }
         catch (Exception exception)
         {
-            StatusText = "Backup gagal: " + exception.Message;
-            DialogService.Error("Backup Gagal", exception.Message);
+            StatusText = Services.Loc.Format("Ui_Import_BackupFailed", exception.Message);
+            DialogService.Error(Services.Loc.Get("Ui_Dialog_BackupFailed"), exception.Message);
         }
         finally
         {
@@ -253,7 +253,7 @@ public partial class ImportExportViewModel : ObservableObject
         var dialog = new OpenFileDialog
         {
             Filter = "GimDeks backup (*.db)|*.db",
-            Title = "Pulihkan dari Backup",
+            Title = Services.Loc.Get("Ui_Import_RestoreTitle"),
             InitialDirectory = Directory.Exists(_backup.BackupsDirectory) ? _backup.BackupsDirectory : null,
         };
         if (dialog.ShowDialog() != true)
@@ -261,7 +261,7 @@ public partial class ImportExportViewModel : ObservableObject
             return;
         }
 
-        if (!DialogService.Confirm("Pulihkan Backup", "Seluruh data sekarang akan diganti dengan isi file backup. Backup sebelum restore tetap dibuat. Lanjutkan?"))
+        if (!DialogService.Confirm(Services.Loc.Get("Ui_Import_RestoreTitle"), Services.Loc.Get("Ui_Import_RestoreConfirm")))
         {
             return;
         }
@@ -270,13 +270,13 @@ public partial class ImportExportViewModel : ObservableObject
         try
         {
             await _backup.RestoreAsync(dialog.FileName);
-            StatusText = "Data dipulihkan dari backup.";
+            StatusText = Services.Loc.Get("Ui_Import_RestoreDone");
             DataChanged?.Invoke();
         }
         catch (Exception exception)
         {
-            StatusText = "Pulihkan gagal: " + exception.Message;
-            DialogService.Error("Pulihkan Gagal", exception.Message);
+            StatusText = Services.Loc.Format("Ui_Import_RestoreFailed", exception.Message);
+            DialogService.Error(Services.Loc.Get("Ui_Dialog_RestoreFailed"), exception.Message);
         }
         finally
         {
@@ -293,9 +293,8 @@ public partial class ImportExportViewModel : ObservableObject
         }
 
         if (!DialogService.Confirm(
-                "Aktifkan Mode Portabel",
-                "Seluruh data akan dipindahkan ke folder \"data\" di sebelah aplikasi. " +
-                "Aplikasi kemudian ditutup; buka kembali dengan aplikasi yang sama untuk memakai data baru. Lanjutkan?"))
+                Services.Loc.Get("Ui_Portable_EnableTitle"),
+                Services.Loc.Get("Ui_Portable_EnableConfirm")))
         {
             return;
         }
@@ -303,13 +302,13 @@ public partial class ImportExportViewModel : ObservableObject
         try
         {
             var target = await _portable.EnableAsync();
-            DialogService.Info("Mode Portabel", $"Data dipindahkan ke:\n{target}\n\nAplikasi akan ditutup. Buka kembali untuk memakai data di lokasi baru.");
+            DialogService.Info(Services.Loc.Get("Ui_Dialog_PortableMode"), Services.Loc.Format("Ui_Portable_EnableDone", target));
             System.Windows.Application.Current.Shutdown();
         }
         catch (Exception exception)
         {
-            StatusText = "Gagal mengaktifkan mode portabel: " + exception.Message;
-            DialogService.Error("Mode Portabel Gagal", exception.Message);
+            StatusText = Services.Loc.Format("Ui_Portable_EnableFailed", exception.Message);
+            DialogService.Error(Services.Loc.Get("Ui_Dialog_PortableFailed"), exception.Message);
         }
     }
 
@@ -322,9 +321,8 @@ public partial class ImportExportViewModel : ObservableObject
         }
 
         if (!DialogService.Confirm(
-                "Kembali ke Mode Biasa",
-                "Seluruh data akan dipindahkan dari folder aplikasi kembali ke profil pengguna. " +
-                "Aplikasi kemudian ditutup; buka kembali untuk memakai data di lokasi baru. Lanjutkan?"))
+                Services.Loc.Get("Ui_Dialog_NormalMode"),
+                Services.Loc.Get("Ui_Portable_DisableConfirm")))
         {
             return;
         }
@@ -332,13 +330,13 @@ public partial class ImportExportViewModel : ObservableObject
         try
         {
             var target = await _portable.DisableAsync();
-            DialogService.Info("Mode Biasa", $"Data dipindahkan ke:\n{target}\n\nAplikasi akan ditutup. Buka kembali untuk memakai data di lokasi baru.");
+            DialogService.Info(Services.Loc.Get("Ui_Dialog_NormalMode"), Services.Loc.Format("Ui_Portable_EnableDone", target));
             System.Windows.Application.Current.Shutdown();
         }
         catch (Exception exception)
         {
-            StatusText = "Gagal menonaktifkan mode portabel: " + exception.Message;
-            DialogService.Error("Mode Portabel Gagal", exception.Message);
+            StatusText = Services.Loc.Format("Ui_Portable_DisableFailed", exception.Message);
+            DialogService.Error(Services.Loc.Get("Ui_Dialog_PortableFailed"), exception.Message);
         }
     }
 
@@ -346,8 +344,8 @@ public partial class ImportExportViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(FilePath) || !File.Exists(FilePath))
         {
-            StatusText = "Pilih file Excel yang valid dulu.";
-            DialogService.Error("File Belum Dipilih", "Pilih file .xlsx yang valid terlebih dahulu.");
+            StatusText = Services.Loc.Get("Ui_Import_SelectFile");
+            DialogService.Error(Services.Loc.Get("Ui_Import_FileTitle"), Services.Loc.Get("Ui_Import_SelectFile"));
             return false;
         }
 

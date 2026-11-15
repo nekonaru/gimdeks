@@ -8,7 +8,7 @@ namespace GimDeks.App.Views;
 
 public partial class GameEditDialog : Window
 {
-    private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
+    private static CultureInfo IdId => Services.AppCulture.Current;
 
     private readonly List<Storage> _storages;
     private readonly Game? _original;
@@ -18,14 +18,14 @@ public partial class GameEditDialog : Window
         InitializeComponent();
         _storages = storages.ToList();
         _original = original;
-        Title = original is null ? "Tambah Game" : "Ubah Game";
+        Title = original is null ? Services.Loc.Get("Ui_GameDialog_AddTitle") : Services.Loc.Get("Ui_GameDialog_EditTitle");
 
         StatusComboBox.ItemsSource = new[]
         {
-            new StatusOption(GameStatus.BelumDownload, "Belum Download"),
-            new StatusOption(GameStatus.SudahAda, "Sudah Ada"),
-            new StatusOption(GameStatus.Dikecualikan, "Dikecualikan"),
-            new StatusOption(GameStatus.Dieliminasi, "Dieliminasi"),
+            new StatusOption(GameStatus.BelumDownload, Services.Loc.Get("Ui_Status_BelumDownload")),
+            new StatusOption(GameStatus.SudahAda, Services.Loc.Get("Ui_Status_SudahAda")),
+            new StatusOption(GameStatus.Dikecualikan, Services.Loc.Get("Ui_Status_Dikecualikan")),
+            new StatusOption(GameStatus.Dieliminasi, Services.Loc.Get("Ui_Status_Dieliminasi")),
         };
         StorageComboBox.ItemsSource = BuildStorageItems(_storages);
 
@@ -34,7 +34,7 @@ public partial class GameEditDialog : Window
             NamaTextBox.Text = original.Nama;
             UpdateCoverPreview(original.Id);
             FetchCoverButton.IsEnabled = original.Id > 0;
-            CoverHintText.Text = "Cari ke Steam dan unduh cover (internet).";
+            CoverHintText.Text = Services.Loc.Get("Ui_GameDialog_CoverEnabled");
             VersiTextBox.Text = original.Versi ?? "";
             UkuranTextBox.Text = original.UkuranGb.ToString("N1", IdId);
             StatusComboBox.SelectedItem = ((StatusOption[])StatusComboBox.ItemsSource)
@@ -53,7 +53,7 @@ public partial class GameEditDialog : Window
             StatusComboBox.SelectedItem = ((StatusOption[])StatusComboBox.ItemsSource).First();
             StorageComboBox.SelectedIndex = 0;
             FetchCoverButton.IsEnabled = false;
-            CoverHintText.Text = "Simpan game ini dulu, lalu buka lagi untuk mengunduh cover.";
+            CoverHintText.Text = Services.Loc.Get("Ui_GameDialog_CoverNewGame");
         }
     }
 
@@ -61,7 +61,7 @@ public partial class GameEditDialog : Window
     public string ResultTagText => TagTextBox.Text.Trim();
 
     private static StorageOption[] BuildStorageItems(IEnumerable<Storage> storages) =>
-        new[] { new StorageOption(null, "Tanpa Storage") }
+        new[] { new StorageOption(null, Services.Loc.Get("Ui_NoStorage")) }
             .Concat(storages.OrderBy(s => s.Urutan).ThenBy(s => s.Nama, StringComparer.CurrentCultureIgnoreCase)
                 .Select(s => new StorageOption(s.Id, s.Nama)))
             .ToArray();
@@ -90,7 +90,7 @@ public partial class GameEditDialog : Window
         var nama = NamaTextBox.Text.Trim();
         if (string.IsNullOrWhiteSpace(nama))
         {
-            ErrorTextBlock.Text = "Nama game wajib diisi.";
+            ErrorTextBlock.Text = Services.Loc.Get("Ui_GameDialog_NameRequired");
             return;
         }
 
@@ -98,13 +98,13 @@ public partial class GameEditDialog : Window
         var ukuran = string.IsNullOrWhiteSpace(ukuranText) ? 0.0 : NumberParser.ParseGb(ukuranText);
         if (ukuran is null)
         {
-            ErrorTextBlock.Text = "Ukuran harus berupa angka, contoh 32,2 atau 32.2.";
+            ErrorTextBlock.Text = Services.Loc.Get("Ui_GameDialog_SizeInvalid");
             return;
         }
 
         if (ukuran < 0)
         {
-            ErrorTextBlock.Text = "Ukuran tidak boleh negatif.";
+            ErrorTextBlock.Text = Services.Loc.Get("Ui_GameDialog_SizeNegative");
             return;
         }
 
@@ -146,13 +146,13 @@ public partial class GameEditDialog : Window
         var title = NamaTextBox.Text.Trim();
         if (string.IsNullOrWhiteSpace(title))
         {
-            ErrorTextBlock.Text = "Isi nama game dulu, lalu unduh cover.";
+            ErrorTextBlock.Text = Services.Loc.Get("Ui_GameDialog_CoverNameFirst");
             return;
         }
 
         if (System.Windows.MessageBox.Show(
-                $"Game \"{title}\" akan dicari di Steam (internet) dan cover-nya diunduh dari CDN Steam.\nData yang dikirim ke internet hanya judul game. Lanjutkan?",
-                "Ambil Cover (Internet)",
+                Services.Loc.Format("Ui_Cover_OnlineBody", title),
+                Services.Loc.Get("Ui_Cover_OnlineTitle"),
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question) != MessageBoxResult.Yes)
         {
@@ -160,22 +160,22 @@ public partial class GameEditDialog : Window
         }
 
         FetchCoverButton.IsEnabled = false;
-        CoverHintText.Text = "Mengunduh cover dari Steam...";
+        CoverHintText.Text = Services.Loc.Get("Ui_Cover_Downloading");
         try
         {
             var result = await new Services.SteamCoverService().FetchCoverAsync(title, _original.Id) is { } r ? r : null;
             if (result is null)
             {
-                CoverHintText.Text = "Tidak menemukan game ini di Steam.";
+                CoverHintText.Text = Services.Loc.Get("Ui_GameDialog_CoverNotFound");
                 return;
             }
 
             UpdateCoverPreview(_original.Id);
-            CoverHintText.Text = $"Cover tersimpan untuk \"{result.MatchedName}\".";
+            CoverHintText.Text = Services.Loc.Format("Ui_GameDialog_CoverSaved", result.MatchedName);
         }
         catch (Exception exception)
         {
-            CoverHintText.Text = "Gagal mengunduh cover: " + exception.Message;
+            CoverHintText.Text = Services.Loc.Format("Ui_GameDialog_CoverFailed", exception.Message);
         }
         finally
         {

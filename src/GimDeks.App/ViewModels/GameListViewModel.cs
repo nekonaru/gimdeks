@@ -11,25 +11,27 @@ namespace GimDeks.App.ViewModels;
 
 public sealed class GameRow
 {
-    private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
+    private static CultureInfo IdId => Services.AppCulture.Current;
 
     public required Game Game { get; init; }
     public required string StorageName { get; init; }
     public string TagsText { get; init; } = "";
     public string UkuranText => $"{Game.UkuranGb.ToString("N1", IdId)} GB";
-    public string StatusText => Game.Status switch
+    public string StatusText => Services.Loc.Get(Game.Status switch
     {
-        GameStatus.BelumDownload => "Belum Download",
-        GameStatus.SudahAda => "Sudah Ada",
-        GameStatus.Dikecualikan => "Dikecualikan",
-        GameStatus.Dieliminasi => "Dieliminasi",
-        _ => Game.Status.ToString(),
-    };
+        GameStatus.BelumDownload => "Ui_Status_BelumDownload",
+        GameStatus.SudahAda => "Ui_Status_SudahAda",
+        GameStatus.Dikecualikan => "Ui_Status_Dikecualikan",
+        GameStatus.Dieliminasi => "Ui_Status_Dieliminasi",
+        _ => "Ui_Status_BelumDownload",
+    });
 }
 
-public sealed record FilterOption(string Value, string Label)
+public sealed record FilterOption(string Value, string LabelKey)
 {
-    public static readonly FilterOption All = new("", "Semua");
+    public string Label => Services.Loc.Get(LabelKey);
+
+    public static readonly FilterOption All = new("", "Ui_All");
 }
 
 public partial class GameListViewModel : ObservableObject, IRefreshable
@@ -75,16 +77,16 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         StatusOptions = new[]
         {
             FilterOption.All,
-            new FilterOption(GameStatus.BelumDownload.ToDatabase(), "Belum Download"),
-            new FilterOption(GameStatus.SudahAda.ToDatabase(), "Sudah Ada"),
-            new FilterOption(GameStatus.Dikecualikan.ToDatabase(), "Dikecualikan"),
-            new FilterOption(GameStatus.Dieliminasi.ToDatabase(), "Dieliminasi"),
+            new FilterOption(GameStatus.BelumDownload.ToDatabase(), "Ui_Status_BelumDownload"),
+            new FilterOption(GameStatus.SudahAda.ToDatabase(), "Ui_Status_SudahAda"),
+            new FilterOption(GameStatus.Dikecualikan.ToDatabase(), "Ui_Status_Dikecualikan"),
+            new FilterOption(GameStatus.Dieliminasi.ToDatabase(), "Ui_Status_Dieliminasi"),
         };
         SelesaiOptions = new[]
         {
             FilterOption.All,
-            new FilterOption("ya", "Sudah Selesai"),
-            new FilterOption("tidak", "Belum Selesai"),
+            new FilterOption("ya", "Ui_SelesaiYes"),
+            new FilterOption("tidak", "Ui_SelesaiNo"),
         };
         StorageOptions = new ObservableCollection<FilterOption> { FilterOption.All };
         TagOptions = new ObservableCollection<FilterOption> { FilterOption.All };
@@ -125,7 +127,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             StorageOptions.Add(new FilterOption(storage.Id.ToString(CultureInfo.InvariantCulture), storage.Nama));
         }
 
-        StorageOptions.Add(new FilterOption("null", "Tanpa Storage"));
+        StorageOptions.Add(new FilterOption("null", "Ui_NoStorage"));
         SelectedStorage = StorageOptions.FirstOrDefault(o => o.Value == current.Value) ?? FilterOption.All;
 
         var allTags = await _tagRepository.GetAllAsync();
@@ -236,7 +238,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             .Select(g => new GameRow
             {
                 Game = g,
-                StorageName = g.StorageId is { } id && storageById.TryGetValue(id, out var name) ? name : "Tanpa Storage",
+                StorageName = g.StorageId is { } id && storageById.TryGetValue(id, out var name) ? name : Services.Loc.Get("Ui_NoStorage"),
                 TagsText = tagsByGame.TryGetValue(g.Id, out var tagText) ? tagText : "",
             })
             .ToList();
@@ -248,7 +250,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         }
 
         var selesaiCount = filtered.Count(g => g.SelesaiMain);
-        SummaryText = $"{rows.Count} game ditampilkan | {selesaiCount} sudah selesai";
+        SummaryText = Services.Loc.Format("Ui_GameList_Summary", rows.Count, selesaiCount);
     }
 
     [RelayCommand]
@@ -257,14 +259,13 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         var rows = SelectedRows.ToList();
         if (rows.Count == 0)
         {
-            StatusText = "Pilih game yang ingin diunduh cover-nya (Ctrl+klik atau klik).";
+            StatusText = Services.Loc.Get("Ui_Button_SelectDownloadCoverHint");
             return;
         }
 
         if (!DialogService.Confirm(
-                "Unduh Cover (Internet)",
-                $"{rows.Count} game akan dicari di Steam dan cover-nya diunduh dari CDN Steam.\n" +
-                "Data yang dikirim ke internet hanya judul game. Lanjutkan?"))
+                Services.Loc.Get("Ui_Cover_Title"),
+                Services.Loc.Format("Ui_Cover_FetchConfirm", rows.Count)))
         {
             return;
         }
@@ -273,7 +274,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         var ok = 0;
         foreach (var (row, index) in rows.Select((r, i) => (r, i)))
         {
-            StatusText = $"Mengunduh cover... ({index + 1}/{rows.Count}) {row.Game.Nama}";
+            StatusText = Services.Loc.Format("Ui_Cover_Progress", index + 1, rows.Count) + " " + row.Game.Nama;
             try
             {
                 var result = await service.FetchCoverAsync(row.Game.Nama, row.Game.Id);
@@ -288,7 +289,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             }
         }
 
-        StatusText = $"Cover diunduh untuk {ok} dari {rows.Count} game.";
+        StatusText = Services.Loc.Format("Ui_Cover_Progress", ok, rows.Count);
         await ReloadAsync();
     }
 
@@ -353,9 +354,9 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         }
 
         var message = SelectedRows.Count == 1
-            ? $"Hapus \"{SelectedRows[0].Game.Nama}\"?"
-            : $"Hapus {SelectedRows.Count} game yang dipilih?";
-        if (!DialogService.Confirm("Hapus Game", message))
+            ? Services.Loc.Format("Ui_GameList_DeleteConfirmOne", SelectedRows[0].Game.Nama)
+            : Services.Loc.Format("Ui_GameList_DeleteConfirmMany", SelectedRows.Count);
+        if (!DialogService.Confirm(Services.Loc.Get("Ui_GameList_DeleteTitle"), message))
         {
             return;
         }
@@ -377,7 +378,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         }
 
         var storages = await _storageRepository.GetAllAsync();
-        var target = Views.StoragePickerDialog.Show(storages, "Pindahkan ke Storage");
+        var target = Views.StoragePickerDialog.Show(storages, Services.Loc.Get("Ui_Move_To"));
         if (target is null)
         {
             return;

@@ -15,14 +15,14 @@ public sealed class DuplicateMember
     public required string StorageName { get; init; }
     public required bool IsKeeper { get; init; }
 
-    private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
+    private static CultureInfo IdId => Services.AppCulture.Current;
 
     public string UkuranText => $"{Game.UkuranGb.ToString("N1", IdId)} GB";
     public string StatusText => Game.Status switch
     {
-        GameStatus.BelumDownload => "Belum Download",
-        GameStatus.SudahAda => "Sudah Ada",
-        _ => Game.Status.ToString(),
+        GameStatus.BelumDownload => Services.Loc.Get("Ui_Status_BelumDownload"),
+        GameStatus.SudahAda => Services.Loc.Get("Ui_Status_SudahAda"),
+        _ => Services.Loc.Get("Ui_Status_BelumDownload"),
     };
 }
 
@@ -76,7 +76,7 @@ public partial class DuplicatesViewModel : ObservableObject, IRefreshable
                 .Select((g, index) => new DuplicateMember
                 {
                     Game = g,
-                    StorageName = g.StorageId is { } id && storageNames.TryGetValue(id, out var name) ? name : "Tanpa Storage",
+                    StorageName = g.StorageId is { } id && storageNames.TryGetValue(id, out var name) ? name : Services.Loc.Get("Ui_NoStorage"),
                     IsKeeper = index == 0,
                 })
                 .ToList();
@@ -85,8 +85,8 @@ public partial class DuplicatesViewModel : ObservableObject, IRefreshable
         }
 
         SummaryText = Groups.Count == 0
-            ? "Tidak ada duplikat terdeteksi."
-            : $"{Groups.Count} grup duplikat ({Groups.Sum(g => g.Members.Count)} game)";
+            ? Services.Loc.Get("Ui_NoDuplicatesFound")
+            : Services.Loc.Format("Ui_DuplicateGroups", Groups.Count, Groups.Sum(g => g.Members.Count));
         StatusText = "";
     }
 
@@ -100,8 +100,8 @@ public partial class DuplicatesViewModel : ObservableObject, IRefreshable
 
         var losers = group.Members.Where(m => !m.IsKeeper).ToList();
         if (!DialogService.Confirm(
-                "Hapus Duplikat",
-                $"Hapus {losers.Count} duplikat dari grup \"{group.Key}\"? Yang tersisa: {group.Members.First(m => m.IsKeeper).Game.Nama}."))
+                Services.Loc.Get("Ui_DeleteDuplicatesTitle"),
+                Services.Loc.Format("Ui_DeleteDuplicatesBody", losers.Count, group.Key, group.Members.First(m => m.IsKeeper).Game.Nama)))
         {
             return;
         }
@@ -111,7 +111,7 @@ public partial class DuplicatesViewModel : ObservableObject, IRefreshable
             await _gameRepository.DeleteAsync(member.Game.Id);
         }
 
-        StatusText = $"{losers.Count} duplikat dihapus.";
+        StatusText = Services.Loc.Format("Ui_DeleteDuplicatesDone", losers.Count);
         await ReloadAsync();
     }
 
@@ -125,8 +125,8 @@ public partial class DuplicatesViewModel : ObservableObject, IRefreshable
 
         var losers = group.Members.Where(m => !m.IsKeeper).ToList();
         if (!DialogService.Confirm(
-                "Eliminasi Duplikat",
-                $"Tandai {losers.Count} duplikat dari grup \"{group.Key}\" sebagai Dieliminasi?"))
+                Services.Loc.Get("Ui_Duplicates_EliminateTitle"),
+                Services.Loc.Format("Ui_EliminateDuplicatesBody", losers.Count, group.Key)))
         {
             return;
         }
@@ -136,11 +136,11 @@ public partial class DuplicatesViewModel : ObservableObject, IRefreshable
             var game = member.Game;
             game.Status = GameStatus.Dieliminasi;
             game.StorageId = null;
-            game.Alasan = $"Duplikat dari {group.Members.First(m => m.IsKeeper).Game.Nama}";
+            game.Alasan = Services.Loc.Format("Ui_DuplicateOf", group.Members.First(m => m.IsKeeper).Game.Nama);
             await _gameRepository.UpdateAsync(game);
         }
 
-        StatusText = $"{losers.Count} duplikat ditandai Dieliminasi.";
+        StatusText = Services.Loc.Format("Ui_EliminateDuplicatesDone", losers.Count);
         await ReloadAsync();
     }
 }
