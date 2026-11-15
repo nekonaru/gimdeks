@@ -78,6 +78,21 @@
                 </StackPanel>
             </Border>
 
+            <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}" CornerRadius="12" Padding="18" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="MODE PORTABEL" FontSize="11" Opacity="0.6" />
+                    <TextBlock Text="{Binding PortableStatusText}" Opacity="0.75" Margin="0,6,0,10" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal">
+                        <Button Content="Aktifkan Mode Portabel..." Style="{StaticResource MaterialDesignRaisedButton}"
+                                Command="{Binding EnablePortableCommand}" Margin="0,0,10,0"
+                                Visibility="{Binding IsPortable, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                        <Button Content="Kembali ke Mode Biasa..." Style="{StaticResource MaterialDesignRaisedButton}"
+                                Command="{Binding DisablePortableCommand}"
+                                Visibility="{Binding IsPortable, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
             <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}" CornerRadius="12" Padding="18">
                 <StackPanel>
                     <TextBlock Text="EXPORT, BACKUP, RESTORE" FontSize="11" Opacity="0.6" />

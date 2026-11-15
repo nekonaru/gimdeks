@@ -55,6 +55,8 @@
                                         <StackPanel>
                                             <TextBlock Text="{Binding TipeLabel}" FontSize="10" Opacity="0.55" />
                                             <TextBlock Text="{Binding Storage.Nama}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding DriveDisconnectedText}" FontSize="11" Foreground="#FFB020"
+                                                       Visibility="{Binding DriveDisconnected, Converter={StaticResource BooleanToVisibilityConverter}}" />
                                         </StackPanel>
                                         <Border VerticalAlignment="Top" HorizontalAlignment="Right"
                                                 Background="#FFB020" CornerRadius="6" Padding="6,2">

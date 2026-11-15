@@ -29,6 +29,8 @@ public partial class ImportExportViewModel : ObservableObject
     private readonly IStorageRepository _storageRepository;
     private readonly IGameRepository _gameRepository;
     private readonly DatabaseBackupService _backup;
+    private readonly Services.AppSettingsService _settings;
+    private readonly Services.PortableModeService _portable;
 
     [ObservableProperty]
     private string _filePath = "";
@@ -45,17 +47,27 @@ public partial class ImportExportViewModel : ObservableObject
     [ObservableProperty]
     private string _previewSummary = "";
 
+    public bool IsPortable => _portable.IsPortable;
+
+    public string PortableStatusText => IsPortable
+        ? "Mode portabel aktif: data tersimpan di folder aplikasi."
+        : "Mode portabel nonaktif: data tersimpan di profil pengguna.";
+
     public ImportExportViewModel(
         ExcelImportService importService,
         IStorageRepository storageRepository,
         IGameRepository gameRepository,
-        DatabaseBackupService backup)
+        DatabaseBackupService backup,
+        Services.AppSettingsService settings,
+        Services.PortableModeService portable)
     {
         _importService = importService;
         _exporter = new ExcelExporter();
         _storageRepository = storageRepository;
         _gameRepository = gameRepository;
         _backup = backup;
+        _settings = settings;
+        _portable = portable;
         ImportModes = new[] { "Gabung", "Ganti Semua" };
         Warnings = new ObservableCollection<string>();
         RingkasanRows = new ObservableCollection<RingkasanRowView>();
@@ -83,6 +95,7 @@ public partial class ImportExportViewModel : ObservableObject
         if (dialog.ShowDialog() == true)
         {
             FilePath = dialog.FileName;
+            _settings.SaveLastImportedPath(FilePath);
         }
     }
 
@@ -163,6 +176,7 @@ public partial class ImportExportViewModel : ObservableObject
         try
         {
             var result = await _importService.ImportAsync(FilePath, mode);
+            _settings.SaveLastImportedPath(FilePath);
             var skippedText = result.GamesSkippedAsDuplicate > 0 ? $", {result.GamesSkippedAsDuplicate} dilewati (duplikat)" : "";
             StatusText = $"Import selesai: {result.StoragesAdded} storage baru, {result.GamesAdded} game masuk{skippedText}.";
             DataChanged?.Invoke();
@@ -267,6 +281,64 @@ public partial class ImportExportViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task EnablePortableAsync()
+    {
+        if (IsPortable)
+        {
+            return;
+        }
+
+        if (!DialogService.Confirm(
+                "Aktifkan Mode Portabel",
+                "Seluruh data akan dipindahkan ke folder \"data\" di sebelah aplikasi. " +
+                "Aplikasi kemudian ditutup; buka kembali dengan aplikasi yang sama untuk memakai data baru. Lanjutkan?"))
+        {
+            return;
+        }
+
+        try
+        {
+            var target = await _portable.EnableAsync();
+            DialogService.Info("Mode Portabel", $"Data dipindahkan ke:\n{target}\n\nAplikasi akan ditutup. Buka kembali untuk memakai data di lokasi baru.");
+            System.Windows.Application.Current.Shutdown();
+        }
+        catch (Exception exception)
+        {
+            StatusText = "Gagal mengaktifkan mode portabel: " + exception.Message;
+            DialogService.Error("Mode Portabel Gagal", exception.Message);
+        }
+    }
+
+    [RelayCommand]
+    private async Task DisablePortableAsync()
+    {
+        if (!IsPortable)
+        {
+            return;
+        }
+
+        if (!DialogService.Confirm(
+                "Kembali ke Mode Biasa",
+                "Seluruh data akan dipindahkan dari folder aplikasi kembali ke profil pengguna. " +
+                "Aplikasi kemudian ditutup; buka kembali untuk memakai data di lokasi baru. Lanjutkan?"))
+        {
+            return;
+        }
+
+        try
+        {
+            var target = await _portable.DisableAsync();
+            DialogService.Info("Mode Biasa", $"Data dipindahkan ke:\n{target}\n\nAplikasi akan ditutup. Buka kembali untuk memakai data di lokasi baru.");
+            System.Windows.Application.Current.Shutdown();
+        }
+        catch (Exception exception)
+        {
+            StatusText = "Gagal menonaktifkan mode portabel: " + exception.Message;
+            DialogService.Error("Mode Portabel Gagal", exception.Message);
         }
     }
 
