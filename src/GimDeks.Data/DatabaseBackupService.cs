@@ -50,7 +50,26 @@ public sealed class DatabaseBackupService
         await BackupAsync(ct);
 
         Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
-        File.Copy(backupFilePath, _factory.DatabasePath, overwrite: true);
+
+        // Copy to a temp file in the same folder, then swap atomically; a plain
+        // overwrite can leave a half-written database behind.
+        var directory = Path.GetDirectoryName(_factory.DatabasePath)!;
+        var temp = Path.Combine(directory, Path.GetFileName(_factory.DatabasePath) + ".restore-tmp");
+        File.Copy(backupFilePath, temp, overwrite: true);
+        try
+        {
+            File.Replace(temp, _factory.DatabasePath, null);
+        }
+        catch (PlatformNotSupportedException)
+        {
+            File.Copy(temp, _factory.DatabasePath, overwrite: true);
+            File.Delete(temp);
+        }
+        catch
+        {
+            try { if (File.Exists(temp)) File.Delete(temp); } catch { /* best effort */ }
+            throw;
+        }
     }
 
     public IReadOnlyList<string> ListBackups()

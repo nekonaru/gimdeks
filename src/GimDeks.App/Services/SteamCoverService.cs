@@ -14,9 +14,12 @@ public sealed class SteamCoverService
     private const long MaxBytes = 20 * 1024 * 1024; // 20 MB
     private static readonly HttpClient Http = CreateClient();
 
+    private const long MaxJsonBytes = 5L * 1024 * 1024; // 5 MB is far above any search response
+
     private static HttpClient CreateClient()
     {
-        var client = new HttpClient { MaxResponseContentBufferSize = MaxBytes };
+        var handler = new HttpClientHandler { UseCookies = false };
+        var client = new HttpClient(handler) { MaxResponseContentBufferSize = MaxBytes };
         client.DefaultRequestHeaders.UserAgent.ParseAdd("GimDeks/1.1");
         client.Timeout = TimeSpan.FromSeconds(15);
         return client;
@@ -71,6 +74,26 @@ public sealed class SteamCoverService
         return null;
     }
 
+    private static async Task<byte[]> ReadBoundedAsync(Stream stream, long maxBytes, CancellationToken ct)
+    {
+        using var ms = new MemoryStream();
+        var buffer = new byte[81920];
+        long total = 0;
+        int read;
+        while ((read = await stream.ReadAsync(buffer, ct)) > 0)
+        {
+            total += read;
+            if (total > maxBytes)
+            {
+                throw new InvalidDataException("The Steam search response is too large.");
+            }
+
+            await ms.WriteAsync(buffer.AsMemory(0, read), ct);
+        }
+
+        return ms.ToArray();
+    }
+
     private async Task<long?> FindAppIdAsync(string term, CancellationToken ct)
     {
         var url = $"https://store.steampowered.com/api/storesearch?term={Uri.EscapeDataString(term)}&l=en&cc=us";
@@ -80,8 +103,14 @@ public sealed class SteamCoverService
             return null;
         }
 
+        if (response.Content.Headers.ContentLength is { } length && length > MaxJsonBytes)
+        {
+            return null;
+        }
+
         using var stream = await response.Content.ReadAsStreamAsync(ct);
-        using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
+        var json = await ReadBoundedAsync(stream, MaxJsonBytes, ct);
+        using var doc = JsonDocument.Parse(json);
         if (!doc.RootElement.TryGetProperty("items", out var items) || items.ValueKind != JsonValueKind.Array || items.GetArrayLength() == 0)
         {
             return null;

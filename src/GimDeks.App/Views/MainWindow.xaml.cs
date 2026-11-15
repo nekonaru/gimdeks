@@ -36,12 +36,19 @@ public partial class MainWindow : Window
 
     private void OnClosing(object? sender, CancelEventArgs e)
     {
-        var settings = new AppSettings
+        _viewModel.StopWatcher();
+        var settings = _settings.Load();
+        settings.IsMaximized = WindowState == WindowState.Maximized;
+        if (WindowState != WindowState.Maximized)
         {
-            IsMaximized = WindowState == WindowState.Maximized,
-            WindowWidth = RestoreBounds.Width,
-            WindowHeight = RestoreBounds.Height,
-        };
+            settings.WindowWidth = Width;
+            settings.WindowHeight = Height;
+        }
+        else
+        {
+            settings.WindowWidth = RestoreBounds.Width;
+            settings.WindowHeight = RestoreBounds.Height;
+        }
         _settings.Save(settings);
     }
 }
