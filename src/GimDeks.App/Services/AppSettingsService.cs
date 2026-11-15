@@ -10,6 +10,7 @@ public sealed class AppSettings
     public double WindowHeight { get; set; } = 800;
     public bool IsMaximized { get; set; }
     public bool IsLightTheme { get; set; }
+    public string? LastImportedPath { get; set; }
 }
 
 /// <summary>Persists window geometry and small UI preferences as JSON next to the database.</summary>
@@ -19,7 +20,7 @@ public sealed class AppSettingsService
 
     public AppSettingsService()
     {
-        _settingsPath = Path.Combine(DatabasePaths.AppDataDirectory, "settings.json");
+        _settingsPath = DatabasePaths.ResolveSettingsPath();
     }
 
     public AppSettings Load()
@@ -38,6 +39,13 @@ public sealed class AppSettingsService
         {
             return new AppSettings();
         }
+    }
+
+    public void SaveLastImportedPath(string path)
+    {
+        var settings = Load();
+        settings.LastImportedPath = path;
+        Save(settings);
     }
 
     public void Save(AppSettings settings)

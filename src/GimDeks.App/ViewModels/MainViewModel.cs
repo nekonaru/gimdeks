@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.IO;
 
 namespace GimDeks.App.ViewModels;
 
@@ -22,8 +23,11 @@ public partial class MainViewModel : ObservableObject
         ImportExportViewModel importExport,
         DuplicatesViewModel duplicates,
         HddSuggestionViewModel hddSuggestion,
-        Services.ThemingService theming)
+        Services.ThemingService theming,
+        Services.AppSettingsService settings)
     {
+        _theming = theming;
+        _settings = settings;
         Dashboard = dashboard;
         GameList = gameList;
         Storage = storage;
@@ -48,12 +52,32 @@ public partial class MainViewModel : ObservableObject
         CurrentViewModel = dashboard;
         dashboard.OpenStorageGamesRequested += storageId => NavigateTo(Page.GameList, storageId);
         importExport.DataChanged += RefreshAll;
+        RegisterWatcher();
     }
 
     private readonly Services.ThemingService _theming;
+    private readonly Services.AppSettingsService _settings;
+    private FileSystemWatcher? _watcher;
+    private string? _watcherDirectory;
 
     [ObservableProperty]
     private bool _isLightTheme;
+
+    [ObservableProperty]
+    private bool _showExcelChangedBanner;
+
+    [RelayCommand]
+    private void FocusSearch()
+    {
+        NavigateTo(Page.GameList);
+        Services.FocusService.RaiseSearchRequested();
+    }
+
+    [RelayCommand]
+    private void AddGame() => GameList.AddGameCommand.Execute(null);
+
+    [RelayCommand]
+    private void Export() => ImportExport.ExportCommand.Execute(null);
 
     public IReadOnlyList<NavItem> NavItems { get; }
     public DashboardViewModel Dashboard { get; }
@@ -73,12 +97,46 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
+    private void RegisterWatcher()
+    {
+        var path = _settings.Load().LastImportedPath;
+        if (!string.IsNullOrWhiteSpace(_watcherDirectory) && string.Equals(_watcherDirectory, path, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        _watcher?.Dispose();
+        _watcher = null;
+        _watcherDirectory = path;
+        ShowExcelChangedBanner = false;
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+        {
+            return;
+        }
+
+        var directory = Path.GetDirectoryName(path)!;
+        _watcher = new FileSystemWatcher(directory, Path.GetFileName(path))
+        {
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.CreationTime,
+            EnableRaisingEvents = true,
+        };
+        _watcher.Changed += OnWatchedFileChanged;
+        _watcher.Created += OnWatchedFileChanged;
+    }
+
+    private void OnWatchedFileChanged(object sender, FileSystemEventArgs e)
+    {
+        System.Windows.Application.Current.Dispatcher.Invoke(() => ShowExcelChangedBanner = true);
+    }
+
     public void NavigateTo(Page page, long? storageFilter = null)
     {
         if (page == Page.GameList && storageFilter is not null)
         {
             GameList.SetStorageFilter(storageFilter);
         }
+
+        RegisterWatcher();
 
         CurrentPage = page;
         CurrentViewModel = page switch
@@ -102,6 +160,16 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void Navigate(Page page) => NavigateTo(page);
+
+    [RelayCommand]
+    private void DismissExcelChanged() => ShowExcelChangedBanner = false;
+
+    [RelayCommand]
+    private void ImportNow()
+    {
+        ShowExcelChangedBanner = false;
+        NavigateTo(Page.ImportExport);
+    }
 
     [RelayCommand]
     private void ToggleTheme()

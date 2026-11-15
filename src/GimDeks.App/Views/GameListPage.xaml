@@ -23,7 +23,7 @@
                     <ColumnDefinition Width="110" />
                     <ColumnDefinition Width="40" />
                 </Grid.ColumnDefinitions>
-                <TextBox Grid.Column="0" materialDesign:HintAssist.Hint="Cari nama game atau versi"
+                <TextBox Grid.Column="0" x:Name="SearchBox" materialDesign:HintAssist.Hint="Cari nama game atau versi"
                          Style="{StaticResource MaterialDesignOutlinedTextBox}"
                          Margin="0,0,10,0"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />

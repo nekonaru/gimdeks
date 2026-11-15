@@ -39,9 +39,17 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
     private readonly IStorageRepository _storageRepository;
     private readonly IGameRepository _gameRepository;
     private readonly IHistoryRepository _historyRepository;
+    private readonly IDriveLinkRepository _driveLinks;
+    private readonly DriveService _driveService;
 
     [ObservableProperty]
     private StorageListItem? _selectedItem;
+
+    [ObservableProperty]
+    private string? _selectedDriveLetter;
+
+    [ObservableProperty]
+    private string _driveStatusText = "";
 
     [ObservableProperty]
     private string _editNama = "";
@@ -64,11 +72,15 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
     public StorageViewModel(
         IStorageRepository storageRepository,
         IGameRepository gameRepository,
-        IHistoryRepository historyRepository)
+        IHistoryRepository historyRepository,
+        IDriveLinkRepository driveLinks,
+        DriveService driveService)
     {
         _storageRepository = storageRepository;
         _gameRepository = gameRepository;
         _historyRepository = historyRepository;
+        _driveLinks = driveLinks;
+        _driveService = driveService;
         Storages = new ObservableCollection<StorageListItem>();
         Games = new ObservableCollection<GameRow>();
         SelectedGames = new ObservableCollection<GameRow>();
@@ -87,8 +99,13 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
     public ObservableCollection<GameRow> Games { get; }
     public ObservableCollection<GameRow> SelectedGames { get; }
     public ObservableCollection<string> Riwayat { get; }
+    public ObservableCollection<DriveOption> DriveOptions { get; } = new();
     public IReadOnlyList<StorageTypeOption> TipeOptions { get; }
     public bool HasGameSelection => SelectedGames.Count > 0;
+    public sealed record DriveOption(string Letter, string DisplayText)
+    {
+        public override string ToString() => DisplayText;
+    }
 
     partial void OnSelectedItemChanged(StorageListItem? value)
     {
@@ -98,6 +115,9 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
             EditNama = "";
             EditKapasitas = "";
             EditBatas = "";
+            DriveOptions.Clear();
+            SelectedDriveLetter = null;
+            DriveStatusText = "";
             _ = ReloadGamesAsync(null);
             return;
         }
@@ -106,6 +126,7 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         EditTipe = TipeOptions.FirstOrDefault(o => o.Type == value.Storage.Tipe) ?? TipeOptions[0];
         EditKapasitas = value.Storage.KapasitasGb?.ToString("0.#", CultureInfo.GetCultureInfo("id-ID")) ?? "";
         EditBatas = value.Storage.BatasGb?.ToString("0.#", CultureInfo.GetCultureInfo("id-ID")) ?? "";
+        _ = LoadDriveOptionsAsync(value.Storage.Id);
         _ = ReloadGamesAsync(value.Storage.Id);
         _ = ReloadRiwayatAsync(value.Storage.Id);
     }
@@ -134,6 +155,54 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
 
         SelectedItem = Storages.FirstOrDefault(s => s.Storage.Id == previousId)
             ?? Storages.FirstOrDefault();
+    }
+
+    private async Task LoadDriveOptionsAsync(long storageId)
+    {
+        _loadingDrives = true;
+        try
+        {
+            DriveOptions.Clear();
+            DriveOptions.Add(new DriveOption("", "Tidak terhubung"));
+            foreach (var drive in _driveService.GetReadyDrives())
+            {
+                DriveOptions.Add(new DriveOption(drive.Letter, $"{drive.Letter} ({drive.Label}) - {drive.FreeText}"));
+            }
+
+            var links = await _driveLinks.GetAllAsync();
+            SelectedDriveLetter = links.TryGetValue(storageId, out var letter) ? letter : "";
+            UpdateDriveStatus(letter: SelectedDriveLetter);
+        }
+        finally
+        {
+            _loadingDrives = false;
+        }
+    }
+
+    private bool _loadingDrives;
+
+    private void UpdateDriveStatus(string? letter)
+    {
+        if (string.IsNullOrEmpty(letter))
+        {
+            DriveStatusText = "Tidak terhubung.";
+            return;
+        }
+
+        var drive = _driveService.FindDrive(letter);
+        DriveStatusText = drive is null ? $"Drive {letter} tidak tersedia." : $"{drive.Letter} ({drive.Label}) - {drive.FreeText}";
+    }
+
+    partial void OnSelectedDriveLetterChanged(string? value)
+    {
+        if (SelectedItem is null || _loadingDrives)
+        {
+            return;
+        }
+
+        var letter = string.IsNullOrEmpty(value) ? null : value;
+        _ = _driveLinks.SetAsync(SelectedItem.Storage.Id, letter);
+        UpdateDriveStatus(letter);
     }
 
     private async Task ReloadGamesAsync(long? storageId)

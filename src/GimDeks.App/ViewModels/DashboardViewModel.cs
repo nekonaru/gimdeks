@@ -23,6 +23,8 @@ public sealed class StorageCardItem
     public double ProgressFraction { get; init; }
     public bool IsOverLimit { get; init; }
     public bool HasLimit { get; init; }
+    public bool DriveDisconnected { get; init; }
+    public string DriveDisconnectedText { get; init; } = "";
 
     private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
 
@@ -63,6 +65,8 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
 {
     private readonly IStorageRepository _storageRepository;
     private readonly IGameRepository _gameRepository;
+    private readonly IDriveLinkRepository _driveLinks;
+    private readonly Services.DriveService _driveService;
 
     [ObservableProperty]
     private string _totalGamesText = "";
@@ -76,10 +80,12 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
     [ObservableProperty]
     private string _statusText = "";
 
-    public DashboardViewModel(IStorageRepository storageRepository, IGameRepository gameRepository)
+    public DashboardViewModel(IStorageRepository storageRepository, IGameRepository gameRepository, IDriveLinkRepository driveLinks, Services.DriveService driveService)
     {
         _storageRepository = storageRepository;
         _gameRepository = gameRepository;
+        _driveLinks = driveLinks;
+        _driveService = driveService;
     }
 
     public event Action<long>? OpenStorageGamesRequested;
@@ -108,12 +114,15 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
         var counted = games.Where(g => CapacityCalculator.CountsTowardTotal(g.Status)).ToList();
 
         Storages.Clear();
+        var driveLinks = await _driveLinks.GetAllAsync();
         foreach (var storage in storages)
         {
             var storageGames = counted.Where(g => g.StorageId == storage.Id).ToList();
             var total = storageGames.Sum(g => g.UkuranGb);
             var remaining = CapacityCalculator.RemainingGb(storage, total);
             var progress = CapacityCalculator.ProgressFraction(storage, total);
+            var driveDisconnected = driveLinks.TryGetValue(storage.Id, out var letter)
+                && _driveService.FindDrive(letter) is null;
 
             Storages.Add(new StorageCardItem
             {
@@ -125,6 +134,8 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
                 ProgressFraction = progress ?? 1.0,
                 IsOverLimit = CapacityCalculator.IsOverLimit(storage, total),
                 HasLimit = progress.HasValue,
+                DriveDisconnected = driveDisconnected,
+                DriveDisconnectedText = driveDisconnected ? $"Drive {driveLinks[storage.Id]} tidak terhubung" : "",
             });
         }
 

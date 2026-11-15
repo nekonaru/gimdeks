@@ -12,11 +12,9 @@ namespace GimDeks.App;
 
 public partial class App : Application
 {
-    private const string LogFileName = "gimdeks.log";
-
     public static IServiceProvider Services { get; private set; } = null!;
 
-    private static string LogPath => Path.Combine(DatabasePaths.AppDataDirectory, LogFileName);
+    private static string LogPath => DatabasePaths.ResolveLogPath();
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -68,6 +66,8 @@ public partial class App : Application
         services.AddSingleton<ExcelImportService>();
         services.AddSingleton<AppSettingsService>();
         services.AddSingleton<ThemingService>();
+        services.AddSingleton<DriveService>();
+        services.AddSingleton<PortableModeService>();
 
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<DashboardViewModel>();
