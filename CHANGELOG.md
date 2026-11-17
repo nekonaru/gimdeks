@@ -4,6 +4,33 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v1.2.0
+
+Interaction overhaul: sidebar tabs navigate again, the app remembers where you left off, and Koleksi_Game.xlsx imports by dropping it onto the window.
+
+## New features
+
+- **Drag and drop import.** Drop Koleksi_Game.xlsx anywhere on the window: the path is pre-filled and the preview opens automatically.
+- **Double-click to edit.** Double-click a game row to open the editor.
+- **Mark played through in bulk.** Select several games and toggle the played-through flag for all of them at once.
+- **Remembers where you left off.** The app reopens on the last open page and restores the window position and size (with off-screen clamping).
+- **Accessible names.** Navigation items and icon-only buttons are exposed to screen readers and Windows UI Automation.
+
+## Improvements
+
+- **Keyboard-friendly dashboard cards.** Storage cards are real buttons with keyboard activation and an accessible name.
+- **Window title and version line.** The title bar shows the current page, and the sidebar version line comes from the assembly instead of a hardcoded string.
+- **Silent failures are visible.** A failed page refresh logs to gimdeks.log and shows in the status bar instead of doing nothing.
+- **Crash log redacts paths.** Drive-letter paths are removed from the crash log.
+- **Cover art cached.** Covers are cached in memory, so scrolling the list is smoother.
+
+## Bug fixes
+
+- **Sidebar navigation.** Sidebar tabs now switch pages. In v1.0.0 and v1.1.0 clicking the tabs never navigated (a binding mode issue in the navigation view model); only the Ctrl+1..9 shortcuts worked.
+- **Toolbar actions without a selection** are disabled until a selection exists, instead of silently swallowing clicks.
+- **Settings on window close** no longer discard the language, the theme and the imported file path.
+- **The Excel file watcher** is stopped when the window closes and is correctly disposed when the language switches.
+
 ## v1.1.0
 
 GimDeks now speaks English as well as Bahasa Indonesia, asks before every online action, and is harder to corrupt: safer restores, safer portable mode, a clearer release gate.

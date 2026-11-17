@@ -4,6 +4,33 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v1.2.0
+
+Perbaikan menyeluruh interaksi: tab sidebar berfungsi lagi, aplikasi mengingat posisi kamu terakhir, dan Koleksi_Game.xlsx bisa diimpor dengan menyeretnya ke jendela.
+
+## Fitur baru
+
+- **Impor dengan drag and drop.** Seret Koleksi_Game.xlsx ke mana pun di jendela: path terisi otomatis dan pratinjau terbuka.
+- **Klik dua kali untuk ubah.** Klik dua kali baris game untuk membuka editornya.
+- **Tandai selesai secara massal.** Pilih beberapa game sekaligus dan centang flag selesai untuk semuanya.
+- **Mengingat posisi terakhir.** Aplikasi terbuka lagi di halaman terakhir dan memulihkan posisi serta ukuran jendela (dengan pembatas di luar layar).
+- **Nama aksesibilitas.** Item navigasi dan tombol berikon dikenali screen reader dan Windows UI Automation.
+
+## Peningkatan
+
+- **Kartu dashboard ramah keyboard.** Kartu storage sekarang tombol sungguhan dengan aktivasi keyboard dan nama aksesibel.
+- **Judul jendela dan baris versi.** Title bar menampilkan halaman aktif, dan baris versi sidebar diambil dari assembly, bukan string hardcoded.
+- **Kegagalan terlihat.** Refresh halaman yang gagal tercatat di gimdeks.log dan tampil di status bar, bukan diam.
+- **Log crash me-redact path.** Path berhuruf drive dihilangkan dari log crash.
+- **Cover di-cache.** Cover disimpan di memori, sehingga scroll daftar lebih halus.
+
+## Perbaikan bug
+
+- **Navigasi sidebar.** Tab sidebar sekarang mengganti halaman. Di v1.0.0 dan v1.1.0, klik tab tidak pernah berpindah (masalah mode binding pada view model navigasi); hanya pintasan Ctrl+1..9 yang berfungsi.
+- **Toolbar tanpa pilihan** kini nonaktif sampai ada pilihan, bukan diam-diam melewati klik.
+- **Pengaturan saat jendela ditutup** tidak lagi menghapus bahasa, tema, dan path file hasil import.
+- **Pemantau file Excel** dihentikan saat jendela ditutup dan dibersihkan dengan benar saat bahasa diganti.
+
 ## v1.1.0
 
 GimDeks sekarang bisa berbicara Bahasa Inggris selain Bahasa Indonesia, meminta izin sebelum setiap aksi online, dan lebih aman terhadap kerusakan data: restore yang lebih aman, mode portabel yang lebih aman, gerbang rilis yang lebih jelas.
