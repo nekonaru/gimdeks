@@ -70,6 +70,7 @@ GimDeks manages a game collection across multiple drives (external HDDs, laptop 
 | **Ringkasan verification** | After import, every per-storage count and GB total is compared against the Ringkasan sheet and differences are shown. |
 | **Excel export** | Writes the same layout back out: one sheet per storage with a live formula row, plus Ringkasan, Dikecualikan and Game Dieliminasi. |
 | **Roundtrip safe** | Export, then re-import, yields the same data. Covered by a test. |
+| **Drag and drop import** | Drop Koleksi_Game.xlsx anywhere on the window: the path is pre-filled and the preview opens automatically. |
 
 ### Managing the collection
 
@@ -78,6 +79,8 @@ GimDeks manages a game collection across multiple drives (external HDDs, laptop 
 | **Dashboard** | One card per storage: game count, GB used, remaining space, progress bar, and a badge when the storage is over its limit. |
 | **Game list** | Sortable, searchable, filterable table (status, storage, size range) with virtualization for thousands of games. |
 | **CRUD with multi-select** | Add, edit, delete, move between storages, and change status in bulk with confirmation. |
+| **Double-click to edit** | Double-click a game row to open the editor. |
+| **Mark played through in bulk** | Select several games and toggle their played-through flag at once, right from the toolbar. |
 | **Storage management** | Add and edit storages: capacity, per-drive limit (default 900 GB for 1 TB external HDDs), and type. |
 | **Over-limit warnings** | Any storage whose counted total passes its limit shows a warning badge. Exactly at the limit is fine. |
 | **Excluded and eliminated** | Dedicated screens for online/mobile/free games and eliminated games, with restore to a storage. |
@@ -206,11 +209,12 @@ dotnet run --project src/GimDeks.App
 ### Everyday use
 
 - **Dashboard**: click any storage card to open its game list.
-- **Daftar Game**: search, filter by status/storage/size, add, edit, delete, move, or change status of games, including bulk selection.
+- **Daftar Game**: search, filter by status/storage/size, add, edit, delete, move, or change status of games, including bulk selection. Double-click a row to open the editor.
 - **Storage**: manage capacities and limits, see per-storage stats and move history, or move many games at once.
 - **Dikecualikan / Dieliminasi**: keep the online and removed games out of capacity math; restore them into a storage when they come back.
 - **Duplikat**: find near-identical games and delete or mark them eliminated per group.
 - **Saran HDD**: get a size-descending packing plan that keeps every HDD under its limit.
+- **Drag and drop import**: drop `Koleksi_Game.xlsx` anywhere on the window. The path is filled in and the preview opens automatically.
 - **Export**: write the collection back to `.xlsx` with the original layout and live formulas.
 - **Language**: click the `ID` / `EN` button in the lower-left sidebar to switch the whole UI between Bahasa Indonesia and English. The choice is remembered.
 

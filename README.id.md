@@ -70,6 +70,7 @@ GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan S
 | **Pemeriksaan Ringkasan** | Setelah import, jumlah dan total GB tiap storage dibandingkan dengan sheet Ringkasan; selisihnya ditampilkan. |
 | **Export Excel** | Menulis kembali format yang sama: satu sheet per storage dengan baris rumus aktif, plus sheet Ringkasan, Dikecualikan dan Game Dieliminasi. |
 | **Aman bolak-balik** | Export lalu import ulang menghasilkan data yang sama. Dicakup oleh test. |
+| **Impor dengan drag and drop** | Seret Koleksi_Game.xlsx ke mana pun di jendela: path terisi otomatis dan pratinjau terbuka. |
 
 ### Mengelola koleksi
 
@@ -78,6 +79,8 @@ GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan S
 | **Dashboard** | Satu kartu per storage: jumlah game, total GB, sisa ruang, progress bar, dan lencana peringatan saat melebihi batas. |
 | **Daftar Game** | Tabel yang bisa diurutkan, dicari, dan difilter (status, storage, rentang ukuran) dengan virtualisasi untuk ribuan game. |
 | **CRUD dengan multi-pilih** | Tambah, ubah, hapus, pindah antar storage, dan ubah status dalam jumlah banyak dengan konfirmasi. |
+| **Klik dua kali untuk ubah** | Klik dua kali baris game untuk membuka editornya. |
+| **Tandai selesai secara massal** | Pilih beberapa game sekaligus dan centang flag selesai untuk semuanya, langsung dari toolbar. |
 | **Kelola storage** | Tambah dan ubah storage: kapasitas, batas per drive (default 900 GB untuk HDD eksternal 1 TB), dan tipe. |
 | **Peringatan melebihi batas** | Storage yang totalnya melewati batas menampilkan lencana peringatan. Tepat di batas tetap aman. |
 | **Dikecualikan dan Dieliminasi** | Layar khusus untuk game online/mobile/gratis dan game yang dieliminasi, dengan pemulihan ke storage. |
@@ -206,11 +209,12 @@ dotnet run --project src/GimDeks.App
 ### Pemakaian sehari-hari
 
 - **Dashboard**: klik kartu storage mana pun untuk membuka daftar game-nya.
-- **Daftar Game**: cari, filter berdasarkan status/storage/ukuran, tambah, ubah, hapus, pindah, atau ubah status game, termasuk multi-pilih.
+- **Daftar Game**: cari, filter berdasarkan status/storage/ukuran, tambah, ubah, hapus, pindah, atau ubah status game, termasuk multi-pilih. Klik dua kali untuk membuka editornya.
 - **Storage**: kelola kapasitas dan batas, lihat statistik per storage dan riwayat pemindahan, atau pindahkan banyak game sekaligus.
 - **Dikecualikan / Dieliminasi**: simpan game online dan yang dihapus di luar hitungan kapasitas; pulihkan ke storage saat kembali.
 - **Duplikat**: temukan game yang mirip dan hapus atau tandai sebagai Dieliminasi per grup.
 - **Saran HDD**: dapatkan plan urutan pengisian HDD yang menjaga tiap HDD di bawah batas.
+- **Drag and drop impor**: seret `Koleksi_Game.xlsx` ke mana pun di jendela. Path terisi otomatis dan pratinjau terbuka.
 - **Export**: tulis koleksi kembali ke `.xlsx` dengan format asli dan rumus aktif.
 - **Bahasa**: klik tombol `ID` / `EN` di sidebar kiri bawah untuk mengganti seluruh antarmuka antara Bahasa Indonesia dan Inggris. Pilihan kamu diingat.
 
