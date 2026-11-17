@@ -340,6 +340,19 @@ public partial class ImportExportViewModel : ObservableObject
         }
     }
 
+    /// <summary>Set the import file path programmatically (e.g. from drag and drop) and run the preview.</summary>
+    public void BeginImportWithFile(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+        {
+            DialogService.Error(Services.Loc.Get("Ui_Import_FileTitle"), Services.Loc.Get("Ui_Import_SelectFile"));
+            return;
+        }
+
+        FilePath = path;
+        _ = PreviewAsync();
+    }
+
     private bool EnsureFile()
     {
         if (string.IsNullOrWhiteSpace(FilePath) || !File.Exists(FilePath))

@@ -447,5 +447,27 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
 
         await ReloadAsync();
     }
+
+    [RelayCommand]
+    private async Task ToggleSelesaiAsync()
+    {
+        var rows = SelectedRows.ToList();
+        if (rows.Count == 0)
+        {
+            return;
+        }
+
+        // If every selected row is already played through, the action un-marks them all;
+        // otherwise it marks them all.
+        var set = !rows.All(row => row.Game.SelesaiMain);
+        foreach (var row in rows)
+        {
+            row.Game.SelesaiMain = set;
+            await _gameRepository.UpdateAsync(row.Game);
+        }
+
+        StatusText = Services.Loc.Format(set ? "Ui_GameList_SelesaiDone" : "Ui_GameList_SelesaiUndone", rows.Count);
+        await ReloadAsync();
+    }
 }
 

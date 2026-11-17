@@ -41,15 +41,26 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:StorageCardItem}">
-                        <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}"
-                                CornerRadius="14" Padding="18" Width="300" Margin="0,0,14,14"
-                                Cursor="Hand"
-                                TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}">
-                            <Border.InputBindings>
-                                <MouseBinding MouseAction="LeftClick"
-                                              Command="{Binding DataContext.OpenStorageCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                              CommandParameter="{Binding}" />
-                            </Border.InputBindings>
+                        <Button Cursor="Hand"
+                                Style="{x:Null}"
+                                Background="{DynamicResource MaterialDesign.Brush.Card.Background}"
+                                Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
+                                Padding="18"
+                                Width="300"
+                                Margin="0,0,14,14"
+                                BorderThickness="0"
+                                Command="{Binding DataContext.OpenStorageCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                CommandParameter="{Binding}"
+                                AutomationProperties.Name="{Binding Storage.Nama}">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}"
+                                            CornerRadius="14" Padding="{TemplateBinding Padding}"
+                                            TextElement.Foreground="{TemplateBinding Foreground}">
+                                        <ContentPresenter />
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
                                 <StackPanel>
                                     <Grid>
                                         <StackPanel>
@@ -98,14 +109,18 @@
                                         <TextBlock Text="{Binding RemainingText}" FontSize="12" Opacity="0.8" HorizontalAlignment="Right" />
                                     </Grid>
                             </StackPanel>
-                        </Border>
+                        </Button>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <TextBlock Text="{DynamicResource Ui_Dashboard_Empty}"
-                       Opacity="0.6" FontSize="13" Margin="4,8,0,0"
-                       Visibility="{Binding Storages.Count, Converter={StaticResource CountToVisibilityConverter}}" />
+            <StackPanel Visibility="{Binding Storages.Count, Converter={StaticResource CountToVisibilityConverter}}" Margin="4,8,0,0">
+                <TextBlock Text="{DynamicResource Ui_Dashboard_Empty}" Opacity="0.6" FontSize="13" />
+                <Button Content="{DynamicResource Ui_Dashboard_ImportNow}" Style="{StaticResource MaterialDesignRaisedButton}"
+                        HorizontalAlignment="Left" Padding="16,6" Margin="0,12,0,0"
+                        Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                        CommandParameter="{x:Static vm:Page.ImportExport}" />
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
