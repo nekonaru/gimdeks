@@ -27,6 +27,15 @@ public partial class MainViewModel : ObservableObject
     private string _shortcutHintText = "";
 
     [ObservableProperty]
+    private string _titleText = "GimDeks";
+
+    [ObservableProperty]
+    private string _appVersionText = $"GimDeks {Services.AppVersion.Current}";
+
+    [ObservableProperty]
+    private bool _isDropTargetActive;
+
+    [ObservableProperty]
     private string _languageLabel = "ID";
 
     public MainViewModel(
@@ -84,23 +93,28 @@ public partial class MainViewModel : ObservableObject
 
     private void UpdateNavigationTexts()
     {
-        StatusBarText = System.Windows.Application.Current.TryFindResource(GetStatusBarKey() ?? "Ui_Page_Dashboard") as string ?? "GimDeks";
+        StatusBarText = $"GimDeks v{Services.AppVersion.Current} | {GetNavLabel()}";
         ShortcutHintText = System.Windows.Application.Current.TryFindResource("Ui_ShortcutHint") as string ?? "";
+        TitleText = Services.Loc.Format("Ui_TitleFormat", GetNavLabel());
     }
 
-    private string? GetStatusBarKey() => CurrentPage switch
+    private string GetNavLabel()
     {
-        Page.Dashboard => "Ui_Page_Dashboard",
-        Page.GameList => "Ui_Page_GameList",
-        Page.Storage => "Ui_Page_Storage",
-        Page.Dikecualikan => "Ui_Page_Dikecualikan",
-        Page.Dieliminasi => "Ui_Page_Dieliminasi",
-        Page.Duplicates => "Ui_Page_Duplicates",
-        Page.SaranHdd => "Ui_Page_SaranHdd",
-        Page.Statistics => "Ui_Page_Statistics",
-        Page.ImportExport => "Ui_Page_ImportExport",
-        _ => "Ui_Page_Dashboard",
-    };
+        var key = CurrentPage switch
+        {
+            Page.Dashboard => "Ui_Nav_Dashboard",
+            Page.GameList => "Ui_Nav_GameList",
+            Page.Storage => "Ui_Nav_Storage",
+            Page.Dikecualikan => "Ui_Nav_Dikecualikan",
+            Page.Dieliminasi => "Ui_Nav_Dieliminasi",
+            Page.Duplicates => "Ui_Nav_Duplicates",
+            Page.SaranHdd => "Ui_Nav_SaranHdd",
+            Page.Statistics => "Ui_Nav_Statistics",
+            Page.ImportExport => "Ui_Nav_ImportExport",
+            _ => "Ui_Nav_Dashboard",
+        };
+        return Services.Loc.Get(key);
+    }
 
     private static string GetLanguageLabel(string lang) =>
         string.Equals(lang, "en", StringComparison.OrdinalIgnoreCase) ? "EN" : "ID";
@@ -178,6 +192,7 @@ public partial class MainViewModel : ObservableObject
     {
         _watcher?.Dispose();
         _watcher = null;
+        _watcherDirectory = null;
     }
 
     public void NavigateTo(Page page, long? storageFilter = null)
@@ -250,15 +265,18 @@ public partial class MainViewModel : ObservableObject
         UpdateNavigationTexts();
     }
 
-    private static async Task SafeRefresh(IRefreshable refreshable)
+    public void SetDropTargetActive(bool value) => IsDropTargetActive = value;
+
+    private async Task SafeRefresh(IRefreshable refreshable)
     {
         try
         {
             await refreshable.RefreshAsync();
         }
-        catch
+        catch (Exception exception)
         {
-            // Refresh failures surface as the last known-good page content; the next action retries.
+            Services.CrashLog.Write(exception);
+            StatusBarText = Services.Loc.Get("Ui_RefreshFailed");
         }
     }
 }

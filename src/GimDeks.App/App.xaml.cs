@@ -1,4 +1,3 @@
-using System.IO;
 using System.Windows;
 using GimDeks.App.Services;
 using GimDeks.App.ViewModels;
@@ -14,7 +13,7 @@ public partial class App : Application
 {
     public static IServiceProvider Services { get; private set; } = null!;
 
-    private static string LogPath => DatabasePaths.ResolveLogPath();
+    private static void Log(Exception exception) => CrashLog.Write(exception);
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -22,7 +21,7 @@ public partial class App : Application
 
         DispatcherUnhandledException += (_, args) =>
         {
-            WriteLog(args.Exception);
+            Log(args.Exception);
             MessageBox.Show(
                 GimDeks.App.Services.Loc.Get("Ui_Crash_Body") + " " + args.Exception.Message,
                 "GimDeks",
@@ -41,7 +40,7 @@ public partial class App : Application
         }
         catch (Exception exception)
         {
-            WriteLog(exception);
+            Log(exception);
             MessageBox.Show(
                 GimDeks.App.Services.Loc.Get("Ui_Db_Body") + "\n\n" + exception.Message,
                 "GimDeks",
@@ -88,25 +87,4 @@ public partial class App : Application
         return services.BuildServiceProvider();
     }
 
-    private static void WriteLog(Exception exception)
-    {
-        try
-        {
-            Directory.CreateDirectory(DatabasePaths.AppDataDirectory);
-            if (File.Exists(LogPath) && new FileInfo(LogPath).Length > 1_000_000)
-            {
-                File.Move(LogPath, LogPath + ".old", overwrite: true);
-            }
-
-            File.AppendAllText(LogPath,
-                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {RedactPaths(exception.ToString())}\n\n");
-        }
-        catch
-        {
-            // Never crash while reporting a crash.
-        }
-    }
-
-    private static string RedactPaths(string text) =>
-        System.Text.RegularExpressions.Regex.Replace(text, @"[A-Za-z]:\\[^\r\n""']*", "<path>");
 }

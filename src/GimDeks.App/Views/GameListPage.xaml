@@ -63,6 +63,7 @@
                          Text="{Binding MaxSize, UpdateSourceTrigger=PropertyChanged}" />
                 <Button Grid.Column="7" ToolTip="{DynamicResource Ui_Filter_Clear}"
                         Style="{StaticResource MaterialDesignIconButton}"
+                        AutomationProperties.Name="{DynamicResource Ui_Filter_Clear}"
                         Command="{Binding ClearFiltersCommand}">
                     <materialDesign:PackIcon Kind="FilterOff" />
                 </Button>
@@ -81,19 +82,22 @@
                     </Button.ContentTemplate>
                 </Button>
                 <Button Content="{DynamicResource Ui_Button_Edit}" Style="{StaticResource MaterialDesignOutlinedButton}"
-                        Command="{Binding EditGameCommand}" Margin="0,0,8,0" />
+                        Command="{Binding EditGameCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0" />
                 <Button Content="{DynamicResource Ui_Button_MoveTo}" Style="{StaticResource MaterialDesignOutlinedButton}"
-                        Command="{Binding MoveToStorageCommand}" Margin="0,0,8,0" />
+                        Command="{Binding MoveToStorageCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0" />
                 <Button Content="{DynamicResource Ui_Button_ChangeStatus}" Style="{StaticResource MaterialDesignOutlinedButton}"
-                        Command="{Binding ChangeStatusCommand}" Margin="0,0,8,0" />
+                        Command="{Binding ChangeStatusCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0" />
+                <Button Content="{DynamicResource Ui_Button_Selesai}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Command="{Binding ToggleSelesaiCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0"
+                        ToolTip="{DynamicResource Ui_Button_SelesaiTooltip}" />
                 <Button Content="{DynamicResource Ui_Button_SplitVersion}" Style="{StaticResource MaterialDesignOutlinedButton}"
-                        Command="{Binding SplitVersionsCommand}" Margin="0,0,8,0"
+                        Command="{Binding SplitVersionsCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0"
                         ToolTip="{DynamicResource Ui_Button_SplitVersionTooltip}" />
                 <Button Content="{DynamicResource Ui_Button_DownloadCover}" Style="{StaticResource MaterialDesignOutlinedButton}"
-                        Command="{Binding DownloadCoversCommand}" Margin="0,0,8,0"
+                        Command="{Binding DownloadCoversCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0"
                         ToolTip="{DynamicResource Ui_Button_DownloadCoverTooltip}" />
                 <Button Content="{DynamicResource Ui_Button_Delete}" Style="{StaticResource MaterialDesignOutlinedButton}"
-                        Command="{Binding DeleteGamesCommand}" Foreground="#FF8A8A" BorderBrush="#FF8A8A" />
+                        Command="{Binding DeleteGamesCommand}" IsEnabled="{Binding HasSelection}" Foreground="#FF8A8A" BorderBrush="#FF8A8A" />
             </StackPanel>
         </StackPanel>
 
@@ -113,7 +117,8 @@
                   RowBackground="Transparent"
                   AlternatingRowBackground="#121A18"
                   HeadersVisibility="Column"
-                  SelectionChanged="DataGrid_OnSelectionChanged">
+                  SelectionChanged="DataGrid_OnSelectionChanged"
+                  MouseDoubleClick="DataGrid_OnMouseDoubleClick">
             <DataGrid.Columns>
                 <DataGridCheckBoxColumn Header="{DynamicResource Ui_Col_Selesai}" Binding="{Binding Game.SelesaiMain}" IsReadOnly="True" Width="55" />
                 <DataGridTemplateColumn Header="{DynamicResource Ui_Col_Cover}" Width="80">

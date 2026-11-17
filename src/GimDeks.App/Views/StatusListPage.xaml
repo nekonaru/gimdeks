@@ -18,9 +18,9 @@
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,12,0,10">
             <Button Content="{DynamicResource Ui_StatusList_Restore}" Style="{StaticResource MaterialDesignRaisedButton}"
-                    Command="{Binding RestoreSelectedCommand}" Margin="0,0,8,0" />
+                    Command="{Binding RestoreSelectedCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0" />
             <Button Content="{DynamicResource Ui_Button_Delete}" Style="{StaticResource MaterialDesignOutlinedButton}"
-                    Command="{Binding DeleteSelectedCommand}"
+                    Command="{Binding DeleteSelectedCommand}" IsEnabled="{Binding HasSelection}"
                     Foreground="#FF8A8A" BorderBrush="#FF8A8A" />
             <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" Opacity="0.8" Margin="12,0,0,0" />
         </StackPanel>

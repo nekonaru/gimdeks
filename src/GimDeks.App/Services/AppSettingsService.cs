@@ -9,9 +9,12 @@ public sealed class AppSettings
     public double WindowWidth { get; set; } = 1280;
     public double WindowHeight { get; set; } = 800;
     public bool IsMaximized { get; set; }
+    public double? WindowLeft { get; set; }
+    public double? WindowTop { get; set; }
     public bool IsLightTheme { get; set; }
     public string? LastImportedPath { get; set; }
     public string UiLanguage { get; set; } = "id";
+    public int LastPage { get; set; }
 }
 
 /// <summary>Persists window geometry and small UI preferences as JSON next to the database.</summary>

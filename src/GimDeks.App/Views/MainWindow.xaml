@@ -4,7 +4,7 @@
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:vm="clr-namespace:GimDeks.App.ViewModels"
         xmlns:views="clr-namespace:GimDeks.App.Views"
-        Title="GimDeks"
+        Title="{Binding TitleText}"
         Width="1280"
         Height="800"
         MinWidth="1200"
@@ -13,6 +13,10 @@
         Background="{DynamicResource MaterialDesign.Brush.Background}"
         TextElement.Foreground="{DynamicResource MaterialDesign.Brush.Foreground}"
         FontFamily="{materialDesign:MaterialDesignFont}"
+        AllowDrop="True"
+        DragEnter="Window_OnDragEnter"
+        DragLeave="Window_OnDragLeave"
+        Drop="Window_OnDrop"
         Icon="pack://siteoforigin:,,,/assets/gimdeks-mark.png">
     <Window.InputBindings>
         <KeyBinding Modifiers="Ctrl" Key="F" Command="{Binding FocusSearchCommand}" />
@@ -90,8 +94,9 @@
 
                 <ListBox Grid.Row="1"
                          ItemsSource="{Binding NavItems}"
-                         SelectedValue="{Binding CurrentPage, Mode=TwoWay}"
+                         SelectedValue="{Binding CurrentPage, Mode=OneWay}"
                          SelectedValuePath="Page"
+                         SelectionChanged="NavList_OnSelectionChanged"
                          Background="Transparent"
                          BorderThickness="0"
                          HorizontalContentAlignment="Stretch">
@@ -108,6 +113,7 @@
                         <Style TargetType="ListBoxItem">
                             <Setter Property="Padding" Value="8,6" />
                             <Setter Property="Margin" Value="0,2" />
+                            <Setter Property="AutomationProperties.Name" Value="{Binding LabelKey, Converter={StaticResource LocKeyConverter}}" />
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="ListBoxItem">
@@ -144,6 +150,7 @@
                                 Style="{StaticResource MaterialDesignFlatButton}"
                                 HorizontalAlignment="Left"
                                 Padding="8,4"
+                                AutomationProperties.Name="{DynamicResource Ui_Theme_Toggle}"
                                 ToolTip="{DynamicResource Ui_Theme_Tooltip}">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Width="18" Height="18" VerticalAlignment="Center"
@@ -156,11 +163,12 @@
                                 Style="{StaticResource MaterialDesignFlatButton}"
                                 Padding="8,4"
                                 Margin="4,0,0,0"
+                                AutomationProperties.Name="{DynamicResource Ui_Language_Tooltip}"
                                 ToolTip="{DynamicResource Ui_Language_Tooltip}">
                             <TextBlock Text="{Binding LanguageLabel}" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" />
                         </Button>
                     </StackPanel>
-                    <TextBlock Text="GimDeks v1.1.0" FontSize="11" Opacity="0.5" Margin="0,6,0,0" />
+                    <TextBlock Text="{Binding AppVersionText}" FontSize="11" Opacity="0.5" Margin="0,6,0,0" />
                     <TextBlock Text="{DynamicResource Ui_OfflineFooter}" FontSize="10" Opacity="0.4" TextWrapping="Wrap" />
                 </StackPanel>
             </Grid>
@@ -203,6 +211,19 @@
                 </Grid>
             </Border>
         </Grid>
+
+        <Border Grid.Column="0" Grid.ColumnSpan="2" Background="#C80F1226"
+                Visibility="{Binding IsDropTargetActive, Converter={StaticResource BooleanToVisibilityConverter}}"
+                AllowDrop="True"
+                DragOver="Overlay_OnDragOver"
+                DragLeave="Overlay_OnDragLeave"
+                Drop="Window_OnDrop">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                <materialDesign:PackIcon Kind="FileExcel" Width="84" Height="84" HorizontalAlignment="Center" Foreground="#2EE6C5" />
+                <TextBlock Text="{DynamicResource Ui_Drop_Title}" FontSize="26" FontWeight="Bold" Margin="0,12,0,6" HorizontalAlignment="Center" />
+                <TextBlock Text="{DynamicResource Ui_Drop_Body}" FontSize="14" Opacity="0.8" HorizontalAlignment="Center" />
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
 
