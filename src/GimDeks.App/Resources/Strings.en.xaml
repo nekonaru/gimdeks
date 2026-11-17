@@ -299,6 +299,9 @@ Only the game title is sent to the internet. Continue?</sys:String>
   <sys:String x:Key="Ui_GameList_SelesaiDone">{0} games marked as played through.</sys:String>
   <sys:String x:Key="Ui_GameList_SelesaiUndone">{0} games marked as not played through.</sys:String>
   <sys:String x:Key="Ui_Dashboard_ImportNow">Open Import / Export</sys:String>
+  <sys:String x:Key="Ui_Import_ExportCsv">Export to CSV...</sys:String>
+  <sys:String x:Key="Ui_Import_ExportCsvTitle">Export to CSV</sys:String>
+  <sys:String x:Key="Ui_Import_ExportCsvFailed">CSV export failed: {0}</sys:String>
   <sys:String x:Key="Ui_Drop_Title">Drop to Import</sys:String>
   <sys:String x:Key="Ui_Drop_Body">Drop Koleksi_Game.xlsx to import it with a preview.</sys:String>
   <sys:String x:Key="Ui_Duplicates_EliminateTitle">Eliminate Duplicates</sys:String>

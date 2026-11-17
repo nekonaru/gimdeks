@@ -88,9 +88,15 @@ public sealed class DatabaseInitializer
             Directory.CreateDirectory(directory);
         }
 
+        var databaseExists = File.Exists(_factory.DatabasePath);
         using var connection = _factory.CreateConnection(); // already open; foreign keys enabled in the factory
 
         var version = GetUserVersion(connection);
+        if (databaseExists && version < Migrations.Length)
+        {
+            BackupBeforeMigration();
+        }
+
         for (var index = version; index < Migrations.Length; index++)
         {
             using var transaction = connection.BeginTransaction();
@@ -100,6 +106,41 @@ public sealed class DatabaseInitializer
             command.ExecuteNonQuery();
             SetUserVersion(connection, transaction, index + 1);
             transaction.Commit();
+        }
+    }
+
+    /// <summary>
+    /// Copy the database via the SQLite online backup API before a pending migration runs,
+    /// so a broken upgrade can never strand the last known-good schema. Best effort; a
+    /// backup failure must not block startup.
+    /// </summary>
+    private void BackupBeforeMigration()
+    {
+        try
+        {
+            var directory = Path.GetDirectoryName(_factory.DatabasePath);
+            if (string.IsNullOrEmpty(directory))
+            {
+                return;
+            }
+
+            var backupDir = Path.Combine(directory, "backups");
+            Directory.CreateDirectory(backupDir);
+            var destination = Path.Combine(
+                backupDir,
+                $"gimdeks-pre-upgrade-{DateTime.Now:yyyyMMdd-HHmmss}.db");
+
+            using var source = _factory.CreateConnection();
+            using var target = new SqliteConnection(new SqliteConnectionStringBuilder
+            {
+                DataSource = destination,
+            }.ToString());
+            target.Open();
+            source.BackupDatabase(target);
+        }
+        catch
+        {
+            // A locked backups folder must never block app startup.
         }
     }
 

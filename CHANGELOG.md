@@ -4,6 +4,22 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v1.3.0
+
+Selection survives every refresh now, the schema upgrade keeps a safety backup, and the catalog exports to CSV.
+
+## New features
+
+- **Selection persists across refreshes.** Delete, move, change status or mark played: the rows you still have selected stay selected after the reload, in the list and for every bulk action on them.
+- **Pre-migration backup.** When a schema upgrade is pending, the app keeps a `gimdeks-pre-upgrade-<timestamp>.db` copy of your database in the backups folder before applying migrations.
+- **CSV export.** The whole catalog exports to a semicolon-separated UTF-8 CSV with a BOM, so both locales of Excel open it directly. Same data as the Excel export, with the storage name and tag list per game.
+
+## Bug fixes
+
+- **Mark played through dropped the selection.** The grid rebuild after a reload replaced the row objects, so the selection was cleared right after the toggle; bulk actions silently targeted nothing. The selection now survives.
+- **Concurrent filter rebuild race.** A filter change triggered twice per reload could restore only part of the selection (one row went missing). All rebuild paths are serialized.
+- **Storage list items have accessible names.**
+
 ## v1.2.0
 
 Interaction overhaul: sidebar tabs navigate again, the app remembers where you left off, and Koleksi_Game.xlsx imports by dropping it onto the window.

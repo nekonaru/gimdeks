@@ -69,6 +69,7 @@ GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan S
 | **Dua mode import** | `Gabung` (gabung, lewati duplikat) atau `Ganti Semua` (ganti seluruhnya, backup otomatis dibuat dulu). |
 | **Pemeriksaan Ringkasan** | Setelah import, jumlah dan total GB tiap storage dibandingkan dengan sheet Ringkasan; selisihnya ditampilkan. |
 | **Export Excel** | Menulis kembali format yang sama: satu sheet per storage dengan baris rumus aktif, plus sheet Ringkasan, Dikecualikan dan Game Dieliminasi. |
+| **Export CSV** | Seluruh koleksi diexport ke CSV UTF-8 dengan BOM (dipisah titik koma): datanya sama, plus nama storage dan daftar tag. |
 | **Aman bolak-balik** | Export lalu import ulang menghasilkan data yang sama. Dicakup oleh test. |
 | **Impor dengan drag and drop** | Seret Koleksi_Game.xlsx ke mana pun di jendela: path terisi otomatis dan pratinjau terbuka. |
 
@@ -209,7 +210,7 @@ dotnet run --project src/GimDeks.App
 ### Pemakaian sehari-hari
 
 - **Dashboard**: klik kartu storage mana pun untuk membuka daftar game-nya.
-- **Daftar Game**: cari, filter berdasarkan status/storage/ukuran, tambah, ubah, hapus, pindah, atau ubah status game, termasuk multi-pilih. Klik dua kali untuk membuka editornya.
+- **Daftar Game**: cari, filter berdasarkan status/storage/ukuran, tambah, ubah, hapus, pindah, atau ubah status game, termasuk multi-pilih. Klik dua kali untuk membuka editornya. Pilihan kamu bertahan saat refresh.
 - **Storage**: kelola kapasitas dan batas, lihat statistik per storage dan riwayat pemindahan, atau pindahkan banyak game sekaligus.
 - **Dikecualikan / Dieliminasi**: simpan game online dan yang dihapus di luar hitungan kapasitas; pulihkan ke storage saat kembali.
 - **Duplikat**: temukan game yang mirip dan hapus atau tandai sebagai Dieliminasi per grup.

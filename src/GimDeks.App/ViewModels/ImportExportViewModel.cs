@@ -26,6 +26,7 @@ public partial class ImportExportViewModel : ObservableObject
 {
     private readonly ExcelImportService _importService;
     private readonly ExcelExporter _exporter;
+    private readonly CsvExporter _csvExporter;
     private readonly IStorageRepository _storageRepository;
     private readonly IGameRepository _gameRepository;
     private readonly DatabaseBackupService _backup;
@@ -55,6 +56,7 @@ public partial class ImportExportViewModel : ObservableObject
 
     public ImportExportViewModel(
         ExcelImportService importService,
+        CsvExporter csvExporter,
         IStorageRepository storageRepository,
         IGameRepository gameRepository,
         DatabaseBackupService backup,
@@ -63,6 +65,7 @@ public partial class ImportExportViewModel : ObservableObject
     {
         _importService = importService;
         _exporter = new ExcelExporter();
+        _csvExporter = csvExporter;
         _storageRepository = storageRepository;
         _gameRepository = gameRepository;
         _backup = backup;
@@ -219,6 +222,38 @@ public partial class ImportExportViewModel : ObservableObject
         catch (Exception exception)
         {
             StatusText = Services.Loc.Format("Ui_Import_ExportFailed", exception.Message);
+            DialogService.Error(Services.Loc.Get("Ui_Dialog_ExportFailed"), exception.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task ExportCsvAsync()
+    {
+        var dialog = new SaveFileDialog
+        {
+            Filter = "File CSV (*.csv)|*.csv",
+            FileName = "Koleksi_Game.csv",
+            Title = Services.Loc.Get("Ui_Import_ExportCsvTitle"),
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        IsBusy = true;
+        StatusText = Services.Loc.Get("Ui_Import_Exporting");
+        try
+        {
+            await _csvExporter.ExportAsync(dialog.FileName);
+            StatusText = Services.Loc.Format("Ui_Import_ExportDone", dialog.FileName);
+        }
+        catch (Exception exception)
+        {
+            StatusText = Services.Loc.Format("Ui_Import_ExportCsvFailed", exception.Message);
             DialogService.Error(Services.Loc.Get("Ui_Dialog_ExportFailed"), exception.Message);
         }
         finally

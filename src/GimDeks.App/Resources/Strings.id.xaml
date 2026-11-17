@@ -299,6 +299,9 @@ Data yang dikirim ke internet hanya judul game. Lanjutkan?</sys:String>
   <sys:String x:Key="Ui_GameList_SelesaiDone">{0} game ditandai selesai main.</sys:String>
   <sys:String x:Key="Ui_GameList_SelesaiUndone">{0} game ditandai belum selesai main.</sys:String>
   <sys:String x:Key="Ui_Dashboard_ImportNow">Buka Import / Export</sys:String>
+  <sys:String x:Key="Ui_Import_ExportCsv">Ekspor ke CSV...</sys:String>
+  <sys:String x:Key="Ui_Import_ExportCsvTitle">Ekspor ke CSV</sys:String>
+  <sys:String x:Key="Ui_Import_ExportCsvFailed">Ekspor CSV gagal: {0}</sys:String>
   <sys:String x:Key="Ui_Drop_Title">Lepaskan untuk Impor</sys:String>
   <sys:String x:Key="Ui_Drop_Body">Lepaskan Koleksi_Game.xlsx untuk impor dengan pratinjau.</sys:String>
   <sys:String x:Key="Ui_Duplicates_EliminateTitle">Eliminasi Duplikat</sys:String>

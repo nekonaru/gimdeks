@@ -60,6 +60,7 @@ public partial class App : Application
         services.AddSingleton(new DatabaseBackupService(
             new SqliteConnectionFactory(databasePath),
             DatabasePaths.ResolveBackupsDirectory()));
+        services.AddSingleton<CsvExporter>();
         services.AddSingleton<IStorageRepository, StorageRepository>();
         services.AddSingleton<IGameRepository, GameRepository>();
         services.AddSingleton<IHistoryRepository, HistoryRepository>();

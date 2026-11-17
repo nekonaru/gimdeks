@@ -20,6 +20,11 @@
                      ItemsSource="{Binding Storages}"
                      SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
                      Background="Transparent" BorderThickness="0">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="AutomationProperties.Name" Value="{Binding Storage.Nama}" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:StorageListItem}">
                         <Border Padding="6,4">

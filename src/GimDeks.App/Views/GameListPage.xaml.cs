@@ -9,15 +9,60 @@ namespace GimDeks.App.Views;
 
 public partial class GameListPage : UserControl
 {
+    private bool _syncingSelection;
+
     public GameListPage()
     {
         InitializeComponent();
         FocusService.SearchRequested += OnSearchRequested;
         Unloaded += OnUnloaded;
+        DataContextChanged += OnDataContextChanged;
     }
 
-    private void OnUnloaded(object sender, RoutedEventArgs e) =>
+    private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+    {
+        if (e.OldValue is GameListViewModel oldVm)
+        {
+            oldVm.RowsReloaded -= OnRowsReloaded;
+        }
+
+        if (e.NewValue is GameListViewModel vm)
+        {
+            vm.RowsReloaded -= OnRowsReloaded;
+            vm.RowsReloaded += OnRowsReloaded;
+        }
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
         FocusService.SearchRequested -= OnSearchRequested;
+        if (DataContext is GameListViewModel vm)
+        {
+            vm.RowsReloaded -= OnRowsReloaded;
+        }
+    }
+
+    private void OnRowsReloaded()
+    {
+        if (DataContext is not GameListViewModel vm || GamesGrid is null)
+        {
+            return;
+        }
+
+        _syncingSelection = true;
+        try
+        {
+            GamesGrid.SelectedItems.Clear();
+            foreach (var row in vm.SelectedRows)
+            {
+                GamesGrid.SelectedItems.Add(row);
+            }
+        }
+        finally
+        {
+            _syncingSelection = false;
+        }
+    }
 
     private void OnSearchRequested()
     {
@@ -35,6 +80,11 @@ public partial class GameListPage : UserControl
 
     public void DataGrid_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (_syncingSelection)
+        {
+            return;
+        }
+
         if (DataContext is not GameListViewModel viewModel || sender is not DataGrid grid)
         {
             return;
