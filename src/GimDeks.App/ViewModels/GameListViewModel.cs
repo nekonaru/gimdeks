@@ -39,6 +39,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     private readonly IGameRepository _gameRepository;
     private readonly IStorageRepository _storageRepository;
     private readonly ITagRepository _tagRepository;
+    private readonly SemaphoreSlim _filtersLock = new(1, 1);
     private List<Game> _allGames = new();
     private List<Storage> _allStorages = new();
 
@@ -103,6 +104,11 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     public ObservableCollection<FilterOption> TagOptions { get; }
     public bool HasSelection => SelectedRows.Count > 0;
 
+    public IReadOnlyList<GameRow> SelectedRowsList => SelectedRows;
+
+    /// <summary>Raised at the end of a rows rebuild; the page re-selects matching rows in the grid.</summary>
+    public event Action? RowsReloaded;
+
     public void SetStorageFilter(long? storageId)
     {
         SelectedStorage = storageId is null
@@ -115,12 +121,13 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     [RelayCommand]
     private async Task ReloadAsync()
     {
-        _allGames = (await _gameRepository.GetAllAsync()).ToList();
-        _allStorages = (await _storageRepository.GetAllAsync()).ToList();
-
+        // Selection is restored by ApplyFiltersAsync at the end of the rebuild.
         var current = SelectedStorage;
         var currentTag = SelectedTag;
         StorageOptions.Clear();
+        _allGames = (await _gameRepository.GetAllAsync()).ToList();
+        _allStorages = (await _storageRepository.GetAllAsync()).ToList();
+
         StorageOptions.Add(FilterOption.All);
         foreach (var storage in _allStorages)
         {
@@ -169,6 +176,19 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     }
 
     private async Task ApplyFiltersAsync()
+    {
+        await _filtersLock.WaitAsync().ConfigureAwait(true);
+        try
+        {
+            await ApplyFiltersCoreAsync();
+        }
+        finally
+        {
+            _filtersLock.Release();
+        }
+    }
+
+    private async Task ApplyFiltersCoreAsync()
     {
         var search = SearchText.Trim();
         var min = NumberParser.ParseGb(MinSize);
@@ -243,14 +263,25 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             })
             .ToList();
 
+        var preservedSelectionIds = SelectedRows.Select(r => r.Game.Id).ToHashSet();
         Rows.Clear();
         foreach (var row in rows)
         {
             Rows.Add(row);
         }
 
+        SelectedRows.Clear();
+        foreach (var row in rows)
+        {
+            if (preservedSelectionIds.Contains(row.Game.Id))
+            {
+                SelectedRows.Add(row);
+            }
+        }
+
         var selesaiCount = filtered.Count(g => g.SelesaiMain);
         SummaryText = Services.Loc.Format("Ui_GameList_Summary", rows.Count, selesaiCount);
+        RowsReloaded?.Invoke();
     }
 
     [RelayCommand]

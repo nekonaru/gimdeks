@@ -69,6 +69,7 @@ GimDeks manages a game collection across multiple drives (external HDDs, laptop 
 | **Two import modes** | `Gabung` (merge, skips duplicates) or `Ganti Semua` (replace everything, with automatic backup first). |
 | **Ringkasan verification** | After import, every per-storage count and GB total is compared against the Ringkasan sheet and differences are shown. |
 | **Excel export** | Writes the same layout back out: one sheet per storage with a live formula row, plus Ringkasan, Dikecualikan and Game Dieliminasi. |
+| **CSV export** | The whole catalog exports to a semicolon-separated UTF-8 CSV with a BOM: same data, plus the storage name and tag list. |
 | **Roundtrip safe** | Export, then re-import, yields the same data. Covered by a test. |
 | **Drag and drop import** | Drop Koleksi_Game.xlsx anywhere on the window: the path is pre-filled and the preview opens automatically. |
 
@@ -209,7 +210,7 @@ dotnet run --project src/GimDeks.App
 ### Everyday use
 
 - **Dashboard**: click any storage card to open its game list.
-- **Daftar Game**: search, filter by status/storage/size, add, edit, delete, move, or change status of games, including bulk selection. Double-click a row to open the editor.
+- **Daftar Game**: search, filter by status/storage/size, add, edit, delete, move, or change status of games, including bulk selection. Double-click a row to open the editor. Your selection survives every refresh.
 - **Storage**: manage capacities and limits, see per-storage stats and move history, or move many games at once.
 - **Dikecualikan / Dieliminasi**: keep the online and removed games out of capacity math; restore them into a storage when they come back.
 - **Duplikat**: find near-identical games and delete or mark them eliminated per group.

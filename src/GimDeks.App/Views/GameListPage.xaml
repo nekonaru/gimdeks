@@ -101,7 +101,7 @@
             </StackPanel>
         </StackPanel>
 
-        <DataGrid Grid.Row="2"
+        <DataGrid x:Name="GamesGrid" Grid.Row="2"
                   ItemsSource="{Binding Rows}"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"

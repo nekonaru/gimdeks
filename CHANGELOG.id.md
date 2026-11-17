@@ -4,6 +4,22 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v1.3.0
+
+Pilihan kamu bertahan saat refresh, upgrade skema menyimpan backup pengaman, dan koleksimu bisa diexport ke CSV.
+
+## Fitur baru
+
+- **Pilihan bertahan saat refresh.** Hapus, pindahkan, ubah status, atau tandai selesai: baris yang masih terpilih tetap terpilih setelah reload, di daftar dan untuk semua aksi massal.
+- **Backup sebelum migrasi.** Saat upgrade skema menunggu, aplikasi menyimpan salinan `gimdeks-pre-upgrade-<timestamp>.db` di folder backups sebelum menjalankan migrasi.
+- **Export CSV.** Seluruh koleksi diexport ke CSV UTF-8 dengan BOM (dipisah titik koma), terbuka langsung di kedua bahasa Excel. Datanya sama dengan export Excel, dengan nama storage dan daftar tag per game.
+
+## Perbaikan bug
+
+- **Tandai selesai kehilangan pilihan.** Rebuild grid setelah reload mengganti objek baris, sehingga pilihan dihapus sesaat setelah toggle; aksi massal tidak mengenai apapun. Pilihan sekarang bertahan.
+- **Balapan pembuatan filter.** Pergantian filter yang terpicu dua kali per reload bisa memulihkan hanya sebagian pilihan (satu baris hilang). Semua jalur rebuild sekarang diserialisasi.
+- **Item daftar storage punya nama aksesibilitas.**
+
 ## v1.2.0
 
 Perbaikan menyeluruh interaksi: tab sidebar berfungsi lagi, aplikasi mengingat posisi kamu terakhir, dan Koleksi_Game.xlsx bisa diimpor dengan menyeretnya ke jendela.
