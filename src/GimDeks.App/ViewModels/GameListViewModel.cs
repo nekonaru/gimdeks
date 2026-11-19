@@ -294,9 +294,32 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             return;
         }
 
+        await DownloadCoversForRowsAsync(rows);
+    }
+
+    [RelayCommand]
+    private async Task DownloadMissingCoversAsync()
+    {
+        var rows = Rows.Where(row => Services.SteamCoverService.FindCoverPath(row.Game.Id) is null).ToList();
+        if (rows.Count == 0)
+        {
+            StatusText = Services.Loc.Get("Ui_Cover_AllHaveOne");
+            return;
+        }
+
         if (!DialogService.Confirm(
                 Services.Loc.Get("Ui_Cover_Title"),
                 Services.Loc.Format("Ui_Cover_FetchConfirm", rows.Count)))
+        {
+            return;
+        }
+
+        await DownloadCoversForRowsAsync(rows);
+    }
+
+    private async Task DownloadCoversForRowsAsync(List<GameRow> rows)
+    {
+        if (rows.Count == 0)
         {
             return;
         }

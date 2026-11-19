@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v1.5.0
+
+Context menu on game list rows, and a one-click bulk download for covers that are missing.
+
+## New features
+
+- **Right-click actions on rows.** Edit, move, change status, split version, mark played through, download cover, or delete, all from a context menu on any game row.
+- **Download all missing covers.** One button finds every game without a local cover and fetches Steam art in a batch, with confirmation.
+- **Layout tweaks.** The games list gets a wider Unduh Cover side of the toolbar separated from the selected-row actions.
+
 ## v1.4.0
 
 Visual refresh across the app: darker gradient surfaces, glow-accented cards and a transformed sidebar, plus a few refinements under the hood.

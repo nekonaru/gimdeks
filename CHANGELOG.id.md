@@ -4,6 +4,16 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v1.5.0
+
+Menu klik kanan di baris game, dan satu klik untuk mengunduh semua cover yang belum ada.
+
+## Fitur baru
+
+- **Aksi klik kanan di baris game.** Ubah, pindahkan, ubah status, pisahkan versi, tandai selesai, unduh cover, atau hapus, semuanya dari menu klik kanan di baris game mana pun.
+- **Unduh semua cover yang belum ada.** Satu tombol mencari setiap game tanpa cover lokal dan mengunduh cover Steam secara batch, dengan konfirmasi.
+- **Penyesuaian layout.** Toolbar daftar game sekarang memuat kontrol aksi cover terdeteksi di samping aksi pilihannya sendiri.
+
 ## v1.4.0
 
 Penyegaran visual di seluruh aplikasi: permukaan gradien lebih gelap, kartu dengan aksen bercahaya, dan sidebar yang berubah, plus beberapa perbaikan di balik layar.
