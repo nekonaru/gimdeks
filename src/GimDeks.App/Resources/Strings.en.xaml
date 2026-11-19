@@ -309,6 +309,9 @@ Only the game title is sent to the internet. Continue?</sys:String>
   <sys:String x:Key="Ui_Cover_DroppedSave">Cover saved for {0}.</sys:String>
   <sys:String x:Key="Ui_Cover_DroppedFailed">Could not save cover: {0}</sys:String>
   <sys:String x:Key="Ui_Column_SelesaiTooltip">Mark or unmark selected games as played through</sys:String>
+  <sys:String x:Key="Ui_Button_DownloadMissingCovers">Download All Covers</sys:String>
+  <sys:String x:Key="Ui_Button_DownloadMissingCoversTooltip">Online: find and download Steam covers for every game without one</sys:String>
+  <sys:String x:Key="Ui_Cover_AllHaveOne">Every game already has a cover.</sys:String>
   <sys:String x:Key="Ui_Drop_Title">Drop to Import</sys:String>
   <sys:String x:Key="Ui_Drop_Body">Drop Koleksi_Game.xlsx to import it with a preview.</sys:String>
   <sys:String x:Key="Ui_Duplicates_EliminateTitle">Eliminate Duplicates</sys:String>

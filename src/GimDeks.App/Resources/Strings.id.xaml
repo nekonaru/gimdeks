@@ -309,6 +309,9 @@ Data yang dikirim ke internet hanya judul game. Lanjutkan?</sys:String>
   <sys:String x:Key="Ui_Cover_DroppedSave">Cover disimpan untuk {0}.</sys:String>
   <sys:String x:Key="Ui_Cover_DroppedFailed">Gagal menyimpan cover: {0}</sys:String>
   <sys:String x:Key="Ui_Column_SelesaiTooltip">Tandai atau batalkan game terpilih sebagai selesai main</sys:String>
+  <sys:String x:Key="Ui_Button_DownloadMissingCovers">Unduh Semua Cover</sys:String>
+  <sys:String x:Key="Ui_Button_DownloadMissingCoversTooltip">Online: cari dan unduh cover Steam untuk semua game yang belum punya cover</sys:String>
+  <sys:String x:Key="Ui_Cover_AllHaveOne">Semua game sudah punya cover.</sys:String>
   <sys:String x:Key="Ui_Drop_Title">Lepaskan untuk Impor</sys:String>
   <sys:String x:Key="Ui_Drop_Body">Lepaskan Koleksi_Game.xlsx untuk impor dengan pratinjau.</sys:String>
   <sys:String x:Key="Ui_Duplicates_EliminateTitle">Eliminasi Duplikat</sys:String>

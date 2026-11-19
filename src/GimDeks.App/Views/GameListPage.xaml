@@ -93,6 +93,9 @@
                 <Button Content="{DynamicResource Ui_Button_SplitVersion}" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding SplitVersionsCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0"
                         ToolTip="{DynamicResource Ui_Button_SplitVersionTooltip}" />
+                <Button Content="{DynamicResource Ui_Button_DownloadMissingCovers}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Command="{Binding DownloadMissingCoversCommand}" Margin="0,0,8,0"
+                        ToolTip="{DynamicResource Ui_Button_DownloadMissingCoversTooltip}" />
                 <Button Content="{DynamicResource Ui_Button_DownloadCover}" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding DownloadCoversCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0"
                         ToolTip="{DynamicResource Ui_Button_DownloadCoverTooltip}" />
@@ -122,6 +125,33 @@
                   HeadersVisibility="Column"
                   SelectionChanged="DataGrid_OnSelectionChanged"
                   MouseDoubleClick="DataGrid_OnMouseDoubleClick">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="{DynamicResource Ui_Button_Edit}"
+                              Command="{Binding DataContext.EditGameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              IsEnabled="{Binding DataContext.HasSelection, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                    <MenuItem Header="{DynamicResource Ui_Button_MoveTo}"
+                              Command="{Binding DataContext.MoveToStorageCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              IsEnabled="{Binding DataContext.HasSelection, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                    <MenuItem Header="{DynamicResource Ui_Button_ChangeStatus}"
+                              Command="{Binding DataContext.ChangeStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              IsEnabled="{Binding DataContext.HasSelection, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                    <MenuItem Header="{DynamicResource Ui_Button_SplitVersion}"
+                              Command="{Binding DataContext.SplitVersionsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              IsEnabled="{Binding DataContext.HasSelection, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                    <MenuItem Header="{DynamicResource Ui_Button_Selesai}"
+                              Command="{Binding DataContext.ToggleSelesaiCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              IsEnabled="{Binding DataContext.HasSelection, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                    <MenuItem Header="{DynamicResource Ui_Button_DownloadCover}"
+                              Command="{Binding DataContext.DownloadCoversCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              IsEnabled="{Binding DataContext.HasSelection, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                    <Separator />
+                    <MenuItem Header="{DynamicResource Ui_Button_Delete}"
+                              Foreground="#FF8A8A"
+                              Command="{Binding DataContext.DeleteGamesCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              IsEnabled="{Binding DataContext.HasSelection, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
             <DataGrid.Columns>
                 <DataGridCheckBoxColumn Header="{DynamicResource Ui_Col_Selesai}" Binding="{Binding Game.SelesaiMain}" IsReadOnly="True" Width="55" />
                 <DataGridTemplateColumn Header="{DynamicResource Ui_Col_Cover}" Width="80">
