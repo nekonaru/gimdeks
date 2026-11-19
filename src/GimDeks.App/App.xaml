@@ -12,9 +12,42 @@
             </ResourceDictionary.MergedDictionaries>
 
             <SolidColorBrush x:Key="GimDeksTileTeal" Color="#2EE6C5" />
+            <SolidColorBrush x:Key="GimDeksTileDeep" Color="#0C2723" />
+            <SolidColorBrush x:Key="GimDeksTileDeepHighlight" Color="#143A34" />
             <SolidColorBrush x:Key="GimDeksInk" Color="#0F1226" />
             <SolidColorBrush x:Key="GimDeksAmber" Color="#FFB020" />
-            <SolidColorBrush x:Key="GimDeksSidebar" Color="#151C1A" />
+            <SolidColorBrush x:Key="GimDeksSidebar" Color="#131F1D" />
+            <SolidColorBrush x:Key="GimDeksCard" Color="#1B2428" />
+            <SolidColorBrush x:Key="GimDeksCardAlt" Color="#1F2B30" />
+            <SolidColorBrush x:Key="GimDeksBorder" Color="#24302E" />
+            <SolidColorBrush x:Key="GimDeksMuted" Color="#7B8C88" />
+            <SolidColorBrush x:Key="GimDeksAccentSoft" Color="#1B2F2B" />
+            <SolidColorBrush x:Key="GimDeksAccentDeep" Color="#0E6B58" />
+            <LinearGradientBrush x:Key="GimDeksHeroGradient" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#14201D" Offset="0" />
+                <GradientStop Color="#0F1519" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GimDeksCardGradient" StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#213026" Offset="0" />
+                <GradientStop Color="#1B2428" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GimDeksCardAltGradient" StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#20302D" Offset="0" />
+                <GradientStop Color="#1B2428" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GimDeksAccentLine" StartPoint="0,0" EndPoint="1,0">
+                <GradientStop Color="#2EE6C5" Offset="0" />
+                <GradientStop Color="#0E8A6E" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GimDeksSidebarGradient" StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#16231F" Offset="0" />
+                <GradientStop Color="#101A18" Offset="0.55" />
+                <GradientStop Color="#0D1514" Offset="1" />
+            </LinearGradientBrush>
+            <RadialGradientBrush x:Key="GimDeksCardGlow" Center="0.5,0.5" RadiusX="0.8" RadiusY="0.8">
+                <GradientStop Color="#12E6C4" Offset="0" />
+                <GradientStop Color="#00000000" Offset="1" />
+            </RadialGradientBrush>
             <views:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
             <views:CountToVisibilityInverseConverter x:Key="CountToVisibilityInverseConverter" />
             <views:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
@@ -23,11 +56,17 @@
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
             <Style TargetType="UserControl">
+                <Setter Property="RenderTransform">
+                    <Setter.Value>
+                        <TranslateTransform Y="20" />
+                    </Setter.Value>
+                </Setter>
                 <Style.Triggers>
                     <EventTrigger RoutedEvent="Loaded">
                         <BeginStoryboard>
                             <Storyboard>
-                                <DoubleAnimation Duration="0:0:0.18" From="0" To="1" Storyboard.TargetProperty="Opacity" />
+                                <DoubleAnimation Duration="0:0:0.22" From="0" To="1" Storyboard.TargetProperty="Opacity" />
+                                <DoubleAnimation Duration="0:0:0.25" From="20" To="0" Storyboard.TargetProperty="RenderTransform.Y" />
                             </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger>

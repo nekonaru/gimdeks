@@ -32,6 +32,8 @@ public partial class GameEditDialog : Window
         if (original is not null)
         {
             NamaTextBox.Text = original.Nama;
+            var hasLocalCover = Services.SteamCoverService.FindCoverPath(original.Id) is not null;
+            RemoveCoverButton.Visibility = hasLocalCover ? Visibility.Visible : Visibility.Collapsed;
             UpdateCoverPreview(original.Id);
             FetchCoverButton.IsEnabled = original.Id > 0;
             CoverHintText.Text = Services.Loc.Get("Ui_GameDialog_CoverEnabled");
@@ -53,6 +55,7 @@ public partial class GameEditDialog : Window
             StatusComboBox.SelectedItem = ((StatusOption[])StatusComboBox.ItemsSource).First();
             StorageComboBox.SelectedIndex = 0;
             FetchCoverButton.IsEnabled = false;
+            RemoveCoverButton.Visibility = Visibility.Collapsed;
             CoverHintText.Text = Services.Loc.Get("Ui_GameDialog_CoverNewGame");
         }
     }
@@ -181,6 +184,22 @@ public partial class GameEditDialog : Window
         {
             FetchCoverButton.IsEnabled = true;
         }
+    }
+
+    private void RemoveCoverButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        if (_original is null || _original.Id <= 0)
+        {
+            return;
+        }
+
+        var removed = new Services.CoverFileService().RemoveCover(_original.Id);
+        UpdateCoverPreview(_original.Id);
+        Views.GameIdToCoverConverter.Invalidate(_original.Id);
+        RemoveCoverButton.Visibility = Visibility.Collapsed;
+        CoverHintText.Text = removed
+            ? Services.Loc.Get("Ui_Button_CoverRemoved")
+            : Services.Loc.Get("Ui_GameDialog_CoverNoCover");
     }
 
     private sealed record StatusOption(GameStatus Status, string Label)

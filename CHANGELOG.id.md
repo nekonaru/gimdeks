@@ -4,6 +4,21 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v1.4.0
+
+Penyegaran visual di seluruh aplikasi: permukaan gradien lebih gelap, kartu dengan aksen bercahaya, dan sidebar yang berubah, plus beberapa perbaikan di balik layar.
+
+## Fitur baru
+
+- **Aksen sekunder yang fokus.** Item navigasi yang aktif membawa bar aksen teal dan latar pill teal lembut; state hover bersinar halus.
+- **Tampilan pertama dashboard.** Layar kosong sekarang menampilkan wordmark GimDeks di tengah bersama prompt untuk mengimpor koleksi kamu.
+- **Penekanan opsi.** Kartu storage di dashboard membuka daftar game lewat klik di seluruh kartu.
+
+## Peningkatan
+
+- **Penyegaran visual.** Sidebar memakai palet gradien lebih gelap; kartu memakai isi gradien dengan garis aksen 1-pixel; hierarki jenis huruf lebih rapi; judul memakai semi-bold 30px.
+- **Paket aset.** Semua aset brand (lockup, mark, ikon, screenshot) sekarang ikut dalam rilis biner.
+
 ## v1.3.0
 
 Pilihan kamu bertahan saat refresh, upgrade skema menyimpan backup pengaman, dan koleksimu bisa diexport ke CSV.

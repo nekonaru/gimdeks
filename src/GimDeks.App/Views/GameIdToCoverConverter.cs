@@ -42,6 +42,21 @@ public sealed class GameIdToCoverConverter : IValueConverter
         }
     }
 
+    /// <summary>Drop any cached image for one game so the next binding re-reads the file.</summary>
+    public static void Invalidate(long gameId)
+    {
+        foreach (var key in Cache.Keys)
+        {
+            var separator = key.IndexOf('|');
+            var path = separator >= 0 ? key[..separator] : key;
+            var fileName = System.IO.Path.GetFileNameWithoutExtension(path);
+            if (long.TryParse(fileName, out var id) && id == gameId)
+            {
+                Cache.TryRemove(key, out _);
+            }
+        }
+    }
+
     private static BitmapImage? Load(string key)
     {
         var path = key.Substring(0, key.LastIndexOf('|'));

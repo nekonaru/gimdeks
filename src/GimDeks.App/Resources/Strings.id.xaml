@@ -19,9 +19,9 @@
   <sys:String x:Key="Ui_ExcelChanged_Text">File Excel yang diimport sudah berubah di luar aplikasi. Impor ulang?</sys:String>
   <sys:String x:Key="Ui_ExcelChanged_ImportNow">Impor Sekarang</sys:String>
   <sys:String x:Key="Ui_ExcelChanged_Dismiss">Abaikan</sys:String>
-  <sys:String x:Key="Ui_StatusBar_Nav">Ctrl+1..9 navigasi | Ctrl+F cari | Ctrl+T tema</sys:String>
+  <sys:String x:Key="Ui_StatusBar_Nav">Ctrl+1..9 navigasi | Ctrl+F cari | Ctrl+K selesai</sys:String>
   <sys:String x:Key="Ui_StatusBar_Storage">Data di %LOCALAPPDATA% / folder aplikasi</sys:String>
-  <sys:String x:Key="Ui_ShortcutHint">Ctrl+1..9 navigasi | Ctrl+F cari | Ctrl+T tema</sys:String>
+  <sys:String x:Key="Ui_ShortcutHint">Ctrl+1..9 navigasi | Ctrl+F cari | Ctrl+N tambah | Ctrl+E ekspor | Ctrl+K selesai toggle | Ctrl+T tema</sys:String>
   <sys:String x:Key="Ui_Dashboard_Title">Dashboard</sys:String>
   <sys:String x:Key="Ui_Dashboard_Subtitle">Ringkasan kapasitas semua storage. Klik kartu untuk membuka daftar gamenya.</sys:String>
   <sys:String x:Key="Ui_Dashboard_TotalGames">TOTAL GAME</sys:String>
@@ -302,6 +302,13 @@ Data yang dikirim ke internet hanya judul game. Lanjutkan?</sys:String>
   <sys:String x:Key="Ui_Import_ExportCsv">Ekspor ke CSV...</sys:String>
   <sys:String x:Key="Ui_Import_ExportCsvTitle">Ekspor ke CSV</sys:String>
   <sys:String x:Key="Ui_Import_ExportCsvFailed">Ekspor CSV gagal: {0}</sys:String>
+  <sys:String x:Key="Ui_Button_RemoveCover">Hapus Cover</sys:String>
+  <sys:String x:Key="Ui_Button_RemoveCoverTooltip">Hapus cover yang tersimpan di lokal</sys:String>
+  <sys:String x:Key="Ui_Button_CoverRemoved">Cover dihapus.</sys:String>
+  <sys:String x:Key="Ui_Button_CoverNoCover">Tidak ada cover lokal untuk game ini.</sys:String>
+  <sys:String x:Key="Ui_Cover_DroppedSave">Cover disimpan untuk {0}.</sys:String>
+  <sys:String x:Key="Ui_Cover_DroppedFailed">Gagal menyimpan cover: {0}</sys:String>
+  <sys:String x:Key="Ui_Column_SelesaiTooltip">Tandai atau batalkan game terpilih sebagai selesai main</sys:String>
   <sys:String x:Key="Ui_Drop_Title">Lepaskan untuk Impor</sys:String>
   <sys:String x:Key="Ui_Drop_Body">Lepaskan Koleksi_Game.xlsx untuk impor dengan pratinjau.</sys:String>
   <sys:String x:Key="Ui_Duplicates_EliminateTitle">Eliminasi Duplikat</sys:String>

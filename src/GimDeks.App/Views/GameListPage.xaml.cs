@@ -97,6 +97,64 @@ public partial class GameListPage : UserControl
         }
     }
 
+    private void DataGrid_OnPreviewDragOver(object sender, DragEventArgs e)
+    {
+        e.Effects = GetDroppedImage(e) is not null ? DragDropEffects.Copy : DragDropEffects.None;
+        e.Handled = true;
+    }
+
+    private async void DataGrid_OnDrop(object sender, DragEventArgs e)
+    {
+        if (FindRowFrom(e) is not { Item: GameRow row })
+        {
+            return;
+        }
+
+        var image = GetDroppedImage(e);
+        if (image is null || DataContext is not GameListViewModel viewModel)
+        {
+            return;
+        }
+
+        try
+        {
+            new Services.CoverFileService().SaveCover(row.Game.Id, image);
+            Views.GameIdToCoverConverter.Invalidate(row.Game.Id);
+            viewModel.StatusText = Services.Loc.Format("Ui_Cover_DroppedSave", row.Game.Nama);
+            await viewModel.RefreshAsync();
+        }
+        catch (Exception exception)
+        {
+            viewModel.StatusText = Services.Loc.Format("Ui_Cover_DroppedFailed", exception.Message);
+        }
+    }
+
+    private static DataGridRow? FindRowFrom(DragEventArgs e)
+    {
+        var element = e.OriginalSource as DependencyObject;
+        while (element is not null && element is not DataGridRow)
+        {
+            element = VisualTreeHelper.GetParent(element);
+        }
+
+        return element as DataGridRow;
+    }
+
+    private static string? GetDroppedImage(DragEventArgs e)
+    {
+        if (!e.Data.GetDataPresent(DataFormats.FileDrop))
+        {
+            return null;
+        }
+
+        if (e.Data.GetData(DataFormats.FileDrop) is not string[] files)
+        {
+            return null;
+        }
+
+        return files.FirstOrDefault(Services.CoverFileService.IsCoverImage);
+    }
+
     public void DataGrid_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         if (DataContext is not GameListViewModel viewModel)

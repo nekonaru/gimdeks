@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v1.4.0
+
+Visual refresh across the app: darker gradient surfaces, glow-accented cards and a transformed sidebar, plus a few refinements under the hood.
+
+## New features
+
+- **Focused secondary accent.** The active navigation item carries a teal accent bar and a soft teal pill background; hover states glow subtly.
+- **Dashboard first impression.** The first-run empty state now shows the GimDeks wordmark centered over the prompt to import your collection.
+- **Selection emphasis.** Storage cards on the dashboard open their game list on click, with the whole card as the hit target.
+
+## Improvements
+
+- **Visual refresh.** Sidebar moved to a darker gradient palette; cards carry gradient fills with a single-pixel accent line; the type hierarchy is tighter; titles render in semi-bold at 30px.
+- **Asset packaging.** All brand assets (lockups, marks, icons, screenshots) now ship inside the release artifact.
+
 ## v1.3.0
 
 Selection survives every refresh now, the schema upgrade keeps a safety backup, and the catalog exports to CSV.
