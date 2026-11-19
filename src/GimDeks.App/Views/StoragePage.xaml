@@ -15,7 +15,7 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" Text="{DynamicResource Ui_Storage_Title}" FontSize="28" FontWeight="Bold" />
+            <TextBlock Grid.Row="0" Text="{DynamicResource Ui_Storage_Title}" FontSize="30" FontWeight="SemiBold" />
             <ListBox Grid.Row="1" Margin="0,12,0,8"
                      ItemsSource="{Binding Storages}"
                      SelectedItem="{Binding SelectedItem, Mode=TwoWay}"

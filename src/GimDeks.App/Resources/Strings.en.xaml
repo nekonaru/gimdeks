@@ -19,9 +19,9 @@
   <sys:String x:Key="Ui_ExcelChanged_Text">The imported Excel file changed outside the app. Re-import?</sys:String>
   <sys:String x:Key="Ui_ExcelChanged_ImportNow">Import Now</sys:String>
   <sys:String x:Key="Ui_ExcelChanged_Dismiss">Dismiss</sys:String>
-  <sys:String x:Key="Ui_StatusBar_Nav">Ctrl+1..9 navigate | Ctrl+F search | Ctrl+T theme</sys:String>
+  <sys:String x:Key="Ui_StatusBar_Nav">Ctrl+1..9 navigate | Ctrl+F search | Ctrl+K played</sys:String>
   <sys:String x:Key="Ui_StatusBar_Storage">Data in %LOCALAPPDATA% / app folder</sys:String>
-  <sys:String x:Key="Ui_ShortcutHint">Ctrl+1..9 navigate | Ctrl+F search | Ctrl+T theme</sys:String>
+  <sys:String x:Key="Ui_ShortcutHint">Ctrl+1..9 navigate | Ctrl+F search | Ctrl+N add | Ctrl+E export | Ctrl+K toggle played | Ctrl+T theme</sys:String>
   <sys:String x:Key="Ui_Dashboard_Title">Dashboard</sys:String>
   <sys:String x:Key="Ui_Dashboard_Subtitle">Capacity overview of every storage. Click a card to open its game list.</sys:String>
   <sys:String x:Key="Ui_Dashboard_TotalGames">TOTAL GAMES</sys:String>
@@ -302,6 +302,13 @@ Only the game title is sent to the internet. Continue?</sys:String>
   <sys:String x:Key="Ui_Import_ExportCsv">Export to CSV...</sys:String>
   <sys:String x:Key="Ui_Import_ExportCsvTitle">Export to CSV</sys:String>
   <sys:String x:Key="Ui_Import_ExportCsvFailed">CSV export failed: {0}</sys:String>
+  <sys:String x:Key="Ui_Button_RemoveCover">Remove Cover</sys:String>
+  <sys:String x:Key="Ui_Button_RemoveCoverTooltip">Delete the locally stored cover</sys:String>
+  <sys:String x:Key="Ui_Button_CoverRemoved">Cover removed.</sys:String>
+  <sys:String x:Key="Ui_Button_CoverNoCover">No local cover for this game.</sys:String>
+  <sys:String x:Key="Ui_Cover_DroppedSave">Cover saved for {0}.</sys:String>
+  <sys:String x:Key="Ui_Cover_DroppedFailed">Could not save cover: {0}</sys:String>
+  <sys:String x:Key="Ui_Column_SelesaiTooltip">Mark or unmark selected games as played through</sys:String>
   <sys:String x:Key="Ui_Drop_Title">Drop to Import</sys:String>
   <sys:String x:Key="Ui_Drop_Body">Drop Koleksi_Game.xlsx to import it with a preview.</sys:String>
   <sys:String x:Key="Ui_Duplicates_EliminateTitle">Eliminate Duplicates</sys:String>

@@ -5,7 +5,7 @@
              xmlns:vm="clr-namespace:GimDeks.App.ViewModels">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="24,20">
-            <TextBlock Text="{DynamicResource Ui_Import_Title}" FontSize="28" FontWeight="Bold" />
+            <TextBlock Text="{DynamicResource Ui_Import_Title}" FontSize="30" FontWeight="SemiBold" />
             <TextBlock Text="{DynamicResource Ui_Import_Subtitle}"
                        Opacity="0.7" Margin="0,2,0,16" />
 

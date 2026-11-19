@@ -28,6 +28,10 @@
                         Style="{StaticResource MaterialDesignOutlinedButton}" Padding="6,2" FontSize="11"
                         Margin="0,6,0,0" Click="FetchCoverButton_OnClick"
                         ToolTip="{DynamicResource Ui_GameDialog_CoverTooltip}" />
+                <Button x:Name="RemoveCoverButton" Content="{DynamicResource Ui_Button_RemoveCover}"
+                        Style="{StaticResource MaterialDesignFlatButton}" Padding="6,2" FontSize="11"
+                        Margin="0,6,0,0" Click="RemoveCoverButton_OnClick"
+                        ToolTip="{DynamicResource Ui_Button_RemoveCoverTooltip}" />
                 <TextBlock x:Name="CoverHintText" Text="{DynamicResource Ui_GameDialog_CoverNewGame}" FontSize="10" Opacity="0.5" Margin="0,4,0,0" TextAlignment="Center" />
             </StackPanel>
         </Grid>

@@ -11,7 +11,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock Grid.Row="0" Text="{DynamicResource Ui_GameList_Title}" FontSize="28" FontWeight="Bold" />
+        <TextBlock Grid.Row="0" Text="{DynamicResource Ui_GameList_Title}" FontSize="30" FontWeight="SemiBold" />
 
         <StackPanel Grid.Row="1" Margin="0,12,0,10">
             <Grid>
@@ -103,6 +103,9 @@
 
         <DataGrid x:Name="GamesGrid" Grid.Row="2"
                   ItemsSource="{Binding Rows}"
+                  AllowDrop="True"
+                  PreviewDragOver="DataGrid_OnPreviewDragOver"
+                  PreviewDrop="DataGrid_OnDrop"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
                   SelectionMode="Extended"

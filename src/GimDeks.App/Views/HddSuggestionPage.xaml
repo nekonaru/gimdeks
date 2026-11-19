@@ -11,7 +11,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0">
-            <TextBlock Text="{DynamicResource Ui_SaranHdd_Title}" FontSize="28" FontWeight="Bold" />
+            <TextBlock Text="{DynamicResource Ui_SaranHdd_Title}" FontSize="30" FontWeight="SemiBold" />
             <TextBlock Text="{DynamicResource Ui_SaranHdd_Subtitle}"
                        Opacity="0.7" Margin="0,2,0,0" TextWrapping="Wrap" />
         </StackPanel>

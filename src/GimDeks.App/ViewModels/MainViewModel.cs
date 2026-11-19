@@ -239,6 +239,9 @@ public partial class MainViewModel : ObservableObject
     private void AddGame() => GameList.AddGameCommand.Execute(null);
 
     [RelayCommand]
+    private void ToggleSelesai() => GameList.ToggleSelesaiCommand.Execute(null);
+
+    [RelayCommand]
     private void Export() => ImportExport.ExportCommand.Execute(null);
 
     [RelayCommand]
