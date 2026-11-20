@@ -20,7 +20,7 @@ public sealed class SteamCoverService
     {
         var handler = new HttpClientHandler { UseCookies = false };
         var client = new HttpClient(handler) { MaxResponseContentBufferSize = MaxBytes };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("GimDeks/1.5");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("GimDeks/1.6");
         client.Timeout = TimeSpan.FromSeconds(15);
         return client;
     }
@@ -176,6 +176,7 @@ public sealed class SteamCoverService
         }
     }
 }
+
 
 
 

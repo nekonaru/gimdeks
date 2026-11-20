@@ -82,6 +82,9 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
     [ObservableProperty]
     private string _statusText = "";
 
+    [ObservableProperty]
+    private bool _hasAnyGames;
+
     public DashboardViewModel(IStorageRepository storageRepository, IGameRepository gameRepository, IDriveLinkRepository driveLinks, Services.DriveService driveService)
     {
         _storageRepository = storageRepository;
@@ -91,6 +94,7 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
     }
 
     public event Action<long>? OpenStorageGamesRequested;
+    public event Action<long>? OpenRandomGameRequested;
 
     public ObservableCollection<StorageCardItem> Storages { get; } = new();
 
@@ -101,6 +105,25 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
         {
             OpenStorageGamesRequested?.Invoke(item.Storage.Id);
         }
+    }
+
+    [RelayCommand]
+    private async Task PickRandomGameAsync()
+    {
+        var games = await _gameRepository.GetAllAsync();
+        var candidates = games
+            .Where(g => g.Status == GameStatus.SudahAda && !g.SelesaiMain)
+            .ToList();
+
+        if (candidates.Count == 0)
+        {
+            StatusText = Services.Loc.Get("Ui_Dashboard_NoPickCandidates");
+            return;
+        }
+
+        var pick = candidates[Random.Shared.Next(candidates.Count)];
+        StatusText = Services.Loc.Format("Ui_Dashboard_Picked", pick.Nama);
+        OpenRandomGameRequested?.Invoke(pick.Id);
     }
 
     public Task RefreshAsync()
@@ -149,6 +172,7 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
             games.Count(g => g.Status == GameStatus.Dikecualikan),
             games.Count(g => g.Status == GameStatus.Dieliminasi),
             games.Count(g => g.SelesaiMain));
+        HasAnyGames = games.Count > 0;
         StatusText = $"{Storages.Count} storage";
     }
 }

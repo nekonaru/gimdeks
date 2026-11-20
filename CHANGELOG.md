@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v1.6.0
+
+Pick a game in one click when you cannot decide what to play next.
+
+## New features
+
+- **Random pick.** A dashboard card picks one of your downloaded, unfinished games at random, opens the game list with every filter cleared, shows the choice in the status line, and selects and scrolls to the row.
+
+## Bug fixes
+
+- **Game list selection on navigation** is now re-applied when a page is created or reloaded, so programmatic navigation (from the dashboard) leaves the intended row highlighted.
+
 ## v1.5.0
 
 Context menu on game list rows, and a one-click bulk download for covers that are missing.

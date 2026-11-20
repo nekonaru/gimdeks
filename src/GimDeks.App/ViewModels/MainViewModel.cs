@@ -81,6 +81,11 @@ public partial class MainViewModel : ObservableObject
         CurrentViewModel = dashboard;
         UpdateNavigationTexts();
         dashboard.OpenStorageGamesRequested += storageId => NavigateTo(Page.GameList, storageId);
+        dashboard.OpenRandomGameRequested += gameId =>
+        {
+            NavigateTo(Page.GameList);
+            _ = GameList.OpenGameByIdAsync(gameId);
+        };
         importExport.DataChanged += RefreshAll;
         RegisterWatcher();
     }
@@ -237,6 +242,9 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void AddGame() => GameList.AddGameCommand.Execute(null);
+
+    [RelayCommand]
+    private void PickRandomGame() => Dashboard.PickRandomGameCommand.Execute(null);
 
     [RelayCommand]
     private void ToggleSelesai() => GameList.ToggleSelesaiCommand.Execute(null);

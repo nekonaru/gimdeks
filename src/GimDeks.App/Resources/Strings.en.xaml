@@ -330,4 +330,10 @@ Only the game title is sent to the internet. Continue?</sys:String>
   <sys:String x:Key="Ui_GameDialog_OriginHint">Example: Laptop HDD 3 (Done)</sys:String>
   <sys:String x:Key="Ui_Optional">Optional</sys:String>
   <sys:String x:Key="Ui_Duplicates_KeepHint">In each group, the earliest game is kept.</sys:String>
+  <sys:String x:Key="Ui_Dashboard_PickRandom">Pick a random game</sys:String>
+  <sys:String x:Key="Ui_Dashboard_PickRandomHint">Can not decide what to play? Let GimDeks pick one of your downloaded games.</sys:String>
+  <sys:String x:Key="Ui_Dashboard_NoPickCandidates">No downloaded, unfinished games to pick from.</sys:String>
+  <sys:String x:Key="Ui_Dashboard_Picked">Picked: {0}</sys:String>
+  <sys:String x:Key="Ui_GameList_PickNotFound">The picked game is not in the current list.</sys:String>
+  <sys:String x:Key="Ui_GameList_Picked">Picked to play: {0}</sys:String>
 </ResourceDictionary>

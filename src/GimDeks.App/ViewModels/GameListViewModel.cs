@@ -40,6 +40,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     private readonly IStorageRepository _storageRepository;
     private readonly ITagRepository _tagRepository;
     private readonly SemaphoreSlim _filtersLock = new(1, 1);
+    private bool _suppressFilterChanges;
     private List<Game> _allGames = new();
     private List<Storage> _allStorages = new();
 
@@ -109,11 +110,47 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     /// <summary>Raised at the end of a rows rebuild; the page re-selects matching rows in the grid.</summary>
     public event Action? RowsReloaded;
 
+    public long? PendingSelectedGameId { get; private set; }
+
     public void SetStorageFilter(long? storageId)
     {
         SelectedStorage = storageId is null
             ? FilterOption.All
             : StorageOptions.FirstOrDefault(o => o.Value == storageId.Value.ToString(CultureInfo.InvariantCulture)) ?? FilterOption.All;
+    }
+
+    /// <summary>Reset all filters, reload, and select one game (used by the dashboard random pick).</summary>
+    public async Task OpenGameByIdAsync(long gameId)
+    {
+        _suppressFilterChanges = true;
+        try
+        {
+            SearchText = "";
+            SelectedStatus = FilterOption.All;
+            SelectedStorage = FilterOption.All;
+            SelectedTag = FilterOption.All;
+            SelectedSelesai = FilterOption.All;
+            MinSize = "";
+            MaxSize = "";
+        }
+        finally
+        {
+            _suppressFilterChanges = false;
+        }
+
+        PendingSelectedGameId = gameId;
+        await ApplyFiltersAsync();
+        var row = Rows.FirstOrDefault(r => r.Game.Id == gameId);
+        if (row is null)
+        {
+            StatusText = Services.Loc.Get("Ui_GameList_PickNotFound");
+            return;
+        }
+
+        SelectedRows.Clear();
+        SelectedRows.Add(row);
+        RowsReloaded?.Invoke();
+        StatusText = Services.Loc.Format("Ui_GameList_Picked", row.Game.Nama);
     }
 
     public Task RefreshAsync() => ReloadAsync();
@@ -155,13 +192,13 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         return tags.ToDictionary(kv => kv.Key, kv => string.Join(", ", kv.Value.Select(t => t.Nama)));
     }
 
-    partial void OnSearchTextChanged(string value) => _ = ApplyFiltersAsync();
-    partial void OnSelectedStatusChanged(FilterOption value) => _ = ApplyFiltersAsync();
-    partial void OnSelectedStorageChanged(FilterOption value) => _ = ApplyFiltersAsync();
-    partial void OnSelectedTagChanged(FilterOption value) => _ = ApplyFiltersAsync();
-    partial void OnSelectedSelesaiChanged(FilterOption value) => _ = ApplyFiltersAsync();
-    partial void OnMinSizeChanged(string value) => _ = ApplyFiltersAsync();
-    partial void OnMaxSizeChanged(string value) => _ = ApplyFiltersAsync();
+    partial void OnSearchTextChanged(string value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
+    partial void OnSelectedStatusChanged(FilterOption value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
+    partial void OnSelectedStorageChanged(FilterOption value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
+    partial void OnSelectedTagChanged(FilterOption value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
+    partial void OnSelectedSelesaiChanged(FilterOption value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
+    partial void OnMinSizeChanged(string value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
+    partial void OnMaxSizeChanged(string value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
 
     [RelayCommand]
     private void ClearFilters()
@@ -277,6 +314,18 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             {
                 SelectedRows.Add(row);
             }
+        }
+
+        if (PendingSelectedGameId is { } pendingId)
+        {
+            var pendingRow = rows.FirstOrDefault(r => r.Game.Id == pendingId);
+            if (pendingRow is not null)
+            {
+                SelectedRows.Clear();
+                SelectedRows.Add(pendingRow);
+                StatusText = Services.Loc.Format("Ui_GameList_Picked", pendingRow.Game.Nama);
+            }
+            PendingSelectedGameId = null;
         }
 
         var selesaiCount = filtered.Count(g => g.SelesaiMain);

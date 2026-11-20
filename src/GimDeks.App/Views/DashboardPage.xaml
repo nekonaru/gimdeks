@@ -30,6 +30,31 @@
                 </Border>
             </StackPanel>
 
+            <Border Background="{StaticResource GimDeksCardGradient}" CornerRadius="14" Padding="18" Margin="0,0,0,20"
+                    Visibility="{Binding HasAnyGames, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    BorderThickness="0,1,0,0" BorderBrush="{StaticResource GimDeksTileTeal}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="{DynamicResource Ui_Dashboard_PickRandom}" FontSize="16" FontWeight="SemiBold" Foreground="#EAF4EC" />
+                        <TextBlock Text="{DynamicResource Ui_Dashboard_PickRandomHint}" FontSize="12" Foreground="#8CA89B" TextWrapping="Wrap" Margin="0,4,0,0" />
+                        <TextBlock Text="{Binding StatusText}" FontSize="12" Foreground="#2EE6C5" Margin="0,6,0,0" />
+                    </StackPanel>
+                    <Button Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            Command="{Binding PickRandomGameCommand}"
+                            AutomationProperties.Name="{DynamicResource Ui_Dashboard_PickRandom}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="DiceMultiple" Width="18" Height="18" VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <TextBlock Text="{DynamicResource Ui_Dashboard_PickRandom}" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
             <ItemsControl ItemsSource="{Binding Storages}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
