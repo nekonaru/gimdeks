@@ -4,6 +4,18 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v1.6.0
+
+Satu klik untuk memilih game saat kamu bingung mau main apa.
+
+## Fitur baru
+
+- **Pilihan acak.** Kartu di dashboard memilih salah satu game Sudah Ada yang belum selesai secara acak, membuka daftar game dengan semua filter dikosongkan, menampilkan pilihan di status bar, serta memilih dan menggulir ke barisnya.
+
+## Perbaikan bug
+
+- **Pilihan baris saat berpindah halaman** sekarang diterapkan ulang ketika halaman dibuat atau dimuat ulang, sehingga navigasi terprogram dari dashboard menyisakan baris yang dimaksud dalam keadaan terpilih.
+
 ## v1.5.0
 
 Menu klik kanan di baris game, dan satu klik untuk mengunduh semua cover yang belum ada.

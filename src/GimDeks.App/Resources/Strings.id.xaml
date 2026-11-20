@@ -330,4 +330,10 @@ Data yang dikirim ke internet hanya judul game. Lanjutkan?</sys:String>
   <sys:String x:Key="Ui_GameDialog_OriginHint">Contoh: Laptop HDD 3 (Done)</sys:String>
   <sys:String x:Key="Ui_Optional">Opsional</sys:String>
   <sys:String x:Key="Ui_Duplicates_KeepHint">Per grup, game pertama (urutan paling awal) dipertahankan.</sys:String>
+  <sys:String x:Key="Ui_Dashboard_PickRandom">Pilih game acak</sys:String>
+  <sys:String x:Key="Ui_Dashboard_PickRandomHint">Bingung mau main apa? Biarkan GimDeks memilih salah satu game yang sudah kamu download.</sys:String>
+  <sys:String x:Key="Ui_Dashboard_NoPickCandidates">Belum ada game Sudah Ada yang belum selesai.</sys:String>
+  <sys:String x:Key="Ui_Dashboard_Picked">Terpilih: {0}</sys:String>
+  <sys:String x:Key="Ui_GameList_PickNotFound">Game terpilih tidak ada di daftar saat ini.</sys:String>
+  <sys:String x:Key="Ui_GameList_Picked">Dipilih untuk dimainkan: {0}</sys:String>
 </ResourceDictionary>

@@ -16,8 +16,12 @@ public partial class GameListPage : UserControl
         InitializeComponent();
         FocusService.SearchRequested += OnSearchRequested;
         Unloaded += OnUnloaded;
+        Loaded += OnLoaded;
         DataContextChanged += OnDataContextChanged;
     }
+
+    private void OnLoaded(object sender, RoutedEventArgs e) =>
+        Dispatcher.BeginInvoke(new Action(OnRowsReloaded));
 
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
@@ -30,6 +34,7 @@ public partial class GameListPage : UserControl
         {
             vm.RowsReloaded -= OnRowsReloaded;
             vm.RowsReloaded += OnRowsReloaded;
+            Dispatcher.BeginInvoke(new Action(OnRowsReloaded));
         }
     }
 
@@ -56,6 +61,11 @@ public partial class GameListPage : UserControl
             foreach (var row in vm.SelectedRows)
             {
                 GamesGrid.SelectedItems.Add(row);
+            }
+
+            if (vm.SelectedRows.Count > 0)
+            {
+                GamesGrid.ScrollIntoView(vm.SelectedRows[0], null);
             }
         }
         finally
