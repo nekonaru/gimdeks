@@ -25,6 +25,7 @@ public sealed class CoverFileService
         RemoveCover(gameId);
         var destination = Path.Combine(CoverDirectory, gameId + extension);
         File.Copy(sourcePath, destination, overwrite: true);
+        CoverPathCache.Refresh(gameId);
         return destination;
     }
 
@@ -47,6 +48,11 @@ public sealed class CoverFileService
             {
                 // Best effort: an undeletable cover just stays on disk.
             }
+        }
+
+        if (removed)
+        {
+            CoverPathCache.Refresh(gameId);
         }
 
         return removed;

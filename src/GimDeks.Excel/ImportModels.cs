@@ -53,7 +53,14 @@ public sealed class RingkasanRow
 public sealed class RingkasanComparison
 {
     public List<RingkasanRow> Rows { get; init; } = new();
-    public bool AllMatch => Rows.All(r => r.ExpectedCount is null || r.Matches);
+    public bool AllMatch
+    {
+        get
+        {
+            var verifiable = Rows.Where(r => r.ExpectedCount is not null).ToList();
+            return verifiable.Count > 0 && verifiable.All(r => r.Matches);
+        }
+    }
 }
 
 public sealed class ImportResult

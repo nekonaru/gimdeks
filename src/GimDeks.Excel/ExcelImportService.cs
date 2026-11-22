@@ -16,6 +16,11 @@ public sealed class ExcelImportService
     private readonly SqliteConnectionFactory _factory;
     private readonly IStorageRepository _storageRepository;
     private readonly DatabaseBackupService _backup;
+    private readonly object _previewLock = new();
+    private string? _cachedPreviewPath;
+    private long _cachedPreviewLength;
+    private DateTime _cachedPreviewWriteUtc;
+    private ImportPreview? _cachedPreview;
 
     public ExcelImportService(
         ExcelImporter importer,
@@ -29,11 +34,31 @@ public sealed class ExcelImportService
         _backup = backup;
     }
 
-    public ImportPreview Preview(string filePath) => _importer.Preview(filePath);
+    public ImportPreview Preview(string filePath)
+    {
+        var info = new FileInfo(filePath);
+        lock (_previewLock)
+        {
+            if (_cachedPreview is not null
+                && string.Equals(_cachedPreviewPath, filePath, StringComparison.OrdinalIgnoreCase)
+                && _cachedPreviewLength == info.Length
+                && _cachedPreviewWriteUtc == info.LastWriteTimeUtc)
+            {
+                return _cachedPreview;
+            }
+
+            var preview = _importer.Preview(filePath);
+            _cachedPreviewPath = filePath;
+            _cachedPreviewLength = info.Length;
+            _cachedPreviewWriteUtc = info.LastWriteTimeUtc;
+            _cachedPreview = preview;
+            return preview;
+        }
+    }
 
     public async Task<ImportResult> ImportAsync(string filePath, ImportMode mode, CancellationToken ct = default)
     {
-        var preview = _importer.Preview(filePath);
+        var preview = Preview(filePath);
 
         // Never write over the user's data without a safety copy first.
         var backupPath = await _backup.BackupAsync(ct);
@@ -106,6 +131,9 @@ public sealed class ExcelImportService
 
             var gamesAdded = 0;
             var gamesSkipped = 0;
+            var existingKeys = mode == ImportMode.Gabung
+                ? await LoadExistingGameKeysAsync(connection, transaction, ct)
+                : new HashSet<(string Nama, long? StorageId)>();
             foreach (var gamePreview in preview.Games)
             {
                 var game = gamePreview.Game;
@@ -114,8 +142,8 @@ public sealed class ExcelImportService
                     game.StorageId = storageId;
                 }
 
-                if (mode == ImportMode.Gabung &&
-                    await ExistsByNameInStorageAsync(connection, transaction, game.Nama, game.StorageId, ct))
+                var key = (game.Nama.ToLowerInvariant(), game.StorageId);
+                if (mode == ImportMode.Gabung && !existingKeys.Add(key))
                 {
                     gamesSkipped++;
                     continue;
@@ -161,18 +189,28 @@ public sealed class ExcelImportService
         }
     }
 
-    private static async Task<bool> ExistsByNameInStorageAsync(
+    private static async Task<HashSet<(string Nama, long? StorageId)>> LoadExistingGameKeysAsync(
         Microsoft.Data.Sqlite.SqliteConnection connection,
         System.Data.Common.DbTransaction transaction,
-        string nama,
-        long? storageId,
         CancellationToken ct)
     {
-        var count = await connection.ExecuteScalarAsync<long>(new CommandDefinition(
-            "SELECT COUNT(1) FROM game WHERE lower(nama) = lower(@Nama) AND storage_id IS @StorageId;",
-            new { Nama = nama, StorageId = storageId },
-            transaction,
+        var rows = await connection.QueryAsync(new CommandDefinition(
+            "SELECT CAST(nama AS TEXT) AS Nama, storage_id AS StorageId FROM game;",
+            transaction: transaction,
             cancellationToken: ct));
-        return count > 0;
+        var keys = new HashSet<(string Nama, long? StorageId)>();
+        foreach (var row in rows)
+        {
+            var values = (IDictionary<string, object?>)row;
+            var rawName = values["Nama"];
+            var name = rawName is string text ? text
+                : rawName is byte[] bytes ? System.Text.Encoding.UTF8.GetString(bytes)
+                : rawName?.ToString() ?? "";
+            var rawStorage = values["StorageId"];
+            long? storageId = rawStorage is long l ? l : rawStorage is int i ? i : null;
+            keys.Add((name.ToLowerInvariant(), storageId));
+        }
+
+        return keys;
     }
 }

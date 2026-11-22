@@ -43,6 +43,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     private bool _suppressFilterChanges;
     private List<Game> _allGames = new();
     private List<Storage> _allStorages = new();
+    private Dictionary<long, string> _tagsByGame = new();
 
     [ObservableProperty]
     private string _searchText = "";
@@ -164,6 +165,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         StorageOptions.Clear();
         _allGames = (await _gameRepository.GetAllAsync()).ToList();
         _allStorages = (await _storageRepository.GetAllAsync()).ToList();
+        _tagsByGame = await MapTagsByGameAsync(_allGames.Select(g => g.Id).ToList());
 
         StorageOptions.Add(FilterOption.All);
         foreach (var storage in _allStorages)
@@ -231,7 +233,6 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         var min = NumberParser.ParseGb(MinSize);
         var max = NumberParser.ParseGb(MaxSize);
         var storageById = _allStorages.ToDictionary(s => s.Id, s => s.Nama);
-        var tagsByGame = await MapTagsByGameAsync(_allGames.Select(g => g.Id).ToList());
 
         IEnumerable<Game> filtered = _allGames;
 
@@ -296,7 +297,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             {
                 Game = g,
                 StorageName = g.StorageId is { } id && storageById.TryGetValue(id, out var name) ? name : Services.Loc.Get("Ui_NoStorage"),
-                TagsText = tagsByGame.TryGetValue(g.Id, out var tagText) ? tagText : "",
+                TagsText = _tagsByGame.TryGetValue(g.Id, out var tagText) ? tagText : "",
             })
             .ToList();
 

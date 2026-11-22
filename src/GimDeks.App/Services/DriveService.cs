@@ -33,6 +33,12 @@ public sealed class DriveService
             .ToList();
     }
 
+    public HashSet<string> GetReadyDriveLetters() =>
+        System.IO.DriveInfo.GetDrives()
+            .Where(d => d.IsReady)
+            .Select(d => d.Name.TrimEnd('\\', ':'))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
     public DriveLinkInfo? FindDrive(string? letter)
     {
         if (string.IsNullOrWhiteSpace(letter))

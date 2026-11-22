@@ -51,28 +51,17 @@ public sealed class SteamCoverService
         var path = Path.Combine(CoverDirectory(), gameId + extension);
         await File.WriteAllBytesAsync(path, bytes, ct);
         RemoveStaleCovers(gameId, extension);
+        CoverPathCache.Refresh(gameId);
         return new CoverResult { Path = path, MatchedName = gameTitle };
     }
 
-    public static string? FindCoverPath(long gameId)
-    {
-        if (!Directory.Exists(CoverDirectory()))
-        {
-            return null;
-        }
+    public static string? FindCoverPath(long gameId) => CoverPathCache.GetPath(gameId);
 
-        foreach (var file in Directory.EnumerateFiles(CoverDirectory(), gameId + ".*"))
-        {
-            if (Path.GetExtension(file).Equals(".jpg", StringComparison.OrdinalIgnoreCase)
-                || Path.GetExtension(file).Equals(".png", StringComparison.OrdinalIgnoreCase)
-                || Path.GetExtension(file).Equals(".webp", StringComparison.OrdinalIgnoreCase))
-            {
-                return file;
-            }
-        }
-
-        return null;
-    }
+    internal static bool IsCoverExtension(string file) =>
+        ".jpg".Equals(Path.GetExtension(file), StringComparison.OrdinalIgnoreCase)
+        || ".jpeg".Equals(Path.GetExtension(file), StringComparison.OrdinalIgnoreCase)
+        || ".png".Equals(Path.GetExtension(file), StringComparison.OrdinalIgnoreCase)
+        || ".webp".Equals(Path.GetExtension(file), StringComparison.OrdinalIgnoreCase);
 
     private static async Task<byte[]> ReadBoundedAsync(Stream stream, long maxBytes, CancellationToken ct)
     {
