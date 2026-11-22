@@ -140,14 +140,19 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
 
         Storages.Clear();
         var driveLinks = await _driveLinks.GetAllAsync();
+        var gamesByStorage = counted.Where(g => g.StorageId is not null)
+            .GroupBy(g => g.StorageId!.Value)
+            .ToDictionary(g => g.Key, g => g.ToList());
+        var readyDrives = _driveService.GetReadyDriveLetters();
         foreach (var storage in storages)
         {
-            var storageGames = counted.Where(g => g.StorageId == storage.Id).ToList();
+            gamesByStorage.TryGetValue(storage.Id, out var storageGames);
+            storageGames ??= new List<Game>();
             var total = storageGames.Sum(g => g.UkuranGb);
             var remaining = CapacityCalculator.RemainingGb(storage, total);
             var progress = CapacityCalculator.ProgressFraction(storage, total);
             var driveDisconnected = driveLinks.TryGetValue(storage.Id, out var letter)
-                && _driveService.FindDrive(letter) is null;
+                && (string.IsNullOrWhiteSpace(letter) || !readyDrives.Contains(letter));
 
             Storages.Add(new StorageCardItem
             {

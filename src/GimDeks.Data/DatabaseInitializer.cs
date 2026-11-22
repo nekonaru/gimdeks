@@ -92,10 +92,9 @@ public sealed class DatabaseInitializer
         using var connection = _factory.CreateConnection(); // already open; foreign keys enabled in the factory
 
         var version = GetUserVersion(connection);
-        if (databaseExists && version < Migrations.Length)
-        {
-            BackupBeforeMigration();
-        }
+        var preUpgradeBackup = databaseExists && version < Migrations.Length
+            ? BackupBeforeMigration()
+            : null;
 
         for (var index = version; index < Migrations.Length; index++)
         {
@@ -107,6 +106,18 @@ public sealed class DatabaseInitializer
             SetUserVersion(connection, transaction, index + 1);
             transaction.Commit();
         }
+
+        if (preUpgradeBackup is not null)
+        {
+            try
+            {
+                File.Delete(preUpgradeBackup);
+            }
+            catch
+            {
+                // Best effort: a leftover upgrade backup is harmless.
+            }
+        }
     }
 
     /// <summary>
@@ -114,14 +125,14 @@ public sealed class DatabaseInitializer
     /// so a broken upgrade can never strand the last known-good schema. Best effort; a
     /// backup failure must not block startup.
     /// </summary>
-    private void BackupBeforeMigration()
+    private string? BackupBeforeMigration()
     {
         try
         {
             var directory = Path.GetDirectoryName(_factory.DatabasePath);
             if (string.IsNullOrEmpty(directory))
             {
-                return;
+                return null;
             }
 
             var backupDir = Path.Combine(directory, "backups");
@@ -137,10 +148,12 @@ public sealed class DatabaseInitializer
             }.ToString());
             target.Open();
             source.BackupDatabase(target);
+            return destination;
         }
         catch
         {
             // A locked backups folder must never block app startup.
+            return null;
         }
     }
 

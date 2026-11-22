@@ -70,24 +70,21 @@ public sealed class GameRepository : IGameRepository
             return;
         }
 
-        const string updateSql = "UPDATE game SET storage_id = @StorageId WHERE id = @Id;";
-        const string historySql = """
-            INSERT INTO riwayat (game_id, dari_storage_id, ke_storage_id)
-            VALUES (@GameId, @DariStorageId, @KeStorageId);
-            """;
-
         using var connection = _factory.CreateConnection();
         await connection.OpenAsync(ct);
         using var transaction = connection.BeginTransaction();
         try
         {
-            foreach (var id in gameIds)
-            {
-                var current = await connection.QuerySingleOrDefaultAsync<long?>(new CommandDefinition(
-                    "SELECT storage_id FROM game WHERE id = @Id;", new { Id = id }, transaction, cancellationToken: ct));
-                await connection.ExecuteAsync(new CommandDefinition(updateSql, new { StorageId = targetStorageId, Id = id }, transaction, cancellationToken: ct));
-                await connection.ExecuteAsync(new CommandDefinition(historySql, new { GameId = id, DariStorageId = current, KeStorageId = targetStorageId }, transaction, cancellationToken: ct));
-            }
+            var parameters = new { Ids = gameIds, Target = targetStorageId };
+            await connection.ExecuteAsync(new CommandDefinition(
+                """
+                INSERT INTO riwayat (game_id, dari_storage_id, ke_storage_id)
+                SELECT id, storage_id, @Target FROM game WHERE id IN @Ids;
+                """,
+                parameters, transaction, cancellationToken: ct));
+            await connection.ExecuteAsync(new CommandDefinition(
+                "UPDATE game SET storage_id = @Target WHERE id IN @Ids;",
+                parameters, transaction, cancellationToken: ct));
 
             transaction.Commit();
         }

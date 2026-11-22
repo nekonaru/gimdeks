@@ -30,11 +30,19 @@ public sealed partial class ExcelImporter
         CheckDecompressionBudget(filePath);
 
         using var workbook = new XLWorkbook(filePath);
+        var warnings = new List<string>();
+        try
+        {
+            workbook.RecalculateAllFormulas();
+        }
+        catch
+        {
+            warnings.Add("Workbook formulas could not be recalculated; cached values were used.");
+        }
 
         var games = new List<GamePreview>();
         var storages = new List<StoragePreview>();
         var skipped = new List<string>();
-        var warnings = new List<string>();
         RingkasanComparison? ringkasan = null;
 
         foreach (var worksheet in workbook.Worksheets)
@@ -345,7 +353,7 @@ public sealed partial class ExcelImporter
                     return cached;
                 }
 
-                workbook.RecalculateAllFormulas();
+                // Formulas were recalculated once at preview start; never per cell.
                 return ToDouble(cell.CachedValue) ?? ToDouble(cell.Value);
             }
 
@@ -406,17 +414,6 @@ public sealed partial class ExcelImporter
         var actualsBySheet = storages.ToDictionary(
             s => NormalizeSheetKey(s.SheetName),
             s => (Count: s.GameCount, Gb: s.TotalGb));
-
-        // ClosedXML does not store cached results for formulas it writes, and older
-        // files may carry stale caches; recalculate once so the comparison is accurate.
-        try
-        {
-            wb.RecalculateAllFormulas();
-        }
-        catch
-        {
-            // Best effort; uncached cells fall back to whatever the file carries.
-        }
 
         var rows = new List<RingkasanRow>();
         var lastRow = ringkasan.LastRowUsed()?.RowNumber() ?? 0;

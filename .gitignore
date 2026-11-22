@@ -13,6 +13,7 @@ publish/
 TestResults/
 coverage/
 *.coverage
+coverage.json
 *.trx
 
 # Rider / VS caches
