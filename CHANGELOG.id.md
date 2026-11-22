@@ -4,6 +4,23 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v1.6.1
+
+Fitur yang ada sekarang berjalan lebih ringan. Cover, filter, import, dan pemindahan game tidak lagi mengulang kerja yang cukup dilakukan sekali.
+
+## Peningkatan
+
+- **Pencarian cover.** Folder cover diindeks sekali di memori, sehingga merender atau menggulir daftar game tidak memindai folder itu untuk setiap baris.
+- **Filter.** Peta tag dimuat sekali per refresh, bukan sekali per ketikan pencarian.
+- **Dashboard.** Game dikelompokkan sekali dan drive yang siap dicek dengan satu enumerasi, bukan satu per storage.
+- **Import.** Pratinjau dipakai ulang untuk file dan timestamp yang sama. Deteksi duplikat memuat nama yang ada sekali, bukan query per game. Kalkulasi rumus dijalankan sekali per pratinjau, bukan per sel.
+- **Pemindahan game.** Riwayat dan pembaruan storage ditulis dalam dua pernyataan, bukan tiga query per game.
+
+## Perbaikan bug
+
+- **Verifikasi Ringkasan.** Sheet tanpa baris yang bisa diverifikasi tidak lagi dilaporkan cocok, dan kegagalan kalkulasi rumus tampil sebagai peringatan.
+- **Backup upgrade skema.** Salinan database sebelum upgrade dihapus hanya setelah migrasi berhasil, sehingga tidak menumpuk tanpa terlihat.
+
 ## v1.6.0
 
 Satu klik untuk memilih game saat kamu bingung mau main apa.

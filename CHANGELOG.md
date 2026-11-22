@@ -4,6 +4,23 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v1.6.1
+
+Existing features run lighter. Cover thumbnails, filtering, import, and moves no longer repeat work that only needs to happen once.
+
+## Improvements
+
+- **Cover lookup.** The covers folder is indexed once in memory, so rendering or scrolling the game list no longer scans it for every row.
+- **Filtering.** The tag map loads once per refresh instead of once per search keystroke.
+- **Dashboard.** Games are grouped once and ready drives are checked with one enumeration instead of one per storage.
+- **Import.** A preview is reused for the same file and timestamp. Duplicate detection loads existing names once instead of querying once per game. Formula recalculation runs once per preview instead of once per cell.
+- **Moving games.** History and storage updates are written in two statements instead of three queries per game.
+
+## Bug fixes
+
+- **Ringkasan verification.** A sheet with no verifiable rows no longer reports a successful check, and formula recalculation failures appear as warnings.
+- **Schema upgrade backups.** Pre-upgrade database copies are removed only after migrations commit, so they no longer accumulate invisibly.
+
 ## v1.6.0
 
 Pick a game in one click when you cannot decide what to play next.
