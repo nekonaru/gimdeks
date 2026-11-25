@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v1.7.0
+
+Launch installed games directly from the collection, and keep a simple play log.
+
+## New features
+
+- **Local game launcher.** Set a game's `.exe` path in its editor, then press Launch from the toolbar, row context menu, or right-click menu. Only a local `.exe` the user chose is started, with no arguments and no shell.
+- **Play log.** Each successful launch increments a play count and records the time. The game list shows a PLAYED column, with "Never played" until the first launch.
+
+## Improvements
+
+- **Executable picker.** The game editor has a Browse button restricted to `.exe` files.
+- **Schema migration.** Version 3 adds the launch path and play log columns with the existing automatic pre-upgrade backup.
+
 ## v1.6.1
 
 Existing features run lighter. Cover thumbnails, filtering, import, and moves no longer repeat work that only needs to happen once.

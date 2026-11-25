@@ -336,4 +336,16 @@ Data yang dikirim ke internet hanya judul game. Lanjutkan?</sys:String>
   <sys:String x:Key="Ui_Dashboard_Picked">Terpilih: {0}</sys:String>
   <sys:String x:Key="Ui_GameList_PickNotFound">Game terpilih tidak ada di daftar saat ini.</sys:String>
   <sys:String x:Key="Ui_GameList_Picked">Dipilih untuk dimainkan: {0}</sys:String>
+  <sys:String x:Key="Ui_GameDialog_PathExe">Path executable (opsional)</sys:String>
+  <sys:String x:Key="Ui_GameDialog_PathExeHint">File .exe game yang tersimpan lokal</sys:String>
+  <sys:String x:Key="Ui_GameDialog_PathExeTitle">Pilih file executable game</sys:String>
+  <sys:String x:Key="Ui_Button_Launch">Luncurkan</sys:String>
+  <sys:String x:Key="Ui_Button_LaunchTooltip">Jalankan file .exe game yang dipilih</sys:String>
+  <sys:String x:Key="Ui_GameList_SelectOneToLaunch">Pilih satu game untuk diluncurkan.</sys:String>
+  <sys:String x:Key="Ui_GameList_NoExe">Game ini belum punya path executable.</sys:String>
+  <sys:String x:Key="Ui_GameList_LaunchFailed">Game gagal diluncurkan. Periksa path executable-nya.</sys:String>
+  <sys:String x:Key="Ui_GameList_Launched">Diluncurkan: {0}</sys:String>
+  <sys:String x:Key="Ui_Col_NeverPlayed">Belum dimainkan</sys:String>
+  <sys:String x:Key="Ui_Col_PlayedTimes">{0}x dimainkan</sys:String>
+  <sys:String x:Key="Ui_Col_Played">DIMAINKAN</sys:String>
 </ResourceDictionary>

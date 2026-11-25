@@ -4,6 +4,20 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v1.7.0
+
+Luncurkan game yang sudah terpasang langsung dari koleksi, dan simpan catatan main yang sederhana.
+
+## Fitur baru
+
+- **Peluncur game lokal.** Isi path `.exe` game di editornya, lalu tekan Luncurkan dari toolbar, menu baris, atau klik kanan. Hanya file `.exe` lokal yang dipilih pengguna yang dijalankan, tanpa argumen dan tanpa shell.
+- **Catatan main.** Setiap peluncuran berhasil menambah jumlah main dan mencatat waktunya. Daftar game menampilkan kolom DIMAINKAN dengan "Belum dimainkan" sebelum game pernah dijalankan.
+
+## Peningkatan
+
+- **Pemilih executable.** Editor game memiliki tombol Pilih File yang hanya menampilkan file `.exe`.
+- **Migrasi skema.** Versi 3 menambah kolom path peluncuran dan catatan main dengan backup otomatis sebelum upgrade yang sudah ada.
+
 ## v1.6.1
 
 Fitur yang ada sekarang berjalan lebih ringan. Cover, filter, import, dan pemindahan game tidak lagi mengulang kerja yang cukup dilakukan sekali.

@@ -16,6 +16,31 @@ public sealed class GameRepositoryTests : IDisposable
     }
 
     [Fact]
+    public async Task LaunchFieldsPersistAcrossReload()
+    {
+        var dbPath = Path.Combine(_tempDir, "launch.db");
+        var factory = new SqliteConnectionFactory(dbPath);
+        new DatabaseInitializer(factory).EnsureCreated();
+        var games = new GameRepository(factory);
+        var id = await games.AddAsync(new Game
+        {
+            Nama = "Launch Me",
+            Status = GameStatus.SudahAda,
+            PathExe = @"C:\Games\Launch Me.exe",
+            JumlahMain = 2,
+            DimainkanPada = new DateTime(2026, 11, 26, 12, 0, 0, DateTimeKind.Utc),
+        });
+
+        var game = await games.GetByIdAsync(id);
+        Assert.NotNull(game);
+        Assert.Equal(@"C:\Games\Launch Me.exe", game!.PathExe);
+        Assert.Equal(2, game.JumlahMain);
+        Assert.Equal(new DateTime(2026, 11, 26, 12, 0, 0, DateTimeKind.Utc), game.DimainkanPada);
+
+        Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+    }
+
+    [Fact]
     public async Task MoveToStorageBatchMovesGamesAndRecordsHistory()
     {
         var dbPath = Path.Combine(_tempDir, "move.db");

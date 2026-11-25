@@ -83,6 +83,7 @@ GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan S
 | **Klik dua kali untuk ubah** | Klik dua kali baris game untuk membuka editornya. |
 | **Tandai selesai secara massal** | Pilih beberapa game sekaligus dan centang flag selesai untuk semuanya, langsung dari toolbar. |
 | **Pilihan acak** | Bingung mau main apa? Dashboard memilih salah satu game Sudah Ada yang belum selesai secara acak dan menyorotnya di daftar game. |
+| **Peluncur lokal** | Simpan path `.exe` game lokal dan luncurkan dari toolbar atau menu klik kanan. Jumlah main dan waktu terakhir dicatat. |
 | **Kelola storage** | Tambah dan ubah storage: kapasitas, batas per drive (default 900 GB untuk HDD eksternal 1 TB), dan tipe. |
 | **Peringatan melebihi batas** | Storage yang totalnya melewati batas menampilkan lencana peringatan. Tepat di batas tetap aman. |
 | **Dikecualikan dan Dieliminasi** | Layar khusus untuk game online/mobile/gratis dan game yang dieliminasi, dengan pemulihan ke storage. |

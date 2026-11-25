@@ -25,6 +25,9 @@ public sealed class GameRow
         GameStatus.Dieliminasi => "Ui_Status_Dieliminasi",
         _ => "Ui_Status_BelumDownload",
     });
+    public string PlayText => Game.JumlahMain == 0
+        ? Services.Loc.Get("Ui_Col_NeverPlayed")
+        : Services.Loc.Format("Ui_Col_PlayedTimes", Game.JumlahMain);
 }
 
 public sealed record FilterOption(string Value, string LabelKey)
@@ -332,6 +335,35 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         var selesaiCount = filtered.Count(g => g.SelesaiMain);
         SummaryText = Services.Loc.Format("Ui_GameList_Summary", rows.Count, selesaiCount);
         RowsReloaded?.Invoke();
+    }
+
+    [RelayCommand]
+    private async Task LaunchGameAsync()
+    {
+        if (SelectedRows.Count != 1)
+        {
+            StatusText = Services.Loc.Get("Ui_GameList_SelectOneToLaunch");
+            return;
+        }
+
+        var game = SelectedRows[0].Game;
+        if (!Services.GameLauncherService.IsValidExecutable(game.PathExe))
+        {
+            StatusText = Services.Loc.Get("Ui_GameList_NoExe");
+            return;
+        }
+
+        if (!Services.GameLauncherService.Launch(game.PathExe))
+        {
+            StatusText = Services.Loc.Get("Ui_GameList_LaunchFailed");
+            return;
+        }
+
+        game.JumlahMain += 1;
+        game.DimainkanPada = DateTime.UtcNow;
+        await _gameRepository.UpdateAsync(game);
+        StatusText = Services.Loc.Format("Ui_GameList_Launched", game.Nama);
+        await ReloadAsync();
     }
 
     [RelayCommand]

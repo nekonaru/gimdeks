@@ -47,6 +47,7 @@ public partial class GameEditDialog : Window
             AsalTextBox.Text = original.AsalStorage ?? "";
             AlasanTextBox.Text = original.Alasan ?? "";
             CatatanTextBox.Text = original.Catatan ?? "";
+            PathExeTextBox.Text = original.PathExe ?? "";
             TagTextBox.Text = tagText ?? "";
             SelesaiCheckBox.IsChecked = original.SelesaiMain;
         }
@@ -124,6 +125,7 @@ public partial class GameEditDialog : Window
             AsalStorage = NullIfEmpty(AsalTextBox.Text),
             Alasan = NullIfEmpty(AlasanTextBox.Text),
             Catatan = NullIfEmpty(CatatanTextBox.Text),
+            PathExe = NullIfEmpty(PathExeTextBox.Text),
             SelesaiMain = SelesaiCheckBox.IsChecked == true,
         };
 
@@ -183,6 +185,19 @@ public partial class GameEditDialog : Window
         finally
         {
             FetchCoverButton.IsEnabled = true;
+        }
+    }
+
+    private void BrowseExeButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Filter = "Executable (*.exe)|*.exe",
+            Title = Services.Loc.Get("Ui_GameDialog_PathExeTitle"),
+        };
+        if (dialog.ShowDialog() == true)
+        {
+            PathExeTextBox.Text = dialog.FileName;
         }
     }
 

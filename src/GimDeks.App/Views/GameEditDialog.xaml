@@ -77,6 +77,17 @@
         <TextBlock Text="{DynamicResource Ui_GameDialog_Notes}" Style="{StaticResource MaterialDesignBody2TextBlock}" Opacity="0.8" />
         <TextBox x:Name="CatatanTextBox" materialDesign:HintAssist.Hint="{DynamicResource Ui_Optional}" TextWrapping="Wrap" AcceptsReturn="True" MinHeight="56" Margin="0,4,0,12" />
 
+        <TextBlock Text="{DynamicResource Ui_GameDialog_PathExe}" Style="{StaticResource MaterialDesignBody2TextBlock}" Opacity="0.8" />
+        <Grid Margin="0,4,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="PathExeTextBox" Grid.Column="0" materialDesign:HintAssist.Hint="{DynamicResource Ui_GameDialog_PathExeHint}" />
+            <Button x:Name="BrowseExeButton" Grid.Column="1" Content="{DynamicResource Ui_Import_Browse}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Margin="8,0,0,0" Padding="10,2" Click="BrowseExeButton_OnClick" />
+        </Grid>
+
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />

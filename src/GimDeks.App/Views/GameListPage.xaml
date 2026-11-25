@@ -81,8 +81,11 @@
                         </DataTemplate>
                     </Button.ContentTemplate>
                 </Button>
-                <Button Content="{DynamicResource Ui_Button_Edit}" Style="{StaticResource MaterialDesignOutlinedButton}"
-                        Command="{Binding EditGameCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0" />
+                    <Button Content="{DynamicResource Ui_Button_Edit}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                            Command="{Binding EditGameCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0" />
+                <Button Content="{DynamicResource Ui_Button_Launch}" Style="{StaticResource MaterialDesignRaisedButton}"
+                        Command="{Binding LaunchGameCommand}" Margin="0,0,8,0"
+                        ToolTip="{DynamicResource Ui_Button_LaunchTooltip}" />
                 <Button Content="{DynamicResource Ui_Button_MoveTo}" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding MoveToStorageCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0" />
                 <Button Content="{DynamicResource Ui_Button_ChangeStatus}" Style="{StaticResource MaterialDesignOutlinedButton}"
@@ -127,6 +130,8 @@
                   MouseDoubleClick="DataGrid_OnMouseDoubleClick">
             <DataGrid.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Header="{DynamicResource Ui_Button_Launch}"
+                              Command="{Binding DataContext.LaunchGameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
                     <MenuItem Header="{DynamicResource Ui_Button_Edit}"
                               Command="{Binding DataContext.EditGameCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                               IsEnabled="{Binding DataContext.HasSelection, RelativeSource={RelativeSource AncestorType=UserControl}}" />
@@ -166,6 +171,7 @@
                 <DataGridTextColumn Header="{DynamicResource Ui_Col_Version}" Binding="{Binding Game.Versi}" Width="100" />
                 <DataGridTextColumn Header="{DynamicResource Ui_Col_Size}" Binding="{Binding Game.UkuranGb, StringFormat=N1}" Width="110" />
                 <DataGridTextColumn Header="{DynamicResource Ui_Col_Status}" Binding="{Binding StatusText}" Width="135" />
+                <DataGridTextColumn Header="{DynamicResource Ui_Col_Played}" Binding="{Binding PlayText}" Width="110" />
                 <DataGridTextColumn Header="{DynamicResource Ui_Col_Storage}" Binding="{Binding StorageName}" Width="160" />
                 <DataGridTextColumn Header="{DynamicResource Ui_Col_Tag}" Binding="{Binding TagsText}" Width="150" />
             </DataGrid.Columns>

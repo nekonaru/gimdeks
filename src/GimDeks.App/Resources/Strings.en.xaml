@@ -336,4 +336,16 @@ Only the game title is sent to the internet. Continue?</sys:String>
   <sys:String x:Key="Ui_Dashboard_Picked">Picked: {0}</sys:String>
   <sys:String x:Key="Ui_GameList_PickNotFound">The picked game is not in the current list.</sys:String>
   <sys:String x:Key="Ui_GameList_Picked">Picked to play: {0}</sys:String>
+  <sys:String x:Key="Ui_GameDialog_PathExe">Executable path (optional)</sys:String>
+  <sys:String x:Key="Ui_GameDialog_PathExeHint">Local .exe file of the game</sys:String>
+  <sys:String x:Key="Ui_GameDialog_PathExeTitle">Select the game executable</sys:String>
+  <sys:String x:Key="Ui_Button_Launch">Launch</sys:String>
+  <sys:String x:Key="Ui_Button_LaunchTooltip">Run the selected game executable</sys:String>
+  <sys:String x:Key="Ui_GameList_SelectOneToLaunch">Select one game to launch.</sys:String>
+  <sys:String x:Key="Ui_GameList_NoExe">This game has no executable path.</sys:String>
+  <sys:String x:Key="Ui_GameList_LaunchFailed">Could not launch the game. Check its executable path.</sys:String>
+  <sys:String x:Key="Ui_GameList_Launched">Launched: {0}</sys:String>
+  <sys:String x:Key="Ui_Col_NeverPlayed">Never played</sys:String>
+  <sys:String x:Key="Ui_Col_PlayedTimes">Played {0}x</sys:String>
+  <sys:String x:Key="Ui_Col_Played">PLAYED</sys:String>
 </ResourceDictionary>

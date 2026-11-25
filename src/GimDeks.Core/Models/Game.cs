@@ -14,4 +14,7 @@ public sealed class Game
     public string? Catatan { get; set; }
     public int Urutan { get; set; }
     public DateTime DibuatPada { get; set; }
+    public string? PathExe { get; set; }
+    public DateTime? DimainkanPada { get; set; }
+    public int JumlahMain { get; set; }
 }
