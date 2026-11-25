@@ -83,6 +83,7 @@ GimDeks manages a game collection across multiple drives (external HDDs, laptop 
 | **Double-click to edit** | Double-click a game row to open the editor. |
 | **Mark played through in bulk** | Select several games and toggle their played-through flag at once, right from the toolbar. |
 | **Random pick** | Can not decide what to play? The dashboard picks one of your downloaded, unfinished games at random and highlights it in the game list. |
+| **Local launcher** | Store a game's local `.exe` path and launch it from the toolbar or right-click menu. A play count and last played time are recorded. |
 | **Storage management** | Add and edit storages: capacity, per-drive limit (default 900 GB for 1 TB external HDDs), and type. |
 | **Over-limit warnings** | Any storage whose counted total passes its limit shows a warning badge. Exactly at the limit is fine. |
 | **Excluded and eliminated** | Dedicated screens for online/mobile/free games and eliminated games, with restore to a storage. |

@@ -72,6 +72,13 @@ public sealed class DatabaseInitializer
           drive_letter TEXT
         );
         """,
+
+        // 3: local launch path and play log
+        """
+        ALTER TABLE game ADD COLUMN path_exe TEXT;
+        ALTER TABLE game ADD COLUMN dimainkan_pada TEXT;
+        ALTER TABLE game ADD COLUMN jumlah_main INTEGER NOT NULL DEFAULT 0;
+        """,
     };
 
     private readonly SqliteConnectionFactory _factory;
