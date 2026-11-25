@@ -70,6 +70,9 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     private FilterOption _selectedSelesai = FilterOption.All;
 
     [ObservableProperty]
+    private FilterOption _selectedSort = FilterOption.All;
+
+    [ObservableProperty]
     private string _summaryText = "";
 
     [ObservableProperty]
@@ -94,6 +97,15 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             new FilterOption("ya", "Ui_SelesaiYes"),
             new FilterOption("tidak", "Ui_SelesaiNo"),
         };
+        SortOptions = new[]
+        {
+            new FilterOption("name", "Ui_Sort_Name"),
+            new FilterOption("size", "Ui_Sort_SizeDesc"),
+            new FilterOption("played", "Ui_Sort_PlayedDesc"),
+            new FilterOption("recent", "Ui_Sort_RecentDesc"),
+            new FilterOption("status", "Ui_Sort_Status"),
+        };
+        _selectedSort = SortOptions[0];
         StorageOptions = new ObservableCollection<FilterOption> { FilterOption.All };
         TagOptions = new ObservableCollection<FilterOption> { FilterOption.All };
         Rows = new ObservableCollection<GameRow>();
@@ -105,6 +117,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     public ObservableCollection<GameRow> SelectedRows { get; }
     public IReadOnlyList<FilterOption> StatusOptions { get; }
     public IReadOnlyList<FilterOption> SelesaiOptions { get; }
+    public IReadOnlyList<FilterOption> SortOptions { get; }
     public ObservableCollection<FilterOption> StorageOptions { get; }
     public ObservableCollection<FilterOption> TagOptions { get; }
     public bool HasSelection => SelectedRows.Count > 0;
@@ -204,6 +217,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     partial void OnSelectedSelesaiChanged(FilterOption value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
     partial void OnMinSizeChanged(string value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
     partial void OnMaxSizeChanged(string value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
+    partial void OnSelectedSortChanged(FilterOption value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
 
     [RelayCommand]
     private void ClearFilters()
@@ -293,8 +307,30 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             filtered = filtered.Where(g => !g.SelesaiMain);
         }
 
-        var rows = filtered
-            .OrderBy(g => g.Nama, StringComparer.CurrentCultureIgnoreCase)
+        var sort = SelectedSort?.Value ?? "name";
+        IOrderedEnumerable<Game> ordered;
+        if (sort == "size")
+        {
+            ordered = filtered.OrderByDescending(g => g.UkuranGb);
+        }
+        else if (sort == "played")
+        {
+            ordered = filtered.OrderByDescending(g => g.JumlahMain).ThenByDescending(g => g.DimainkanPada);
+        }
+        else if (sort == "recent")
+        {
+            ordered = filtered.OrderByDescending(g => g.DimainkanPada ?? DateTime.MinValue);
+        }
+        else if (sort == "status")
+        {
+            ordered = filtered.OrderBy(g => g.Status.ToString(), StringComparer.OrdinalIgnoreCase);
+        }
+        else
+        {
+            ordered = filtered.OrderBy(g => g.Nama, StringComparer.CurrentCultureIgnoreCase);
+        }
+
+        var rows = ordered
             .ThenBy(g => g.Urutan)
             .Select(g => new GameRow
             {

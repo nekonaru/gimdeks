@@ -4,6 +4,20 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v1.8.0
+
+Periksa kesehatan koleksi sekilas, dan urutkan game berdasarkan seberapa sering dan kapan terakhir kamu memainkannya.
+
+## Fitur baru
+
+- **Halaman Pemeriksaan.** Halaman baru di sidebar memindai storage yang melebihi batas, drive yang tidak terhubung, grup duplikat, game berukuran nol, game dengan status tidak konsisten, backup yang belum ada atau sudah lama, dan file Excel sumber yang hilang. Setiap temuan punya tombol Buka yang langsung menuju halaman terkait dan memilih itemnya.
+- **Pengurutan berdasarkan main.** Daftar game kini bisa diurutkan berdasarkan ukuran terbesar, paling sering dimainkan, baru dimainkan, atau status, selain urutan abjad bawaan.
+
+## Peningkatan
+
+- **Temuan yang bisa ditindaklanjuti.** Temuan pemeriksaan menuju ke Storage, Duplikat, Daftar Game, dan Import / Export, sehingga hasil pindai langsung mengarah ke perbaikan.
+- **Tetap offline.** Semua pemeriksaan hanya membaca file SQLite lokal dan drive lokal. Tidak ada panggilan jaringan baru.
+
 ## v1.7.0
 
 Luncurkan game yang sudah terpasang langsung dari koleksi, dan simpan catatan main yang sederhana.
