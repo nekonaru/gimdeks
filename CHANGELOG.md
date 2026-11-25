@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v1.8.0
+
+Check the health of your collection at a glance, and sort games by how often and how recently you played them.
+
+## New features
+
+- **Health Check page.** A new sidebar page scans for over-limit storages, disconnected drives, duplicate groups, zero-size games, games with an inconsistent status, missing or stale backups, and a missing imported Excel source. Each finding has an Open button that navigates straight to the relevant page and selects the item.
+- **Play-based sorting.** The game list can now sort by biggest size, most played, recently played, or status, alongside the default alphabetical order.
+
+## Improvements
+
+- **Actionable findings.** Health issues link into Storage, Duplicates, Game List, and Import / Export, so a scan leads directly to a fix.
+- **Offline only.** All health checks read the local SQLite file and local drives. No network call is added.
+
 ## v1.7.0
 
 Launch installed games directly from the collection, and keep a simple play log.

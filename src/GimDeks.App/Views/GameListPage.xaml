@@ -70,6 +70,11 @@
             </Grid>
 
             <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                <ComboBox Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          materialDesign:HintAssist.Hint="{DynamicResource Ui_Filter_Sort}"
+                          ItemsSource="{Binding SortOptions}"
+                          SelectedItem="{Binding SelectedSort}"
+                          DisplayMemberPath="Label" Width="150" Margin="0,0,8,0" />
                 <Button Content="{DynamicResource Ui_Button_Add}" Style="{StaticResource MaterialDesignRaisedButton}"
                         Command="{Binding AddGameCommand}" Margin="0,0,8,0">
                     <Button.ContentTemplate>

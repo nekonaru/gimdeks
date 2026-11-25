@@ -53,6 +53,7 @@
             <views:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
             <views:GameIdToCoverConverter x:Key="GameIdToCoverConverter" />
             <views:LocKeyConverter x:Key="LocKeyConverter" />
+            <views:HealthSeverityToVisibilityConverter x:Key="HealthSeverityToVisibilityConverter" />
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
             <Style TargetType="UserControl">

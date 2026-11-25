@@ -50,7 +50,8 @@ public partial class MainViewModel : ObservableObject
         StatisticsViewModel statistics,
         Services.ThemingService theming,
         Services.LocalizationService localization,
-        Services.AppSettingsService settings)
+        Services.AppSettingsService settings,
+        HealthViewModel health)
     {
         _theming = theming;
         _localization = localization;
@@ -64,6 +65,7 @@ public partial class MainViewModel : ObservableObject
         Duplicates = duplicates;
         HddSuggestion = hddSuggestion;
         Statistics = statistics;
+        Health = health;
         IsLightTheme = theming.IsLightTheme;
         LanguageLabel = GetLanguageLabel(localization.CurrentLanguage);
         NavItems = new[]
@@ -76,6 +78,7 @@ public partial class MainViewModel : ObservableObject
             new NavItem(Page.Duplicates, "Ui_Nav_Duplicates", "ContentDuplicate"),
             new NavItem(Page.SaranHdd, "Ui_Nav_SaranHdd", "ChartBar"),
             new NavItem(Page.Statistics, "Ui_Nav_Statistics", "ChartLine"),
+            new NavItem(Page.Health, "Ui_Nav_Health", "Medical"),
             new NavItem(Page.ImportExport, "Ui_Nav_ImportExport", "ImportExport"),
         };
         CurrentViewModel = dashboard;
@@ -87,6 +90,7 @@ public partial class MainViewModel : ObservableObject
             _ = GameList.OpenGameByIdAsync(gameId);
         };
         importExport.DataChanged += RefreshAll;
+        health.OpenIssueRequested += OpenHealthIssue;
         RegisterWatcher();
     }
 
@@ -115,6 +119,7 @@ public partial class MainViewModel : ObservableObject
             Page.Duplicates => "Ui_Nav_Duplicates",
             Page.SaranHdd => "Ui_Nav_SaranHdd",
             Page.Statistics => "Ui_Nav_Statistics",
+            Page.Health => "Ui_Nav_Health",
             Page.ImportExport => "Ui_Nav_ImportExport",
             _ => "Ui_Nav_Dashboard",
         };
@@ -134,10 +139,34 @@ public partial class MainViewModel : ObservableObject
     public DuplicatesViewModel Duplicates { get; }
     public HddSuggestionViewModel HddSuggestion { get; }
     public StatisticsViewModel Statistics { get; }
+    public HealthViewModel Health { get; }
+
+    private void OpenHealthIssue(HealthIssue issue)
+    {
+        if (issue.TargetPage is not { } page)
+        {
+            return;
+        }
+
+        NavigateTo(page);
+        if (issue.TargetId is not { } id)
+        {
+            return;
+        }
+
+        if (page == Page.GameList)
+        {
+            _ = GameList.OpenGameByIdAsync(id);
+        }
+        else if (page == Page.Storage)
+        {
+            _ = Storage.SelectStorageByIdAsync(id);
+        }
+    }
 
     private void RefreshAll()
     {
-        foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated, Duplicates, HddSuggestion, Statistics })
+        foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated, Duplicates, HddSuggestion, Statistics, Health })
         {
             _ = SafeRefresh(vm);
         }
@@ -221,6 +250,7 @@ public partial class MainViewModel : ObservableObject
             Page.Duplicates => Duplicates,
             Page.SaranHdd => HddSuggestion,
             Page.Statistics => Statistics,
+            Page.Health => Health,
             _ => Dashboard,
         };
 

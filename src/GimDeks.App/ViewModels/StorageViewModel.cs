@@ -248,6 +248,13 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         }
     }
 
+    /// <summary>Select a storage by id after the list reloads (deep link from health checks).</summary>
+    public async Task SelectStorageByIdAsync(long id)
+    {
+        await ReloadAsync();
+        SelectedItem = Storages.FirstOrDefault(s => s.Storage.Id == id);
+    }
+
     [RelayCommand]
     private async Task AddStorageAsync()
     {
