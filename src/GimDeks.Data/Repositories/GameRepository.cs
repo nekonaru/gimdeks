@@ -32,8 +32,8 @@ public sealed class GameRepository : IGameRepository
     public async Task<long> AddAsync(Game game, CancellationToken ct = default)
     {
         const string sql = """
-            INSERT INTO game (nama, versi, ukuran_gb, status, storage_id, asal_storage, alasan, catatan, urutan, selesai, path_exe, dimainkan_pada, jumlah_main)
-            VALUES (@Nama, @Versi, @UkuranGb, @Status, @StorageId, @AsalStorage, @Alasan, @Catatan, @Urutan, @SelesaiMain, @PathExe, @DimainkanPada, @JumlahMain);
+            INSERT INTO game (nama, versi, ukuran_gb, status, storage_id, asal_storage, alasan, catatan, urutan, selesai, path_exe, dimainkan_pada, jumlah_main, favorit, rating, prioritas, folder_path, total_detik)
+            VALUES (@Nama, @Versi, @UkuranGb, @Status, @StorageId, @AsalStorage, @Alasan, @Catatan, @Urutan, @SelesaiMain, @PathExe, @DimainkanPada, @JumlahMain, @Favorit, @Rating, @Prioritas, @FolderPath, @TotalDetik);
             SELECT last_insert_rowid();
             """;
         using var connection = _factory.CreateConnection();
@@ -45,7 +45,8 @@ public sealed class GameRepository : IGameRepository
         const string sql = """
             UPDATE game SET nama = @Nama, versi = @Versi, ukuran_gb = @UkuranGb, status = @Status,
                 storage_id = @StorageId, asal_storage = @AsalStorage, alasan = @Alasan, catatan = @Catatan, urutan = @Urutan, selesai = @SelesaiMain,
-                path_exe = @PathExe, dimainkan_pada = @DimainkanPada, jumlah_main = @JumlahMain
+                path_exe = @PathExe, dimainkan_pada = @DimainkanPada, jumlah_main = @JumlahMain,
+                favorit = @Favorit, rating = @Rating, prioritas = @Prioritas, folder_path = @FolderPath, total_detik = @TotalDetik
             WHERE id = @Id;
             """;
         using var connection = _factory.CreateConnection();
@@ -137,6 +138,11 @@ public sealed class GameRepository : IGameRepository
         PathExe = game.PathExe,
         DimainkanPada = game.DimainkanPada?.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture),
         JumlahMain = game.JumlahMain,
+        Favorit = game.Favorit ? 1 : 0,
+        Rating = game.Rating,
+        Prioritas = game.Prioritas,
+        FolderPath = game.FolderPath,
+        TotalDetik = game.TotalDetik,
     };
 
     private static Game Map(dynamic row) => new()
@@ -159,5 +165,10 @@ public sealed class GameRepository : IGameRepository
             (string)row.dimainkan_pada, System.Globalization.CultureInfo.InvariantCulture,
             System.Globalization.DateTimeStyles.AssumeUniversal, out var played) ? played.ToUniversalTime() : null,
         JumlahMain = row.jumlah_main is null ? 0 : Convert.ToInt32(row.jumlah_main, System.Globalization.CultureInfo.InvariantCulture),
+        Favorit = row.favorit is not null && Convert.ToInt64(row.favorit, System.Globalization.CultureInfo.InvariantCulture) != 0,
+        Rating = row.rating is null ? 0 : Convert.ToInt32(row.rating, System.Globalization.CultureInfo.InvariantCulture),
+        Prioritas = row.prioritas is null ? 0 : Convert.ToInt32(row.prioritas, System.Globalization.CultureInfo.InvariantCulture),
+        FolderPath = row.folder_path is null ? null : (string)row.folder_path,
+        TotalDetik = row.total_detik is null ? 0 : Convert.ToInt32(row.total_detik, System.Globalization.CultureInfo.InvariantCulture),
     };
 }

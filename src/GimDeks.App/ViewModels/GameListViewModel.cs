@@ -6,6 +6,7 @@ using GimDeks.App.Services;
 using GimDeks.Core.Interfaces;
 using GimDeks.Core.Models;
 using GimDeks.Core.Rules;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GimDeks.App.ViewModels;
 
@@ -28,6 +29,21 @@ public sealed class GameRow
     public string PlayText => Game.JumlahMain == 0
         ? Services.Loc.Get("Ui_Col_NeverPlayed")
         : Services.Loc.Format("Ui_Col_PlayedTimes", Game.JumlahMain);
+    public string RatingText => Game.Rating <= 0 ? "" : new string('*', Game.Rating);
+    public string TimeText
+    {
+        get
+        {
+            var seconds = Game.TotalDetik;
+            if (seconds <= 0)
+            {
+                return "-";
+            }
+            var hours = seconds / 3600;
+            var minutes = (seconds % 3600) / 60;
+            return hours > 0 ? $"{hours}h {minutes}m" : $"{minutes}m";
+        }
+    }
 }
 
 public sealed record FilterOption(string Value, string LabelKey)
@@ -42,6 +58,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     private readonly IGameRepository _gameRepository;
     private readonly IStorageRepository _storageRepository;
     private readonly ITagRepository _tagRepository;
+    private readonly Services.SessionTrackerService _sessionTracker;
     private readonly SemaphoreSlim _filtersLock = new(1, 1);
     private readonly SemaphoreSlim _reloadLock = new(1, 1);
     private readonly SemaphoreSlim _launchLock = new(1, 1);
@@ -80,11 +97,12 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     [ObservableProperty]
     private string _statusText = "";
 
-    public GameListViewModel(IGameRepository gameRepository, IStorageRepository storageRepository, ITagRepository tagRepository)
+    public GameListViewModel(IGameRepository gameRepository, IStorageRepository storageRepository, ITagRepository tagRepository, Services.SessionTrackerService sessionTracker)
     {
         _gameRepository = gameRepository;
         _storageRepository = storageRepository;
         _tagRepository = tagRepository;
+        _sessionTracker = sessionTracker;
         StatusOptions = new[]
         {
             FilterOption.All,
@@ -106,6 +124,10 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             new FilterOption("played", "Ui_Sort_PlayedDesc"),
             new FilterOption("recent", "Ui_Sort_RecentDesc"),
             new FilterOption("status", "Ui_Sort_Status"),
+            new FilterOption("favorite", "Ui_Sort_Favorite"),
+            new FilterOption("rating", "Ui_Sort_Rating"),
+            new FilterOption("priority", "Ui_Sort_Priority"),
+            new FilterOption("time", "Ui_Sort_Time"),
         };
         _selectedSort = SortOptions[0];
         StorageOptions = new ObservableCollection<FilterOption> { FilterOption.All };
@@ -372,6 +394,22 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         {
             ordered = filtered.OrderBy(g => g.Status.ToString(), StringComparer.OrdinalIgnoreCase);
         }
+        else if (sort == "favorite")
+        {
+            ordered = filtered.OrderByDescending(g => g.Favorit).ThenBy(g => g.Nama, StringComparer.CurrentCultureIgnoreCase);
+        }
+        else if (sort == "rating")
+        {
+            ordered = filtered.OrderByDescending(g => g.Rating).ThenByDescending(g => g.Favorit);
+        }
+        else if (sort == "priority")
+        {
+            ordered = filtered.OrderByDescending(g => g.Prioritas).ThenBy(g => g.Nama, StringComparer.CurrentCultureIgnoreCase);
+        }
+        else if (sort == "time")
+        {
+            ordered = filtered.OrderByDescending(g => g.TotalDetik);
+        }
         else
         {
             ordered = filtered.OrderBy(g => g.Nama, StringComparer.CurrentCultureIgnoreCase);
@@ -452,17 +490,44 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             return;
         }
 
-        if (!Services.GameLauncherService.Launch(game.PathExe))
+        if (_sessionTracker.IsRunning(game.Id))
+        {
+            StatusText = Services.Loc.Get("Ui_GameList_AlreadyRunning");
+            return;
+        }
+
+        if (!await _sessionTracker.LaunchAsync(game))
         {
             StatusText = Services.Loc.Get("Ui_GameList_LaunchFailed");
             return;
         }
 
-        game.JumlahMain += 1;
-        game.DimainkanPada = DateTime.UtcNow;
-        await _gameRepository.UpdateAsync(game);
         StatusText = Services.Loc.Format("Ui_GameList_Launched", game.Nama);
         await ReloadAsync();
+    }
+
+    public async Task SaveFavoritAsync(GameRow row)
+    {
+        await _gameRepository.UpdateAsync(row.Game);
+    }
+
+    [RelayCommand]
+    private void OpenDetail()
+    {
+        if (SelectedRows.Count != 1)
+        {
+            StatusText = Services.Loc.Get("Ui_GameList_SelectOneToLaunch");
+            return;
+        }
+
+        var app = App.Services;
+        var vm = new GameDetailViewModel(
+            SelectedRows[0].Game,
+            app.GetRequiredService<IGameRepository>(),
+            app.GetRequiredService<IGameNoteRepository>(),
+            app.GetRequiredService<IPlaySessionRepository>(),
+            app.GetRequiredService<Services.SessionTrackerService>());
+        new Views.GameDetailWindow(vm) { Owner = System.Windows.Application.Current.MainWindow }.Show();
     }
 
     [RelayCommand]

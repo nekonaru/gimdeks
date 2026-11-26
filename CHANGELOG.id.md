@@ -4,6 +4,33 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v2.0.0
+
+Catat berapa lama kamu main, tandai favorit, dan temukan game atau aksi apa pun dengan cepat. Ini pembaruan mayor pertama dengan versi skema baru.
+
+## Fitur baru
+
+- **Sesi main.** Meluncurkan game memulai sesi yang berakhir saat proses berhenti. Durasi, waktu mulai, dan sumber disimpan. Sesi yang masih berjalan ditutup aman saat aplikasi keluar. Panel detail menampilkan daftar sesi dan total waktu.
+- **Favorit, rating, dan prioritas.** Tiap game bisa ditandai favorit, diberi rating 0 sampai 5, dan memiliki prioritas unduhan. Daftar game memiliki kolom FAV dan RATE, serta pengurutan berdasarkan favorit, rating, prioritas, dan waktu main.
+- **Panel detail game.** Jendela khusus menampilkan cover, catatan, sesi main, dan aksi langsung untuk luncurkan serta membuka folder game lokal.
+- **Catatan bertanggal.** Simpan beberapa catatan per game dengan timestamp, terpisah dari kolom Catatan yang kompatibel dengan Excel.
+- **Pencarian cepat.** Ctrl+P membuka command palette yang mencari semua game dan aksi umum dengan navigasi keyboard.
+- **Folder game lokal.** Tetapkan folder per game dan bukakan di Explorer dari panel detail. Path tidak pernah diekspor.
+
+## Peningkatan
+
+- **Skema versi 4.** Menambah tabel dan kolom baru dengan backup otomatis sebelum upgrade yang sudah ada.
+- **Edit game yang aman.** Mengedit game kini mempertahankan jumlah main, total waktu, dan timestamp alih-alih mengulangnya.
+- **Tautan drive yang jujur.** Kegagalan menulis tautan drive dicatat dan dilaporkan, tidak lagi mengklaim berhasil.
+- **Pilihan storage.** Load async yang usang dibuang memakai token seleksi, sehingga klik cepat tidak menampilkan data storage sebelumnya.
+- **Pengaman import dan export.** Perintah yang berjalan lama tidak bisa tumpang tindih saat halaman sibuk.
+- **Game dieliminasi di Excel.** Asal HDD dan Alasan kini memakai dua kolom, sehingga alasan tidak berubah menjadi storage palsu.
+
+## Perbaikan bug
+
+- **Waktu main terjaga.** Peluncuran tidak lagi menimpa kolom game tambahan, dan pelacakan sesi menggantikan jalur lama yang hanya menambah hitungan.
+- **Deteksi Dikecualikan.** Sheet dengan kolom Alasan dan Asal tidak lagi salah diklasifikasikan sebagai Dikecualikan.
+
 ## v1.9.0
 
 Pindai game terpasang di drive lokal dan tautkan executable ke koleksi, beserta banyak perbaikan data dan interaksi dari audit segar.

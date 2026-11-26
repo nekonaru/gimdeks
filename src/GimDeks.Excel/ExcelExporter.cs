@@ -231,7 +231,7 @@ public sealed class ExcelExporter
         sheet.Cell(1, 1).Style.Font.Bold = true;
         sheet.Cell(1, 1).Style.Font.FontSize = 14;
 
-        var headers = new[] { "No", "Nama Game", "Ukuran (GB)", "Asal HDD / Alasan" };
+        var headers = new[] { "No", "Nama Game", "Ukuran (GB)", "Asal HDD", "Alasan" };
         for (var column = 1; column <= headers.Length; column++)
         {
             var cell = sheet.Cell(2, column);
@@ -248,13 +248,15 @@ public sealed class ExcelExporter
             sheet.Cell(row, 2).Value = eliminated[index].Nama;
             sheet.Cell(row, 3).Value = eliminated[index].UkuranGb;
             sheet.Cell(row, 3).Style.NumberFormat.Format = "0.0";
-            sheet.Cell(row, 4).Value = eliminated[index].AsalStorage ?? eliminated[index].Alasan ?? "";
+            sheet.Cell(row, 4).Value = eliminated[index].AsalStorage ?? "";
+            sheet.Cell(row, 5).Value = eliminated[index].Alasan ?? "";
         }
 
         sheet.Column(1).Width = 5;
         sheet.Column(2).Width = 62;
         sheet.Column(3).Width = 14;
-        sheet.Column(4).Width = 56;
+        sheet.Column(4).Width = 40;
+        sheet.Column(5).Width = 40;
         sheet.SheetView.FreezeRows(2);
     }
 

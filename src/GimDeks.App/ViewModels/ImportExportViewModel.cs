@@ -63,6 +63,23 @@ public partial class ImportExportViewModel : ObservableObject
     [ObservableProperty]
     private string _previewSummary = "";
 
+    public bool CanRun => !IsBusy;
+
+    partial void OnIsBusyChanged(bool value) => NotifyCanExecuteChangedForAll();
+
+    private void NotifyCanExecuteChangedForAll()
+    {
+        BrowseCommand.NotifyCanExecuteChanged();
+        PreviewCommand.NotifyCanExecuteChanged();
+        ImportCommand.NotifyCanExecuteChanged();
+        ExportCommand.NotifyCanExecuteChanged();
+        ExportCsvCommand.NotifyCanExecuteChanged();
+        BackupCommand.NotifyCanExecuteChanged();
+        RestoreCommand.NotifyCanExecuteChanged();
+        EnablePortableCommand.NotifyCanExecuteChanged();
+        DisablePortableCommand.NotifyCanExecuteChanged();
+    }
+
     public bool IsPortable => _portable.IsPortable;
 
     public string PortableStatusText => IsPortable
@@ -107,7 +124,7 @@ public partial class ImportExportViewModel : ObservableObject
 
     public IReadOnlyList<string> FileFilters => new[] { "File Excel (*.xlsx)|*.xlsx" };
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRun))]
     private void Browse()
     {
         var dialog = new OpenFileDialog
@@ -122,7 +139,7 @@ public partial class ImportExportViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRun))]
     private async Task PreviewAsync()
     {
         if (!EnsureFile())
@@ -176,7 +193,7 @@ public partial class ImportExportViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRun))]
     private async Task ImportAsync()
     {
         if (!EnsureFile())
@@ -216,7 +233,7 @@ public partial class ImportExportViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRun))]
     private async Task ExportAsync()
     {
         var dialog = new SaveFileDialog
@@ -250,7 +267,7 @@ public partial class ImportExportViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRun))]
     private async Task ExportCsvAsync()
     {
         var dialog = new SaveFileDialog
@@ -282,7 +299,7 @@ public partial class ImportExportViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRun))]
     private async Task BackupAsync()
     {
         IsBusy = true;
@@ -302,7 +319,7 @@ public partial class ImportExportViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRun))]
     private async Task RestoreAsync()
     {
         var dialog = new OpenFileDialog
@@ -339,7 +356,7 @@ public partial class ImportExportViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRun))]
     private async Task EnablePortableAsync()
     {
         if (IsPortable)
@@ -367,7 +384,7 @@ public partial class ImportExportViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRun))]
     private async Task DisablePortableAsync()
     {
         if (!IsPortable)
@@ -421,3 +438,4 @@ public partial class ImportExportViewModel : ObservableObject
         return true;
     }
 }
+
