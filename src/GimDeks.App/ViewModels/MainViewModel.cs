@@ -51,7 +51,8 @@ public partial class MainViewModel : ObservableObject
         Services.ThemingService theming,
         Services.LocalizationService localization,
         Services.AppSettingsService settings,
-        HealthViewModel health)
+        HealthViewModel health,
+        ScanGamesViewModel scanGames)
     {
         _theming = theming;
         _localization = localization;
@@ -66,6 +67,7 @@ public partial class MainViewModel : ObservableObject
         HddSuggestion = hddSuggestion;
         Statistics = statistics;
         Health = health;
+        ScanGames = scanGames;
         IsLightTheme = theming.IsLightTheme;
         LanguageLabel = GetLanguageLabel(localization.CurrentLanguage);
         NavItems = new[]
@@ -79,6 +81,7 @@ public partial class MainViewModel : ObservableObject
             new NavItem(Page.SaranHdd, "Ui_Nav_SaranHdd", "ChartBar"),
             new NavItem(Page.Statistics, "Ui_Nav_Statistics", "ChartLine"),
             new NavItem(Page.Health, "Ui_Nav_Health", "Medical"),
+            new NavItem(Page.ScanGames, "Ui_Nav_ScanGames", "FolderSearch"),
             new NavItem(Page.ImportExport, "Ui_Nav_ImportExport", "ImportExport"),
         };
         CurrentViewModel = dashboard;
@@ -86,11 +89,12 @@ public partial class MainViewModel : ObservableObject
         dashboard.OpenStorageGamesRequested += storageId => NavigateTo(Page.GameList, storageId);
         dashboard.OpenRandomGameRequested += gameId =>
         {
+            GameList.SetPendingGame(gameId);
             NavigateTo(Page.GameList);
-            _ = GameList.OpenGameByIdAsync(gameId);
         };
         importExport.DataChanged += RefreshAll;
         health.OpenIssueRequested += OpenHealthIssue;
+        scanGames.DataChanged += RefreshAll;
         RegisterWatcher();
     }
 
@@ -120,6 +124,7 @@ public partial class MainViewModel : ObservableObject
             Page.SaranHdd => "Ui_Nav_SaranHdd",
             Page.Statistics => "Ui_Nav_Statistics",
             Page.Health => "Ui_Nav_Health",
+            Page.ScanGames => "Ui_Nav_ScanGames",
             Page.ImportExport => "Ui_Nav_ImportExport",
             _ => "Ui_Nav_Dashboard",
         };
@@ -140,6 +145,7 @@ public partial class MainViewModel : ObservableObject
     public HddSuggestionViewModel HddSuggestion { get; }
     public StatisticsViewModel Statistics { get; }
     public HealthViewModel Health { get; }
+    public ScanGamesViewModel ScanGames { get; }
 
     private void OpenHealthIssue(HealthIssue issue)
     {
@@ -148,25 +154,24 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        NavigateTo(page);
-        if (issue.TargetId is not { } id)
+        if (issue.TargetId is { } id)
         {
-            return;
+            if (page == Page.GameList)
+            {
+                GameList.SetPendingGame(id);
+            }
+            else if (page == Page.Storage)
+            {
+                Storage.SetPendingStorage(id);
+            }
         }
 
-        if (page == Page.GameList)
-        {
-            _ = GameList.OpenGameByIdAsync(id);
-        }
-        else if (page == Page.Storage)
-        {
-            _ = Storage.SelectStorageByIdAsync(id);
-        }
+        NavigateTo(page);
     }
 
     private void RefreshAll()
     {
-        foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated, Duplicates, HddSuggestion, Statistics, Health })
+        foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated, Duplicates, HddSuggestion, Statistics, Health, ScanGames })
         {
             _ = SafeRefresh(vm);
         }
@@ -251,6 +256,7 @@ public partial class MainViewModel : ObservableObject
             Page.SaranHdd => HddSuggestion,
             Page.Statistics => Statistics,
             Page.Health => Health,
+            Page.ScanGames => ScanGames,
             _ => Dashboard,
         };
 

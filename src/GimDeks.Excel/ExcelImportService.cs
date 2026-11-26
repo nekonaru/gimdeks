@@ -1,6 +1,8 @@
 using Dapper;
+using System.Security.Cryptography;
 using GimDeks.Core.Interfaces;
 using GimDeks.Core.Models;
+using GimDeks.Core.Rules;
 using GimDeks.Data;
 
 namespace GimDeks.Excel;
@@ -20,6 +22,7 @@ public sealed class ExcelImportService
     private string? _cachedPreviewPath;
     private long _cachedPreviewLength;
     private DateTime _cachedPreviewWriteUtc;
+    private string? _cachedPreviewHash;
     private ImportPreview? _cachedPreview;
 
     public ExcelImportService(
@@ -37,12 +40,14 @@ public sealed class ExcelImportService
     public ImportPreview Preview(string filePath)
     {
         var info = new FileInfo(filePath);
+        var hash = ComputeHash(filePath);
         lock (_previewLock)
         {
             if (_cachedPreview is not null
                 && string.Equals(_cachedPreviewPath, filePath, StringComparison.OrdinalIgnoreCase)
                 && _cachedPreviewLength == info.Length
-                && _cachedPreviewWriteUtc == info.LastWriteTimeUtc)
+                && _cachedPreviewWriteUtc == info.LastWriteTimeUtc
+                && string.Equals(_cachedPreviewHash, hash, StringComparison.Ordinal))
             {
                 return _cachedPreview;
             }
@@ -51,8 +56,31 @@ public sealed class ExcelImportService
             _cachedPreviewPath = filePath;
             _cachedPreviewLength = info.Length;
             _cachedPreviewWriteUtc = info.LastWriteTimeUtc;
+            _cachedPreviewHash = hash;
             _cachedPreview = preview;
             return preview;
+        }
+    }
+
+    private static string ComputeHash(string filePath)
+    {
+        try
+        {
+            using var stream = File.OpenRead(filePath);
+            return Convert.ToHexString(SHA256.HashData(stream));
+        }
+        catch
+        {
+            return string.Empty;
+        }
+    }
+
+    private void ClearPreviewCache()
+    {
+        lock (_previewLock)
+        {
+            _cachedPreview = null;
+            _cachedPreviewHash = null;
         }
     }
 
@@ -133,8 +161,7 @@ public sealed class ExcelImportService
             var gamesSkipped = 0;
             var existingKeys = mode == ImportMode.Gabung
                 ? await LoadExistingGameKeysAsync(connection, transaction, ct)
-                : new HashSet<(string Nama, long? StorageId)>();
-            foreach (var gamePreview in preview.Games)
+                : new HashSet<(string Nama, long? StorageId)>();            foreach (var gamePreview in preview.Games)
             {
                 var game = gamePreview.Game;
                 if (storageIdBySheet.TryGetValue(gamePreview.SheetName, out var storageId))
@@ -142,8 +169,10 @@ public sealed class ExcelImportService
                     game.StorageId = storageId;
                 }
 
-                var key = (game.Nama.ToLowerInvariant(), game.StorageId);
-                if (mode == ImportMode.Gabung && !existingKeys.Add(key))
+                // Deduplicate in both modes so one file cannot insert the same
+                // game twice. Use the same normalizer as the duplicate page.
+                var key = (GameNameNormalizer.Normalize(game.Nama), game.StorageId);
+                if (!existingKeys.Add(key))
                 {
                     gamesSkipped++;
                     continue;
@@ -172,6 +201,7 @@ public sealed class ExcelImportService
             }
 
             transaction.Commit();
+            ClearPreviewCache();
 
             return new ImportResult
             {
@@ -208,7 +238,7 @@ public sealed class ExcelImportService
                 : rawName?.ToString() ?? "";
             var rawStorage = values["StorageId"];
             long? storageId = rawStorage is long l ? l : rawStorage is int i ? i : null;
-            keys.Add((name.ToLowerInvariant(), storageId));
+            keys.Add((GameNameNormalizer.Normalize(name), storageId));
         }
 
         return keys;

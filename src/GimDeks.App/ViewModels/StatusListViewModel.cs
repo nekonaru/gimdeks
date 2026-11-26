@@ -47,6 +47,7 @@ public abstract partial class StatusListViewModelBase : ObservableObject, IRefre
     {
         var games = await _gameRepository.GetByStatusAsync(_status);
         Rows.Clear();
+        SelectedRows.Clear();
         foreach (var game in games.OrderBy(g => g.Nama, StringComparer.CurrentCultureIgnoreCase))
         {
             Rows.Add(new GameRow
@@ -58,7 +59,7 @@ public abstract partial class StatusListViewModelBase : ObservableObject, IRefre
             });
         }
 
-        SummaryText = $"{Rows.Count} game";
+        SummaryText = Services.Loc.Format("Ui_StatusList_Summary", Rows.Count);
     }
 
     [RelayCommand]

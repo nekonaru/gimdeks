@@ -27,7 +27,8 @@
                                   Style="{StaticResource MaterialDesignOutlinedComboBox}"
                                   Width="150"
                                   ItemsSource="{Binding ImportModes}"
-                                  SelectedItem="{Binding SelectedMode}" />
+                                  SelectedItem="{Binding SelectedMode}"
+                                  DisplayMemberPath="Label" />
                     </Grid>
 
                     <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
@@ -113,3 +114,5 @@
         </StackPanel>
     </ScrollViewer>
 </UserControl>
+
+

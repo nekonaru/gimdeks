@@ -102,6 +102,41 @@ public sealed class ExcelImporterTests : IDisposable
     }
 
     [Fact]
+    public void PreviewAggregatesSheetsWithTheSameNormalizedKey()
+    {
+        var path = Path.Combine(_tempDir, "same-key.xlsx");
+        using (var workbook = new XLWorkbook())
+        {
+            foreach (var (name, gameName) in new[] { ("Laptop HDD 1", "Game Satu"), ("Laptop HDD 1 (Done)", "Game Dua") })
+            {
+                var sheet = workbook.Worksheets.Add(name);
+                sheet.Cell(1, 1).Value = $"Laptop: {name}";
+                sheet.Cell(2, 1).Value = "No";
+                sheet.Cell(2, 2).Value = "Nama Game";
+                sheet.Cell(2, 3).Value = "Ukuran (GB)";
+                sheet.Cell(3, 1).Value = 1;
+                sheet.Cell(3, 2).Value = gameName;
+                sheet.Cell(3, 3).Value = 10;
+            }
+
+            var ringkasan = workbook.Worksheets.Add("Ringkasan");
+            ringkasan.Cell(1, 1).Value = "HDD / Kategori";
+            ringkasan.Cell(1, 2).Value = "Jumlah Game";
+            ringkasan.Cell(1, 3).Value = "Total Ukuran (GB)";
+            ringkasan.Cell(2, 1).Value = "Laptop HDD 1 (Sudah Di-download)";
+            ringkasan.Cell(2, 2).Value = 2;
+            ringkasan.Cell(2, 3).Value = 20;
+            workbook.SaveAs(path);
+        }
+
+        var preview = new ExcelImporter().Preview(path);
+        var row = Assert.Single(preview.Ringkasan!.Rows);
+        Assert.Equal(2, row.ActualCount);
+        Assert.Equal(20, row.ActualGb);
+        Assert.True(row.Matches);
+    }
+
+    [Fact]
     public void PreviewDetectsStoragesGamesAndSkippedSheets()
     {
         var path = CreateMiniWorkbook();

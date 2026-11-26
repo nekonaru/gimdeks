@@ -144,14 +144,34 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
 
     public Task RefreshAsync() => ReloadAsync();
 
+    private readonly SemaphoreSlim _reloadLock = new(1, 1);
+    private long? _pendingStorageId;
+
+    /// <summary>Select this storage when the next reload finishes (deep links).</summary>
+    public void SetPendingStorage(long id) => _pendingStorageId = id;
+
     [RelayCommand]
     private async Task ReloadAsync()
+    {
+        await _reloadLock.WaitAsync().ConfigureAwait(true);
+        try
+        {
+            await ReloadCoreAsync();
+        }
+        finally
+        {
+            _reloadLock.Release();
+        }
+    }
+
+    private async Task ReloadCoreAsync()
     {
         var storages = await _storageRepository.GetAllAsync();
         var games = await _gameRepository.GetAllAsync();
         var counted = games.Where(g => CapacityCalculator.CountsTowardTotal(g.Status)).ToList();
 
-        var previousId = SelectedItem?.Storage.Id;
+        var previousId = _pendingStorageId ?? SelectedItem?.Storage.Id;
+        _pendingStorageId = null;
         Storages.Clear();
         foreach (var storage in storages)
         {
@@ -251,8 +271,8 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
     /// <summary>Select a storage by id after the list reloads (deep link from health checks).</summary>
     public async Task SelectStorageByIdAsync(long id)
     {
+        SetPendingStorage(id);
         await ReloadAsync();
-        SelectedItem = Storages.FirstOrDefault(s => s.Storage.Id == id);
     }
 
     [RelayCommand]
@@ -284,13 +304,13 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         var nama = EditNama.Trim();
         if (string.IsNullOrWhiteSpace(nama))
         {
-            DialogService.Error("Storage", Services.Loc.Get("Ui_Storage_NameRequired"));
+            DialogService.Error(Services.Loc.Get("Ui_Storage_Title"), Services.Loc.Get("Ui_Storage_NameRequired"));
             return;
         }
 
         if (await _storageRepository.ExistsByNameAsync(nama, SelectedItem.Storage.Id))
         {
-            DialogService.Error("Storage", Services.Loc.Format("Ui_Storage_NameTaken", nama));
+            DialogService.Error(Services.Loc.Get("Ui_Storage_Title"), Services.Loc.Format("Ui_Storage_NameTaken", nama));
             return;
         }
 
@@ -298,13 +318,13 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         var batas = ParseNullableGb(EditBatas);
         if (!kapasitas.Ok)
         {
-            DialogService.Error("Storage", Services.Loc.Get("Ui_Storage_CapacityInvalid"));
+            DialogService.Error(Services.Loc.Get("Ui_Storage_Title"), Services.Loc.Get("Ui_Storage_CapacityInvalid"));
             return;
         }
 
         if (!batas.Ok)
         {
-            DialogService.Error("Storage", Services.Loc.Get("Ui_Storage_LimitInvalid"));
+            DialogService.Error(Services.Loc.Get("Ui_Storage_Title"), Services.Loc.Get("Ui_Storage_LimitInvalid"));
             return;
         }
 
@@ -329,7 +349,7 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         var count = await _gameRepository.CountByStorageAsync(SelectedItem.Storage.Id);
         if (count > 0)
         {
-            DialogService.Error("Storage", Services.Loc.Format("Ui_Storage_InUse", count));
+            DialogService.Error(Services.Loc.Get("Ui_Storage_Title"), Services.Loc.Format("Ui_Storage_InUse", count));
             return;
         }
 
@@ -377,3 +397,4 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
             : (false, null);
     }
 }
+

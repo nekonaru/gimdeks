@@ -181,7 +181,8 @@ public sealed class ExcelExporter
         {
             var kapasitasTb = storage.KapasitasGb is { } cap ? cap / 1000.0 : 1.0;
             var batas = storage.BatasGb is { } b ? $"  (Maks <= {b.ToString(Invariant)} GB)" : "";
-            return $"{storage.Nama}: {kapasitasTb.ToString("0.#", Invariant)} TB{batas}";
+            // Keep two decimals so a 930 GB drive roundtrips as 930, not 900.
+            return $"{storage.Nama}: {kapasitasTb.ToString("0.##", Invariant)} TB{batas}";
         }
 
         if (storage.Tipe is StorageType.LaptopHdd or StorageType.LaptopSsd or StorageType.Virtual)

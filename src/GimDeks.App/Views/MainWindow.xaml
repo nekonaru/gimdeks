@@ -64,6 +64,9 @@
         <DataTemplate DataType="{x:Type vm:HealthViewModel}">
             <views:HealthPage />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ScanGamesViewModel}">
+            <views:ScanGamesPage />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:HddSuggestionViewModel}">
             <views:HddSuggestionPage />
         </DataTemplate>
