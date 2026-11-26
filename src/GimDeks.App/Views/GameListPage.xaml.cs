@@ -47,6 +47,14 @@ public partial class GameListPage : UserControl
         }
     }
 
+    private void FavoriteCheckBox_OnChanged(object sender, RoutedEventArgs e)
+    {
+        if (sender is CheckBox { DataContext: GameRow row } && DataContext is GameListViewModel vm)
+        {
+            _ = vm.SaveFavoritAsync(row);
+        }
+    }
+
     private void OnRowsReloaded()
     {
         if (DataContext is not GameListViewModel vm || GamesGrid is null)

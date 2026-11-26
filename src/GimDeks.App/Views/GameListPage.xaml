@@ -88,6 +88,8 @@
                 </Button>
                     <Button Content="{DynamicResource Ui_Button_Edit}" Style="{StaticResource MaterialDesignOutlinedButton}"
                             Command="{Binding EditGameCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0" />
+                    <Button Content="{DynamicResource Ui_Button_Detail}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                            Command="{Binding OpenDetailCommand}" IsEnabled="{Binding HasSelection}" Margin="0,0,8,0" />
                 <Button Content="{DynamicResource Ui_Button_Launch}" Style="{StaticResource MaterialDesignRaisedButton}"
                         Command="{Binding LaunchGameCommand}" Margin="0,0,8,0"
                         ToolTip="{DynamicResource Ui_Button_LaunchTooltip}" />
@@ -164,6 +166,18 @@
             </DataGrid.ContextMenu>
             <DataGrid.Columns>
                 <DataGridCheckBoxColumn Header="{DynamicResource Ui_Col_Selesai}" Binding="{Binding Game.SelesaiMain}" IsReadOnly="True" Width="55" />
+                <DataGridTemplateColumn Header="{DynamicResource Ui_Col_Favorite}" Width="50">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <CheckBox IsChecked="{Binding Game.Favorit, UpdateSourceTrigger=PropertyChanged}"
+                                      HorizontalAlignment="Center"
+                                      Checked="FavoriteCheckBox_OnChanged"
+                                      Unchecked="FavoriteCheckBox_OnChanged" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="{DynamicResource Ui_Col_Rating}" Binding="{Binding RatingText}" Width="70" />
+                <DataGridTextColumn Header="{DynamicResource Ui_Col_Time}" Binding="{Binding TimeText}" Width="80" />
                 <DataGridTemplateColumn Header="{DynamicResource Ui_Col_Cover}" Width="80">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>

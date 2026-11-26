@@ -17,4 +17,9 @@ public sealed class Game
     public string? PathExe { get; set; }
     public DateTime? DimainkanPada { get; set; }
     public int JumlahMain { get; set; }
+    public bool Favorit { get; set; }
+    public int Rating { get; set; }
+    public int Prioritas { get; set; }
+    public string? FolderPath { get; set; }
+    public int TotalDetik { get; set; }
 }

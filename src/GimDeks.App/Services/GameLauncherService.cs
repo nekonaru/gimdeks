@@ -16,9 +16,16 @@ public static class GameLauncherService
 
     public static bool Launch(string? path)
     {
+        using var process = LaunchAndGetProcess(path);
+        return process is not null;
+    }
+
+    /// <summary>Starts a validated local exe and returns the live process for session tracking.</summary>
+    public static Process? LaunchAndGetProcess(string? path)
+    {
         if (!IsValidExecutable(path))
         {
-            return false;
+            return null;
         }
 
         try
@@ -29,12 +36,11 @@ public static class GameLauncherService
                 WorkingDirectory = Path.GetDirectoryName(path!) ?? "",
                 UseShellExecute = false,
             };
-            using var process = Process.Start(start);
-            return process is not null;
+            return Process.Start(start);
         }
         catch
         {
-            return false;
+            return null;
         }
     }
 }

@@ -4,6 +4,33 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v2.0.0
+
+Track how long you play, mark favorites, and find any game or action instantly. This is the first major update with a new schema version.
+
+## New features
+
+- **Play sessions.** Launching a game starts a session that ends when the process exits. Duration, start time, and source are stored. Open sessions are closed safely when the app exits. The game detail panel shows the session list and total time.
+- **Favorites, rating, and priority.** Each game can be a favorite, have a 0 to 5 rating, and carry a download priority. The game list has FAV and RATE columns, plus sorting by favorites, rating, priority, and time played.
+- **Game detail panel.** A dedicated window shows the cover, notes, play sessions, and direct actions for launch and opening the local game folder.
+- **Dated notes.** Store several notes per game with timestamps, separate from the Excel compatible Notes field.
+- **Quick search.** Ctrl+P opens a command palette that searches all games and common actions, with keyboard navigation.
+- **Local game folder.** Set a folder per game and open it in Explorer from the detail panel. The path stays local and is never exported.
+
+## Improvements
+
+- **Schema version 4.** Adds the extended tables and columns with the existing automatic pre-upgrade backup.
+- **Stable game editing.** Editing a game now preserves play count, total time, and timestamps instead of resetting them.
+- **Drive link feedback.** Failed drive link writes are logged and reported instead of silently claiming success.
+- **Storage selection.** Stale async loads are discarded with a selection token, so fast clicks cannot show the previous storage's data.
+- **Import and export guards.** Long-running commands cannot overlap while the page is busy.
+- **Excel eliminated games.** Asal HDD and Alasan now use two columns so a reason string never becomes a fake source storage.
+
+## Bug fixes
+
+- **Play time preserved.** Launch no longer overwrites extended game fields, and session tracking replaces the old count-only launch path.
+- **Dikecualikan detection.** A sheet with an Alasan column and an Asal column is no longer misclassified as Dikecualikan.
+
 ## v1.9.0
 
 Scan a local drive for installed games and link executables to your collection, with a wide set of data and interaction fixes from a fresh audit.

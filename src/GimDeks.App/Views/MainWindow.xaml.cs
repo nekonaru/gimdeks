@@ -133,6 +133,14 @@ public partial class MainWindow : Window
     private void OnClosing(object? sender, CancelEventArgs e)
     {
         _viewModel.StopWatcher();
+        try
+        {
+            App.Services.GetRequiredService<SessionTrackerService>().CloseOpenSessionsAsync().GetAwaiter().GetResult();
+        }
+        catch (Exception exception)
+        {
+            CrashLog.Write(exception);
+        }
         var settings = _settings.Load();
         settings.IsMaximized = WindowState == WindowState.Maximized;
         if (WindowState != WindowState.Maximized)

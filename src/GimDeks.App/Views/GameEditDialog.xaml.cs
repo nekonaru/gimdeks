@@ -28,6 +28,7 @@ public partial class GameEditDialog : Window
             new StatusOption(GameStatus.Dieliminasi, Services.Loc.Get("Ui_Status_Dieliminasi")),
         };
         StorageComboBox.ItemsSource = BuildStorageItems(_storages);
+        RatingComboBox.ItemsSource = Enumerable.Range(0, 6).Select(i => new RatingOption(i, i == 0 ? Services.Loc.Get("Ui_GameDialog_NoRating") : i + " / 5")).ToArray();
 
         if (original is not null)
         {
@@ -49,6 +50,11 @@ public partial class GameEditDialog : Window
             CatatanTextBox.Text = original.Catatan ?? "";
             PathExeTextBox.Text = original.PathExe ?? "";
             TagTextBox.Text = tagText ?? "";
+            FavoritCheckBox.IsChecked = original.Favorit;
+            RatingComboBox.SelectedItem = ((RatingOption[])RatingComboBox.ItemsSource)
+                .First(r => r.Value == Math.Clamp(original.Rating, 0, 5));
+            PrioritasTextBox.Text = original.Prioritas.ToString(CultureInfo.InvariantCulture);
+            FolderTextBox.Text = original.FolderPath ?? "";
             SelesaiCheckBox.IsChecked = original.SelesaiMain;
         }
         else
@@ -58,6 +64,7 @@ public partial class GameEditDialog : Window
             FetchCoverButton.IsEnabled = false;
             RemoveCoverButton.Visibility = Visibility.Collapsed;
             CoverHintText.Text = Services.Loc.Get("Ui_GameDialog_CoverNewGame");
+            RatingComboBox.SelectedIndex = 0;
         }
     }
 
@@ -117,6 +124,7 @@ public partial class GameEditDialog : Window
 
         Result = new Game
         {
+            Id = _original?.Id ?? 0,
             Nama = nama,
             Versi = NullIfEmpty(VersiTextBox.Text),
             UkuranGb = ukuran.Value,
@@ -127,6 +135,14 @@ public partial class GameEditDialog : Window
             Catatan = NullIfEmpty(CatatanTextBox.Text),
             PathExe = NullIfEmpty(PathExeTextBox.Text),
             SelesaiMain = SelesaiCheckBox.IsChecked == true,
+            Favorit = FavoritCheckBox.IsChecked == true,
+            Rating = RatingComboBox.SelectedItem is RatingOption rating ? rating.Value : 0,
+            Prioritas = int.TryParse(PrioritasTextBox.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var prioritas) ? prioritas : 0,
+            FolderPath = NullIfEmpty(FolderTextBox.Text),
+            JumlahMain = _original?.JumlahMain ?? 0,
+            DimainkanPada = _original?.DimainkanPada,
+            TotalDetik = _original?.TotalDetik ?? 0,
+            Urutan = _original?.Urutan ?? 0,
         };
 
         DialogResult = true;
@@ -226,4 +242,10 @@ public partial class GameEditDialog : Window
     {
         public override string ToString() => Label;
     }
+
+    private sealed record RatingOption(int Value, string Label)
+    {
+        public override string ToString() => Label;
+    }
 }
+

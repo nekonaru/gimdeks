@@ -88,6 +88,28 @@
                     Margin="8,0,0,0" Padding="10,2" Click="BrowseExeButton_OnClick" />
         </Grid>
 
+        <Grid Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <CheckBox Grid.Column="0" x:Name="FavoritCheckBox" Content="{DynamicResource Ui_GameDialog_Favorite}" VerticalAlignment="Center" />
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="{DynamicResource Ui_GameDialog_Rating}" Style="{StaticResource MaterialDesignBody2TextBlock}" Opacity="0.8" />
+                <ComboBox x:Name="RatingComboBox" Margin="0,4,0,0" />
+            </StackPanel>
+            <StackPanel Grid.Column="4">
+                <TextBlock Text="{DynamicResource Ui_GameDialog_Priority}" Style="{StaticResource MaterialDesignBody2TextBlock}" Opacity="0.8" />
+                <TextBox x:Name="PrioritasTextBox" materialDesign:HintAssist.Hint="0" Margin="0,4,0,0" />
+            </StackPanel>
+        </Grid>
+
+        <TextBlock Text="{DynamicResource Ui_GameDialog_Folder}" Style="{StaticResource MaterialDesignBody2TextBlock}" Opacity="0.8" />
+        <TextBox x:Name="FolderTextBox" materialDesign:HintAssist.Hint="{DynamicResource Ui_GameDialog_FolderHint}" Margin="0,4,0,12" />
+
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />

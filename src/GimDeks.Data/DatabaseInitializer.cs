@@ -79,6 +79,65 @@ public sealed class DatabaseInitializer
         ALTER TABLE game ADD COLUMN dimainkan_pada TEXT;
         ALTER TABLE game ADD COLUMN jumlah_main INTEGER NOT NULL DEFAULT 0;
         """,
+
+        // 4: favorites, rating, play sessions, notes, gallery, presets, history and snapshots
+        """
+        ALTER TABLE game ADD COLUMN favorit INTEGER NOT NULL DEFAULT 0;
+        ALTER TABLE game ADD COLUMN rating INTEGER NOT NULL DEFAULT 0;
+        ALTER TABLE game ADD COLUMN prioritas INTEGER NOT NULL DEFAULT 0;
+        ALTER TABLE game ADD COLUMN folder_path TEXT;
+        ALTER TABLE game ADD COLUMN total_detik INTEGER NOT NULL DEFAULT 0;
+
+        CREATE TABLE sesi_main (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          game_id INTEGER NOT NULL REFERENCES game(id) ON DELETE CASCADE,
+          mulai TEXT NOT NULL,
+          selesai TEXT,
+          durasi_detik INTEGER NOT NULL DEFAULT 0,
+          sumber TEXT NOT NULL DEFAULT 'launcher'
+        );
+        CREATE INDEX ix_sesi_main_game ON sesi_main(game_id);
+        CREATE INDEX ix_sesi_main_mulai ON sesi_main(mulai);
+
+        CREATE TABLE catatan_game (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          game_id INTEGER NOT NULL REFERENCES game(id) ON DELETE CASCADE,
+          isi TEXT NOT NULL,
+          dibuat_pada TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        CREATE INDEX ix_catatan_game_game ON catatan_game(game_id);
+
+        CREATE TABLE gambar_game (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          game_id INTEGER NOT NULL REFERENCES game(id) ON DELETE CASCADE,
+          nama_file TEXT NOT NULL,
+          urutan INTEGER NOT NULL DEFAULT 0
+        );
+        CREATE INDEX ix_gambar_game_game ON gambar_game(game_id);
+
+        CREATE TABLE preset_filter (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          nama TEXT NOT NULL UNIQUE,
+          definisi_json TEXT NOT NULL
+        );
+
+        CREATE TABLE histori_import (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          path TEXT NOT NULL,
+          mode TEXT NOT NULL,
+          hasil_json TEXT NOT NULL,
+          waktu TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+
+        CREATE TABLE snapshot_kapasitas (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          storage_id INTEGER NOT NULL REFERENCES storage(id) ON DELETE CASCADE,
+          tanggal TEXT NOT NULL,
+          jumlah_game INTEGER NOT NULL,
+          total_gb REAL NOT NULL
+        );
+        CREATE INDEX ix_snapshot_storage_tanggal ON snapshot_kapasitas(storage_id, tanggal);
+        """,
     };
 
     private readonly SqliteConnectionFactory _factory;

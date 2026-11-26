@@ -289,6 +289,12 @@ public partial class MainViewModel : ObservableObject
     private void Export() => ImportExport.ExportCommand.Execute(null);
 
     [RelayCommand]
+    private void OpenPalette()
+    {
+        new Views.CommandPaletteWindow { Owner = System.Windows.Application.Current.MainWindow }.Show();
+    }
+
+    [RelayCommand]
     private void DismissExcelChanged() => ShowExcelChangedBanner = false;
 
     [RelayCommand]

@@ -34,6 +34,7 @@
         <KeyBinding Modifiers="Ctrl" Key="D7" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.SaranHdd}" />
         <KeyBinding Modifiers="Ctrl" Key="D8" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.ImportExport}" />
         <KeyBinding Modifiers="Ctrl" Key="D9" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.Statistics}" />
+        <KeyBinding Modifiers="Ctrl" Key="P" Command="{Binding OpenPaletteCommand}" />
     </Window.InputBindings>
 
     <Window.Resources>

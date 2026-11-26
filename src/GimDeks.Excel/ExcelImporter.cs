@@ -61,7 +61,7 @@ public sealed partial class ExcelImporter
                 continue;
             }
 
-            var (namaCol, ukuranCol, thirdCol, headerHasAlasan, headerHasAsal) = AnalyzeHeader(worksheet, headerRow.Value);
+            var (namaCol, ukuranCol, thirdCol, alasanCol, asalCol, headerHasAlasan, headerHasAsal) = AnalyzeHeader(worksheet, headerRow.Value);
 
             if (TryGetStorageClassification(sheetName, out var classification))
             {
@@ -79,16 +79,16 @@ public sealed partial class ExcelImporter
                 continue;
             }
 
-            if (IsDikecualikan(sheetName, headerHasAlasan))
+            if (IsDikecualikan(sheetName, headerHasAlasan, headerHasAsal))
             {
-                var rows = ReadRows(workbook, worksheet, headerRow.Value, namaCol, ukuranCol, thirdCol, GameStatus.Dikecualikan, alasanCol: thirdCol, asalStorageCol: null, sheetName, warnings);
+                var rows = ReadRows(workbook, worksheet, headerRow.Value, namaCol, ukuranCol, thirdCol, GameStatus.Dikecualikan, alasanCol: alasanCol ?? thirdCol, asalStorageCol: null, sheetName, warnings);
                 games.AddRange(rows);
                 continue;
             }
 
             if (IsDieliminasi(sheetName, headerHasAsal))
             {
-                var rows = ReadRows(workbook, worksheet, headerRow.Value, namaCol, ukuranCol, thirdCol, GameStatus.Dieliminasi, alasanCol: thirdCol, asalStorageCol: thirdCol, sheetName, warnings);
+                var rows = ReadRows(workbook, worksheet, headerRow.Value, namaCol, ukuranCol, thirdCol, GameStatus.Dieliminasi, alasanCol: alasanCol, asalStorageCol: asalCol ?? (alasanCol is null ? thirdCol : null), sheetName, warnings);
                 games.AddRange(rows);
                 continue;
             }
@@ -134,8 +134,8 @@ public sealed partial class ExcelImporter
     private static bool IsRingkasan(string sheetName) =>
         string.Equals(sheetName, "Ringkasan", StringComparison.OrdinalIgnoreCase);
 
-    private static bool IsDikecualikan(string sheetName, bool headerHasAlasan) =>
-        string.Equals(sheetName, "Dikecualikan", StringComparison.OrdinalIgnoreCase) || headerHasAlasan;
+    private static bool IsDikecualikan(string sheetName, bool headerHasAlasan, bool headerHasAsal) =>
+        string.Equals(sheetName, "Dikecualikan", StringComparison.OrdinalIgnoreCase) || (headerHasAlasan && !headerHasAsal);
 
     private static bool IsDieliminasi(string sheetName, bool headerHasAsal) =>
         string.Equals(sheetName, "Game Dieliminasi", StringComparison.OrdinalIgnoreCase) || headerHasAsal;
@@ -186,12 +186,14 @@ public sealed partial class ExcelImporter
         return null;
     }
 
-    private static (int NamaCol, int? UkuranCol, int? ThirdCol, bool HeaderHasAlasan, bool HeaderHasAsal) AnalyzeHeader(
+    private static (int NamaCol, int? UkuranCol, int? ThirdCol, int? AlasanCol, int? AsalCol, bool HeaderHasAlasan, bool HeaderHasAsal) AnalyzeHeader(
         IXLWorksheet worksheet, int headerRow)
     {
         int namaCol = 0;
         int? ukuranCol = null;
         int? thirdCol = null;
+        int? alasanCol = null;
+        int? asalCol = null;
         var headerHasAlasan = false;
         var headerHasAsal = false;
 
@@ -216,19 +218,32 @@ public sealed partial class ExcelImporter
                 continue; // row number column; unused
             }
 
-            thirdCol = column;
-            if (text.StartsWith("Alasan", StringComparison.OrdinalIgnoreCase))
+            var isAlasan = text.StartsWith("Alasan", StringComparison.OrdinalIgnoreCase);
+            var mentionsAlasan = text.IndexOf("alasan", StringComparison.OrdinalIgnoreCase) >= 0;
+            var isAsal = text.StartsWith("Asal", StringComparison.OrdinalIgnoreCase);
+            if (text.IndexOf("Asal", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                headerHasAsal = true;
+            }
+
+            if (isAlasan && !isAsal)
+            {
+                alasanCol = column;
+                headerHasAlasan = true;
+            }
+            if (isAsal && !mentionsAlasan)
+            {
+                asalCol = column;
+            }
+            if (text.IndexOf("Alasan", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 headerHasAlasan = true;
             }
 
-            if (text.StartsWith("Asal", StringComparison.OrdinalIgnoreCase))
-            {
-                headerHasAsal = true;
-            }
+            thirdCol = column;
         }
 
-        return (namaCol, ukuranCol, thirdCol, headerHasAlasan, headerHasAsal);
+        return (namaCol, ukuranCol, thirdCol, alasanCol, asalCol, headerHasAlasan, headerHasAsal);
     }
 
     private static Storage BuildStorage(IXLWorksheet worksheet, string sheetName, StorageClassification classification, int order, List<string> warnings)
@@ -520,3 +535,4 @@ public sealed partial class ExcelImporter
     [GeneratedRegex(@"\s+", RegexOptions.CultureInvariant)]
     private static partial Regex Whitespace();
 }
+

@@ -83,6 +83,9 @@ GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan S
 | **Klik dua kali untuk ubah** | Klik dua kali baris game untuk membuka editornya. |
 | **Tandai selesai secara massal** | Pilih beberapa game sekaligus dan centang flag selesai untuk semuanya, langsung dari toolbar. |
 | **Pilihan acak** | Bingung mau main apa? Dashboard memilih salah satu game Sudah Ada yang belum selesai secara acak dan menyorotnya di daftar game. |
+| **Sesi main** | Peluncuran memulai sesi yang dilacak. Durasi dan riwayat tampil di panel detail, dan total waktu bisa diurutkan di daftar. |
+| **Favorit dan rating** | Tandai favorit, beri rating 0 sampai 5, atur prioritas, lalu saring atau urutkan berdasarkan itu. |
+| **Pencarian cepat** | Tekan Ctrl+P untuk menemukan game atau aksi umum dari satu palette berbasis keyboard. |
 | **Pemindai game terpasang** | Pindai drive atau folder untuk file `.exe` lokal dan tautkan ke game yang belum punya path peluncuran. Pemindaian hanya membaca file dan tidak pernah menjalankan program. |
 | **Pemeriksaan** | Satu halaman memindai storage yang over limit, drive terputus, duplikat, game ukuran nol, backup lama, dan file Excel hilang, dengan tautan langsung ke perbaikannya. |
 | **Peluncur lokal** | Simpan path `.exe` game lokal dan luncurkan dari toolbar atau menu klik kanan. Jumlah main dan waktu terakhir dicatat. |

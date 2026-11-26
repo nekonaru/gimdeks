@@ -118,8 +118,11 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         public override string ToString() => DisplayText;
     }
 
+    private long _selectionToken;
+
     partial void OnSelectedItemChanged(StorageListItem? value)
     {
+        var token = ++_selectionToken;
         HasSelection = value is not null;
         if (value is null)
         {
@@ -129,7 +132,7 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
             DriveOptions.Clear();
             SelectedDriveLetter = null;
             DriveStatusText = "";
-            _ = ReloadGamesAsync(null);
+            _ = ReloadGamesAsync(null, token);
             return;
         }
 
@@ -137,9 +140,9 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         EditTipe = TipeOptions.FirstOrDefault(o => o.Type == value.Storage.Tipe) ?? TipeOptions[0];
         EditKapasitas = value.Storage.KapasitasGb?.ToString("0.#", GimDeks.App.Services.AppCulture.Current) ?? "";
         EditBatas = value.Storage.BatasGb?.ToString("0.#", GimDeks.App.Services.AppCulture.Current) ?? "";
-        _ = LoadDriveOptionsAsync(value.Storage.Id);
-        _ = ReloadGamesAsync(value.Storage.Id);
-        _ = ReloadRiwayatAsync(value.Storage.Id);
+        _ = LoadDriveOptionsAsync(value.Storage.Id, token);
+        _ = ReloadGamesAsync(value.Storage.Id, token);
+        _ = ReloadRiwayatAsync(value.Storage.Id, token);
     }
 
     public Task RefreshAsync() => ReloadAsync();
@@ -188,7 +191,7 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
             ?? Storages.FirstOrDefault();
     }
 
-    private async Task LoadDriveOptionsAsync(long storageId)
+    private async Task LoadDriveOptionsAsync(long storageId, long token)
     {
         _loadingDrives = true;
         try
@@ -201,6 +204,10 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
             }
 
             var links = await _driveLinks.GetAllAsync();
+            if (token != _selectionToken)
+            {
+                return;
+            }
             SelectedDriveLetter = links.TryGetValue(storageId, out var letter) ? letter : "";
             UpdateDriveStatus(letter: SelectedDriveLetter);
         }
@@ -232,13 +239,34 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         }
 
         var letter = string.IsNullOrEmpty(value) ? null : value;
-        _ = _driveLinks.SetAsync(SelectedItem.Storage.Id, letter);
+        var id = SelectedItem.Storage.Id;
+        _ = ApplyDriveLinkAsync(id, letter);
         UpdateDriveStatus(letter);
     }
 
-    private async Task ReloadGamesAsync(long? storageId)
+    private async Task ApplyDriveLinkAsync(long storageId, string? letter)
+    {
+        try
+        {
+            await _driveLinks.SetAsync(storageId, letter);
+        }
+        catch (Exception exception)
+        {
+            Services.CrashLog.Write(exception);
+            if (SelectedItem?.Storage.Id == storageId)
+            {
+                DriveStatusText = Services.Loc.Get("Ui_Storage_DriveLinkFailed");
+            }
+        }
+    }
+
+    private async Task ReloadGamesAsync(long? storageId, long token)
     {
         var games = await _gameRepository.GetByStorageAsync(storageId);
+        if (token != _selectionToken)
+        {
+            return;
+        }
         var storageName = SelectedItem?.Storage.Nama ?? "";
         Games.Clear();
         foreach (var game in games.OrderBy(g => g.Nama, StringComparer.CurrentCultureIgnoreCase))
@@ -247,11 +275,19 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         }
     }
 
-    private async Task ReloadRiwayatAsync(long storageId)
+    private async Task ReloadRiwayatAsync(long storageId, long token)
     {
         var entries = await _historyRepository.GetByStorageAsync(storageId);
+        if (token != _selectionToken)
+        {
+            return;
+        }
         var gameNames = (await _gameRepository.GetAllAsync()).ToDictionary(g => g.Id, g => g.Nama);
         var storageNames = (await _storageRepository.GetAllAsync()).ToDictionary(s => s.Id, s => s.Nama);
+        if (token != _selectionToken)
+        {
+            return;
+        }
         string NameOf(long? id) =>
             id is { } i && storageNames.TryGetValue(i, out var name) ? name : Services.Loc.Get("Ui_NoStorage");
 

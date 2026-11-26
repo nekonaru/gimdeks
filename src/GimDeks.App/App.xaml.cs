@@ -66,6 +66,13 @@ public partial class App : Application
         services.AddSingleton<IHistoryRepository, HistoryRepository>();
         services.AddSingleton<ITagRepository, TagRepository>();
         services.AddSingleton<IDriveLinkRepository, DriveLinkRepository>();
+        services.AddSingleton<IPlaySessionRepository, PlaySessionRepository>();
+        services.AddSingleton<IGameNoteRepository, GameNoteRepository>();
+        services.AddSingleton<IGameImageRepository, GameImageRepository>();
+        services.AddSingleton<IFilterPresetRepository, FilterPresetRepository>();
+        services.AddSingleton<IImportHistoryRepository, ImportHistoryRepository>();
+        services.AddSingleton<ICapacitySnapshotRepository, CapacitySnapshotRepository>();
+        services.AddSingleton<SessionTrackerService>();
         services.AddSingleton<ExcelImporter>();
         services.AddSingleton<ExcelImportService>();
         services.AddSingleton<AppSettingsService>();
