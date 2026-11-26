@@ -80,7 +80,7 @@ public sealed class GameRepository : IGameRepository
             await connection.ExecuteAsync(new CommandDefinition(
                 """
                 INSERT INTO riwayat (game_id, dari_storage_id, ke_storage_id)
-                SELECT id, storage_id, @Target FROM game WHERE id IN @Ids;
+                SELECT id, storage_id, @Target FROM game WHERE id IN @Ids AND storage_id IS NOT @Target;
                 """,
                 parameters, transaction, cancellationToken: ct));
             await connection.ExecuteAsync(new CommandDefinition(

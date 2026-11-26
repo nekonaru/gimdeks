@@ -74,16 +74,19 @@ public sealed class TagRepository : ITagRepository
         }
 
         using var connection = _factory.CreateConnection();
-        var existing = await connection.QuerySingleOrDefaultAsync<long?>(new CommandDefinition(
-            "SELECT id FROM tag WHERE lower(nama) = lower(@Nama);", new { Nama = normalized }, cancellationToken: ct));
-        if (existing is { } id)
-        {
-            return id;
-        }
+        await connection.OpenAsync(ct);
+        using var transaction = connection.BeginTransaction();
 
-        return await connection.ExecuteScalarAsync<long>(new CommandDefinition(
-            "INSERT INTO tag (nama) VALUES (@Nama); SELECT last_insert_rowid();",
-            new { Nama = normalized }, cancellationToken: ct));
+        // One transaction with INSERT OR IGNORE makes concurrent calls for the
+        // same tag reuse the existing id instead of hitting the UNIQUE constraint.
+        await connection.ExecuteAsync(new CommandDefinition(
+            "INSERT OR IGNORE INTO tag (nama) VALUES (@Nama);",
+            new { Nama = normalized }, transaction, cancellationToken: ct));
+        var id = await connection.QuerySingleAsync<long>(new CommandDefinition(
+            "SELECT id FROM tag WHERE nama = @Nama;",
+            new { Nama = normalized }, transaction, cancellationToken: ct));
+        transaction.Commit();
+        return id;
     }
 
     public async Task<IReadOnlyList<long>> GetGameIdsWithTagAsync(long tagId, CancellationToken ct = default)

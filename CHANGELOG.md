@@ -4,6 +4,32 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v1.9.0
+
+Scan a local drive for installed games and link executables to your collection, with a wide set of data and interaction fixes from a fresh audit.
+
+## New features
+
+- **Installed game scanner.** A new Scan Games page reads `.exe` files from a chosen drive or folder, suggests links for games without a launch path, and lets you apply the ones you confirm. Exact name matches are marked Exact, likely matches Likely. Scanning only reads files; applying only stores a local path. It never launches a process.
+
+## Improvements
+
+- **Stable import mode.** Import modes are keyed by a stable enum value instead of a localized label, so switching language can no longer silently downgrade Replace All to Merge.
+- **Reliable deep links.** Dashboard storage cards, the random pick, and Health Check findings now queue their target and apply it after the page reloads. A fresh app no longer shows all games when you click a storage card.
+- **Serialized reloads.** Game list and storage reloads are serialized, so overlapping refreshes cannot restore stale filters or selections. Clearing filters triggers one rebuild instead of seven.
+- **Honest cover results.** Failed cover downloads are counted, logged, and shown in the status instead of being silently ignored.
+- **Unique backups.** Backup file names include a unique suffix, so two backups in the same second cannot overwrite each other.
+
+## Bug fixes
+
+- **Restore safety.** Pruning can no longer delete the backup currently being restored.
+- **Ringkasan comparison.** Sheets that normalize to the same name are aggregated instead of throwing, and the longest matching label wins so HDD 10 does not inherit HDD 1 totals.
+- **Excel import.** Duplicate detection now uses the app's game name normalizer in both import modes. Storage sheet names are matched case-insensitively and allow documented suffixes. A real game named TOTAL no longer truncates a sheet. Ringkasan counts are clamped instead of overflowing.
+- **Excel roundtrip.** Drive capacity keeps two decimals, so a 930 GB drive no longer comes back as 900 GB.
+- **Preview cache.** The cache includes a file hash and is cleared after a successful import, so a rewritten file cannot yield stale data.
+- **Data consistency.** No-op storage moves no longer write history rows, and tag creation is atomic under concurrent calls.
+- **Interaction.** Launch is guarded against double clicks, status list selection clears on reload, and drag-and-drop import records the watched path. Remaining hardcoded English labels now use the active language.
+
 ## v1.8.0
 
 Check the health of your collection at a glance, and sort games by how often and how recently you played them.

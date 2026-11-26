@@ -43,6 +43,8 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     private readonly IStorageRepository _storageRepository;
     private readonly ITagRepository _tagRepository;
     private readonly SemaphoreSlim _filtersLock = new(1, 1);
+    private readonly SemaphoreSlim _reloadLock = new(1, 1);
+    private readonly SemaphoreSlim _launchLock = new(1, 1);
     private bool _suppressFilterChanges;
     private List<Game> _allGames = new();
     private List<Storage> _allStorages = new();
@@ -128,52 +130,37 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     public event Action? RowsReloaded;
 
     public long? PendingSelectedGameId { get; private set; }
+    public long? PendingStorageFilterId { get; private set; }
+    public long? PendingGameId { get; private set; }
 
-    public void SetStorageFilter(long? storageId)
-    {
-        SelectedStorage = storageId is null
-            ? FilterOption.All
-            : StorageOptions.FirstOrDefault(o => o.Value == storageId.Value.ToString(CultureInfo.InvariantCulture)) ?? FilterOption.All;
-    }
+    public void SetStorageFilter(long? storageId) => PendingStorageFilterId = storageId;
 
-    /// <summary>Reset all filters, reload, and select one game (used by the dashboard random pick).</summary>
+    public void SetPendingGame(long gameId) => PendingGameId = gameId;
+
+    /// <summary>Reset filters and select one game (used by the dashboard random pick).</summary>
     public async Task OpenGameByIdAsync(long gameId)
     {
-        _suppressFilterChanges = true;
-        try
-        {
-            SearchText = "";
-            SelectedStatus = FilterOption.All;
-            SelectedStorage = FilterOption.All;
-            SelectedTag = FilterOption.All;
-            SelectedSelesai = FilterOption.All;
-            MinSize = "";
-            MaxSize = "";
-        }
-        finally
-        {
-            _suppressFilterChanges = false;
-        }
-
-        PendingSelectedGameId = gameId;
-        await ApplyFiltersAsync();
-        var row = Rows.FirstOrDefault(r => r.Game.Id == gameId);
-        if (row is null)
-        {
-            StatusText = Services.Loc.Get("Ui_GameList_PickNotFound");
-            return;
-        }
-
-        SelectedRows.Clear();
-        SelectedRows.Add(row);
-        RowsReloaded?.Invoke();
-        StatusText = Services.Loc.Format("Ui_GameList_Picked", row.Game.Nama);
+        PendingGameId = gameId;
+        await ReloadAsync();
     }
 
     public Task RefreshAsync() => ReloadAsync();
 
     [RelayCommand]
     private async Task ReloadAsync()
+    {
+        await _reloadLock.WaitAsync().ConfigureAwait(true);
+        try
+        {
+            await ReloadCoreAsync();
+        }
+        finally
+        {
+            _reloadLock.Release();
+        }
+    }
+
+    private async Task ReloadCoreAsync()
     {
         // Selection is restored by ApplyFiltersAsync at the end of the rebuild.
         var current = SelectedStorage;
@@ -190,7 +177,6 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         }
 
         StorageOptions.Add(new FilterOption("null", "Ui_NoStorage"));
-        SelectedStorage = StorageOptions.FirstOrDefault(o => o.Value == current.Value) ?? FilterOption.All;
 
         var allTags = await _tagRepository.GetAllAsync();
         TagOptions.Clear();
@@ -200,8 +186,66 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             TagOptions.Add(new FilterOption(tag.Id.ToString(CultureInfo.InvariantCulture), tag.Nama));
         }
 
-        SelectedTag = TagOptions.FirstOrDefault(o => o.Value == currentTag.Value) ?? FilterOption.All;
+        long? gameToSelect = null;
+        _suppressFilterChanges = true;
+        try
+        {
+            if (PendingGameId is { } gameId)
+            {
+                gameToSelect = gameId;
+                PendingGameId = null;
+                PendingStorageFilterId = null;
+                ClearFilterValues();
+            }
+            else if (PendingStorageFilterId is { } storageId)
+            {
+                PendingStorageFilterId = null;
+                SelectedStorage = StorageOptions.FirstOrDefault(o => o.Value == storageId.ToString(CultureInfo.InvariantCulture)) ?? FilterOption.All;
+                SelectedTag = TagOptions.FirstOrDefault(o => o.Value == currentTag.Value) ?? FilterOption.All;
+            }
+            else
+            {
+                SelectedStorage = StorageOptions.FirstOrDefault(o => o.Value == current.Value) ?? FilterOption.All;
+                SelectedTag = TagOptions.FirstOrDefault(o => o.Value == currentTag.Value) ?? FilterOption.All;
+            }
+        }
+        finally
+        {
+            _suppressFilterChanges = false;
+        }
+
         await ApplyFiltersAsync();
+        if (gameToSelect is { } target)
+        {
+            SelectGameById(target);
+        }
+    }
+
+    private void ClearFilterValues()
+    {
+        SearchText = "";
+        SelectedStatus = FilterOption.All;
+        SelectedStorage = FilterOption.All;
+        SelectedTag = FilterOption.All;
+        SelectedSelesai = FilterOption.All;
+        MinSize = "";
+        MaxSize = "";
+    }
+
+    private void SelectGameById(long gameId)
+    {
+        PendingSelectedGameId = gameId;
+        var row = Rows.FirstOrDefault(r => r.Game.Id == gameId);
+        if (row is null)
+        {
+            StatusText = Services.Loc.Get("Ui_GameList_PickNotFound");
+            return;
+        }
+
+        SelectedRows.Clear();
+        SelectedRows.Add(row);
+        RowsReloaded?.Invoke();
+        StatusText = Services.Loc.Format("Ui_GameList_Picked", row.Game.Nama);
     }
 
     private async Task<Dictionary<long, string>> MapTagsByGameAsync(IReadOnlyList<long> gameIds)
@@ -220,15 +264,18 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     partial void OnSelectedSortChanged(FilterOption value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
 
     [RelayCommand]
-    private void ClearFilters()
+    private async Task ClearFilters()
     {
-        SearchText = "";
-        SelectedStatus = FilterOption.All;
-        SelectedStorage = FilterOption.All;
-        SelectedTag = FilterOption.All;
-        SelectedSelesai = FilterOption.All;
-        MinSize = "";
-        MaxSize = "";
+        _suppressFilterChanges = true;
+        try
+        {
+            ClearFilterValues();
+        }
+        finally
+        {
+            _suppressFilterChanges = false;
+        }
+        await ApplyFiltersAsync();
     }
 
     private async Task ApplyFiltersAsync()
@@ -376,6 +423,22 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     [RelayCommand]
     private async Task LaunchGameAsync()
     {
+        if (!await _launchLock.WaitAsync(0).ConfigureAwait(true))
+        {
+            return; // A launch is already in progress.
+        }
+        try
+        {
+            await LaunchGameCoreAsync();
+        }
+        finally
+        {
+            _launchLock.Release();
+        }
+    }
+
+    private async Task LaunchGameCoreAsync()
+    {
         if (SelectedRows.Count != 1)
         {
             StatusText = Services.Loc.Get("Ui_GameList_SelectOneToLaunch");
@@ -444,6 +507,8 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
 
         var service = new Services.SteamCoverService();
         var ok = 0;
+        var failed = 0;
+        Exception? firstError = null;
         foreach (var (row, index) in rows.Select((r, i) => (r, i)))
         {
             StatusText = Services.Loc.Format("Ui_Cover_Progress", index + 1, rows.Count) + " " + row.Game.Nama;
@@ -455,13 +520,21 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
                     ok++;
                 }
             }
-            catch
+            catch (Exception exception)
             {
+                failed++;
+                firstError ??= exception;
                 // Continue with the next one.
             }
         }
 
-        StatusText = Services.Loc.Format("Ui_Cover_Progress", ok, rows.Count);
+        if (firstError is not null)
+        {
+            Services.CrashLog.Write(firstError);
+        }
+        StatusText = failed == 0
+            ? Services.Loc.Format("Ui_Cover_Progress", ok, rows.Count)
+            : Services.Loc.Format("Ui_Cover_WithFailures", ok, failed, rows.Count);
         await ReloadAsync();
     }
 

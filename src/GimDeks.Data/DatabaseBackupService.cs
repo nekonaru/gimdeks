@@ -22,18 +22,18 @@ public sealed class DatabaseBackupService
 
     public string BackupsDirectory => _backupsDirectory;
 
-    public async Task<string> BackupAsync(CancellationToken ct = default)
+    public async Task<string> BackupAsync(CancellationToken ct = default, string? protectPath = null)
     {
         Directory.CreateDirectory(_backupsDirectory);
         var destination = Path.Combine(
             _backupsDirectory,
-            $"gimdeks-backup-{DateTime.Now:yyyyMMdd-HHmmss}.db");
+            $"gimdeks-backup-{DateTime.Now:yyyyMMdd-HHmmss}-{Guid.NewGuid():N}.db");
 
         await using var source = _factory.CreateConnection();
         await using var target = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = destination }.ToString());
         await target.OpenAsync(ct);
         source.BackupDatabase(target);
-        PruneBackups();
+        PruneBackups(protectPath);
         return destination;
     }
 
@@ -47,7 +47,8 @@ public sealed class DatabaseBackupService
         ValidateBackup(backupFilePath);
 
         // Always keep a fresh copy of the current state before overwriting.
-        await BackupAsync(ct);
+        // Protect the selected backup so pruning can never delete the file we are restoring.
+        await BackupAsync(ct, backupFilePath);
 
         Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
 
@@ -80,13 +81,18 @@ public sealed class DatabaseBackupService
         }
 
         return Directory.GetFiles(_backupsDirectory, "gimdeks-backup-*.db")
-            .OrderByDescending(File.GetCreationTimeUtc)
+            .OrderByDescending(Path.GetFileName, StringComparer.Ordinal)
             .ToList();
     }
 
-    private void PruneBackups()
+    private void PruneBackups(string? protectPath = null)
     {
-        var backups = ListBackups();
+        var protectedFullPath = string.IsNullOrWhiteSpace(protectPath)
+            ? null
+            : Path.GetFullPath(protectPath);
+        var backups = ListBackups()
+            .Where(p => !string.Equals(Path.GetFullPath(p), protectedFullPath, StringComparison.OrdinalIgnoreCase))
+            .ToList();
         foreach (var old in backups.Skip(MaxBackups))
         {
             try

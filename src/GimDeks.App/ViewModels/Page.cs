@@ -12,4 +12,5 @@ public enum Page
     SaranHdd,
     Statistics,
     Health,
+    ScanGames,
 }

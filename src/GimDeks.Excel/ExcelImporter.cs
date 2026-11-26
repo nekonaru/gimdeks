@@ -296,9 +296,13 @@ public sealed partial class ExcelImporter
                 continue;
             }
 
-            if (string.Equals(nama, "TOTAL", StringComparison.OrdinalIgnoreCase))
+            // Only a formula-bearing TOTAL row is the footer. A real game named
+            // TOTAL must not truncate the rest of the sheet.
+            if (string.Equals(nama, "TOTAL", StringComparison.OrdinalIgnoreCase)
+                && ukuranCol is { } totalCol
+                && worksheet.Cell(row, totalCol).HasFormula)
             {
-                break; // nothing but totals below the data block
+                break;
             }
 
             double uk = 0;
@@ -411,9 +415,17 @@ public sealed partial class ExcelImporter
         List<StoragePreview> storages,
         List<GamePreview> games)
     {
-        var actualsBySheet = storages.ToDictionary(
-            s => NormalizeSheetKey(s.SheetName),
-            s => (Count: s.GameCount, Gb: s.TotalGb));
+        // Two sheets can normalize to the same key (for example a "Done" suffix).
+        // Group instead of ToDictionary so preview never throws, and aggregate totals.
+        var actuals = storages
+            .GroupBy(s => NormalizeSheetKey(s.SheetName), StringComparer.OrdinalIgnoreCase)
+            .Select(g => (
+                Key: g.Key,
+                SheetName: g.First().SheetName,
+                Count: g.Sum(s => s.GameCount),
+                Gb: g.Sum(s => s.TotalGb)))
+            .Where(x => x.Key.Length > 0)
+            .ToList();
 
         var rows = new List<RingkasanRow>();
         var lastRow = ringkasan.LastRowUsed()?.RowNumber() ?? 0;
@@ -440,9 +452,14 @@ public sealed partial class ExcelImporter
                 continue;
             }
 
-            var match = actualsBySheet.Keys.FirstOrDefault(k => key.StartsWith(k, StringComparison.Ordinal));
-            var actual = match is null ? ((int Count, double Gb)?)null : actualsBySheet[match];
-            var sheetName = match is null ? null : storages.First(s => NormalizeSheetKey(s.SheetName) == match).SheetName;
+            // Prefer the longest matching key: "HDD Eksternal 10" must not attach
+            // the totals of "HDD Eksternal 1".
+            var match = actuals
+                .Where(a => key.StartsWith(a.Key, StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(a => a.Key.Length)
+                .FirstOrDefault();
+            var hasMatch = match.Key is not null;
+            var sheetName = hasMatch ? match.SheetName : null;
 
             rows.Add(new RingkasanRow
             {
@@ -450,8 +467,8 @@ public sealed partial class ExcelImporter
                 StorageSheet = sheetName,
                 ExpectedCount = ToInt(ToDouble(ringkasan.Cell(row, 2).Value)),
                 ExpectedGb = ToDouble(ringkasan.Cell(row, 3).Value),
-                ActualCount = actual?.Count ?? 0,
-                ActualGb = actual?.Gb ?? 0,
+                ActualCount = hasMatch ? match.Count : 0,
+                ActualGb = hasMatch ? match.Gb : 0,
             });
         }
 
@@ -465,16 +482,30 @@ public sealed partial class ExcelImporter
         return collapsed;
     }
 
-    private static int? ToInt(double? value) =>
-        value.HasValue ? (int)Math.Round(value.Value, MidpointRounding.AwayFromZero) : null;
+    private static int? ToInt(double? value)
+    {
+        if (!value.HasValue || double.IsNaN(value.Value) || double.IsInfinity(value.Value))
+        {
+            return null;
+        }
+        if (value.Value >= int.MaxValue)
+        {
+            return int.MaxValue;
+        }
+        if (value.Value <= int.MinValue)
+        {
+            return int.MinValue;
+        }
+        return (int)Math.Round(value.Value, MidpointRounding.AwayFromZero);
+    }
 
-    [GeneratedRegex(@"^HDD Eksternal \d+$", RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"^HDD Eksternal \d+", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex HddEksternalSheet();
 
-    [GeneratedRegex(@"^Laptop HDD \d+", RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"^Laptop HDD \d+", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex LaptopHddSheet();
 
-    [GeneratedRegex(@"^Laptop SSD Internal$", RegexOptions.CultureInvariant)]
+    [GeneratedRegex(@"^Laptop SSD", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex LaptopSsdSheet();
 
     [GeneratedRegex(@"(?<tb>\d+([.,]\d+)?)\s*TB", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]

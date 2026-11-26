@@ -85,6 +85,7 @@ public partial class App : Application
         services.AddSingleton<HddSuggestionViewModel>();
         services.AddSingleton<StatisticsViewModel>();
         services.AddSingleton<HealthViewModel>();
+        services.AddSingleton<ScanGamesViewModel>();
 
         return services.BuildServiceProvider();
     }

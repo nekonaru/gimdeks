@@ -4,6 +4,32 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v1.9.0
+
+Pindai game terpasang di drive lokal dan tautkan executable ke koleksi, beserta banyak perbaikan data dan interaksi dari audit segar.
+
+## Fitur baru
+
+- **Pemindai game terpasang.** Halaman Pindai Game baru membaca file `.exe` dari drive atau folder pilihan, menyarankan tautan untuk game yang belum punya path peluncuran, dan menyimpan hanya saran yang kamu setujui. Cocokan persis ditandai Persis, sisanya Kemungkinan. Pemindaian hanya membaca file; penyimpanan hanya menulis path lokal. Tidak ada proses yang dijalankan.
+
+## Peningkatan
+
+- **Mode import yang stabil.** Mode import memakai nilai enum tetap, bukan label yang diterjemahkan, sehingga pergantian bahasa tidak bisa menurunkan Ganti Semua menjadi Gabung tanpa pemberitahuan.
+- **Deep link yang andal.** Kartu storage di dashboard, pilihan acak, dan temuan Pemeriksaan kini mengantri target dan menerapkannya setelah halaman selesai dimuat. Aplikasi yang baru dibuka tidak lagi menampilkan semua game saat kartu storage diklik.
+- **Reload terserialisasi.** Reload daftar game dan storage berjalan berurutan, sehingga refresh yang tumpang tindih tidak bisa mengembalikan filter atau pilihan lama. Mengosongkan filter kini memicu satu pembangunan ulang, bukan tujuh.
+- **Hasil cover yang jujur.** Kegagalan unduh cover dihitung, dicatat, dan ditampilkan di status, bukan dibungkam.
+- **Backup unik.** Nama file backup memuat sufiks unik, sehingga dua backup dalam detik yang sama tidak menimpa satu sama lain.
+
+## Perbaikan bug
+
+- **Keamanan restore.** Pembersihan backup tidak lagi bisa menghapus backup yang sedang dipulihkan.
+- **Perbandingan Ringkasan.** Sheet yang ternormalisasi ke nama sama digabungkan alih-alih menyebabkan error, dan label paling panjang yang menang sehingga HDD 10 tidak mewarisi total HDD 1.
+- **Import Excel.** Deteksi duplikat memakai normalizer nama game aplikasi di kedua mode. Nama sheet storage dicocokkan tanpa memperhatikan huruf besar dan memperbolehkan sufiks yang didokumentasikan. Game bernyata TOTAL tidak lagi memotong sheet. Jumlah Ringkasan dibatasi agar tidak overflow.
+- **Roundtrip Excel.** Kapasitas drive disimpan dua desimal, sehingga drive 930 GB tidak kembali sebagai 900 GB.
+- **Cache preview.** Cache menyertakan hash file dan dikosongkan setelah import berhasil, sehingga file yang ditulis ulang tidak menghasilkan data basi.
+- **Konsistensi data.** Pemindahan storage tanpa perubahan tidak lagi menulis riwayat, dan pembuatan tag bersifat atomik saat dipanggil bersamaan.
+- **Interaksi.** Peluncuran dilindungi dari klik ganda, pilihan daftar status dikosongkan saat reload, dan import drag and drop mencatat path yang dipantau. Label bahasa Inggris tersisa kini mengikuti bahasa aktif.
+
 ## v1.8.0
 
 Periksa kesehatan koleksi sekilas, dan urutkan game berdasarkan seberapa sering dan kapan terakhir kamu memainkannya.

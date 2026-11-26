@@ -178,6 +178,6 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
             games.Count(g => g.Status == GameStatus.Dieliminasi),
             games.Count(g => g.SelesaiMain));
         HasAnyGames = games.Count > 0;
-        StatusText = $"{Storages.Count} storage";
+        StatusText = Services.Loc.Format("Ui_Dashboard_StorageCount", Storages.Count);
     }
 }

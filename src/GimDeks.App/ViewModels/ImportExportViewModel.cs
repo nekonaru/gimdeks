@@ -22,6 +22,21 @@ public sealed class RingkasanRowView
     public bool Mismatch => !Row.Matches;
 }
 
+public sealed class ImportModeOption
+{
+    private readonly string _labelKey;
+
+    public ImportModeOption(ImportMode value, string labelKey)
+    {
+        Value = value;
+        _labelKey = labelKey;
+    }
+
+    public ImportMode Value { get; }
+    public string Label => Services.Loc.Get(_labelKey);
+    public override string ToString() => Label;
+}
+
 public partial class ImportExportViewModel : ObservableObject
 {
     private readonly ExcelImportService _importService;
@@ -37,7 +52,7 @@ public partial class ImportExportViewModel : ObservableObject
     private string _filePath = "";
 
     [ObservableProperty]
-    private string _selectedMode = Services.Loc.Get("Ui_Import_ModeGabung");
+    private ImportModeOption _selectedMode;
 
     [ObservableProperty]
     private bool _isBusy;
@@ -71,7 +86,12 @@ public partial class ImportExportViewModel : ObservableObject
         _backup = backup;
         _settings = settings;
         _portable = portable;
-        ImportModes = new[] { Services.Loc.Get("Ui_Import_ModeGabung"), Services.Loc.Get("Ui_Import_ModeGantiSemua") };
+        ImportModes = new[]
+        {
+            new ImportModeOption(ImportMode.Gabung, "Ui_Import_ModeGabung"),
+            new ImportModeOption(ImportMode.GantiSemua, "Ui_Import_ModeGantiSemua"),
+        };
+        _selectedMode = ImportModes[0];
         Warnings = new ObservableCollection<string>();
         RingkasanRows = new ObservableCollection<RingkasanRowView>();
         SkippedSheets = new ObservableCollection<string>();
@@ -80,7 +100,7 @@ public partial class ImportExportViewModel : ObservableObject
     /// <summary>Raised after any operation that changes stored data.</summary>
     public event Action? DataChanged;
 
-    public IReadOnlyList<string> ImportModes { get; }
+    public IReadOnlyList<ImportModeOption> ImportModes { get; }
     public ObservableCollection<string> Warnings { get; }
     public ObservableCollection<RingkasanRowView> RingkasanRows { get; }
     public ObservableCollection<string> SkippedSheets { get; }
@@ -164,7 +184,7 @@ public partial class ImportExportViewModel : ObservableObject
             return;
         }
 
-        var mode = SelectedMode == Services.Loc.Get("Ui_Import_ModeGantiSemua") ? ImportMode.GantiSemua : ImportMode.Gabung;
+        var mode = SelectedMode?.Value ?? ImportMode.Gabung;
         var warning = mode == ImportMode.GantiSemua
             ? Services.Loc.Get("Ui_Import_GantiSemuaConfirm")
             : Services.Loc.Get("Ui_Import_GabungConfirm");
@@ -385,6 +405,7 @@ public partial class ImportExportViewModel : ObservableObject
         }
 
         FilePath = path;
+        _settings.SaveLastImportedPath(path);
         _ = PreviewAsync();
     }
 
