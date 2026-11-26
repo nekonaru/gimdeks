@@ -69,6 +69,7 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
     private readonly IGameRepository _gameRepository;
     private readonly IDriveLinkRepository _driveLinks;
     private readonly Services.DriveService _driveService;
+    private readonly ICapacitySnapshotRepository _snapshots;
 
     [ObservableProperty]
     private string _totalGamesText = "";
@@ -85,12 +86,16 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
     [ObservableProperty]
     private bool _hasAnyGames;
 
-    public DashboardViewModel(IStorageRepository storageRepository, IGameRepository gameRepository, IDriveLinkRepository driveLinks, Services.DriveService driveService)
+    [ObservableProperty]
+    private string _trendText = "";
+
+    public DashboardViewModel(IStorageRepository storageRepository, IGameRepository gameRepository, IDriveLinkRepository driveLinks, Services.DriveService driveService, ICapacitySnapshotRepository snapshots)
     {
         _storageRepository = storageRepository;
         _gameRepository = gameRepository;
         _driveLinks = driveLinks;
         _driveService = driveService;
+        _snapshots = snapshots;
     }
 
     public event Action<long>? OpenStorageGamesRequested;
@@ -179,5 +184,38 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
             games.Count(g => g.SelesaiMain));
         HasAnyGames = games.Count > 0;
         StatusText = Services.Loc.Format("Ui_Dashboard_StorageCount", Storages.Count);
+        await UpdateTrendAsync(totalGb);
+    }
+
+    private async Task UpdateTrendAsync(double totalGb)
+    {
+        try
+        {
+            var snapshots = await _snapshots.GetAllAsync();
+            var today = DateTime.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+            if (!snapshots.Any(s => s.Tanggal.StartsWith(today, StringComparison.Ordinal)))
+            {
+                foreach (var card in Storages)
+                {
+                    await _snapshots.AddAsync(card.Storage.Id, card.GameCount, card.TotalGb);
+                }
+            }
+
+            var latest = snapshots.OrderByDescending(s => s.Tanggal).FirstOrDefault();
+            if (latest is null)
+            {
+                TrendText = Services.Loc.Get("Ui_Dashboard_TrendNone");
+                return;
+            }
+            var difference = totalGb - latest.TotalGb;
+            TrendText = Math.Abs(difference) < 0.05
+                ? Services.Loc.Get("Ui_Dashboard_TrendFlat")
+                : Services.Loc.Format("Ui_Dashboard_Trend", difference.ToString("N1", Services.AppCulture.Current));
+        }
+        catch (Exception exception)
+        {
+            Services.CrashLog.Write(exception);
+            TrendText = "";
+        }
     }
 }

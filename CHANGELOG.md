@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v2.2.0
+
+Import CSV files back into GimDeks and see how capacity changes over time.
+
+## New features
+
+- **CSV import.** The semicolon CSV exported by GimDeks can be imported again. Storage names and tags are resolved, duplicates are skipped with the same name normalizer, and a backup is created first.
+- **Capacity trend.** The dashboard records one snapshot per storage per day and shows how total size changed since the last snapshot.
+
 ## v2.1.0
 
 Keep the collection organized with screenshot galleries, backup management, advanced search, and saved filters.

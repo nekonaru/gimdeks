@@ -471,4 +471,12 @@ Only the game title is sent to the internet. Continue?</sys:String>
   <sys:String x:Key="Ui_Import_HistoryTime">Time</sys:String>
   <sys:String x:Key="Ui_Import_HistoryMode">Mode</sys:String>
   <sys:String x:Key="Ui_Import_HistoryFile">Source file</sys:String>
+  <sys:String x:Key="Ui_Import_ImportCsv">Import CSV</sys:String>
+  <sys:String x:Key="Ui_Import_CsvTitle">Import CSV</sys:String>
+  <sys:String x:Key="Ui_Import_CsvConfirm">Import {0} games from this CSV? A backup is created first.</sys:String>
+  <sys:String x:Key="Ui_Import_CsvEmpty">No game rows were found in this CSV.</sys:String>
+  <sys:String x:Key="Ui_Import_CsvDone">{0} games imported, {1} duplicates skipped.</sys:String>
+  <sys:String x:Key="Ui_Dashboard_TrendNone">No saved capacity snapshot yet.</sys:String>
+  <sys:String x:Key="Ui_Dashboard_TrendFlat">Capacity unchanged since the last snapshot.</sys:String>
+  <sys:String x:Key="Ui_Dashboard_Trend">{0} GB since the last snapshot</sys:String>
 </ResourceDictionary>

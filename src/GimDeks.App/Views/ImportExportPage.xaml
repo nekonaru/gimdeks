@@ -104,6 +104,8 @@
                                 Command="{Binding ExportCommand}" Margin="0,0,10,0" />
                         <Button Content="{DynamicResource Ui_Import_ExportCsv}" Style="{StaticResource MaterialDesignOutlinedButton}"
                                 Command="{Binding ExportCsvCommand}" Margin="0,0,10,0" />
+                        <Button Content="{DynamicResource Ui_Import_ImportCsv}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Command="{Binding ImportCsvCommand}" Margin="0,0,10,0" />
                         <Button Content="{DynamicResource Ui_Import_BackupNow}" Style="{StaticResource MaterialDesignOutlinedButton}"
                                 Command="{Binding BackupCommand}" Margin="0,0,10,0" />
                         <Button Content="{DynamicResource Ui_Import_Restore}" Style="{StaticResource MaterialDesignOutlinedButton}"

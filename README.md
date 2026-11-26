@@ -83,6 +83,8 @@ GimDeks manages a game collection across multiple drives (external HDDs, laptop 
 | **Double-click to edit** | Double-click a game row to open the editor. |
 | **Mark played through in bulk** | Select several games and toggle their played-through flag at once, right from the toolbar. |
 | **Random pick** | Can not decide what to play? The dashboard picks one of your downloaded, unfinished games at random and highlights it in the game list. |
+| **CSV import** | Import the semicolon CSV exported by GimDeks back into the collection, with backup and duplicate protection. |
+| **Capacity trend** | Daily snapshots show how total collection size changed since the last recorded day. |
 | **Screenshot gallery** | Add local images to a game and browse them in its detail window. Files stay on disk. |
 | **Backup Manager** | Create, preview and restore local database snapshots from one page. |
 | **Advanced search and saved filters** | Search by name, regex, notes and size range, then save the filter for later. |

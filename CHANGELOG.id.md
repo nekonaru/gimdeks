@@ -4,6 +4,15 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v2.2.0
+
+Import CSV kembali ke GimDeks dan lihat perubahan kapasitas dari waktu ke waktu.
+
+## Fitur baru
+
+- **Import CSV.** CSV semicolon yang diekspor GimDeks bisa diimport kembali. Nama storage dan tag dikenali, duplikat dilewati dengan normalizer nama yang sama, dan backup dibuat terlebih dahulu.
+- **Tren kapasitas.** Dashboard mencatat satu snapshot per storage per hari dan menampilkan perubahan total ukuran sejak snapshot terakhir.
+
 ## v2.1.0
 
 Rapikan koleksi dengan galeri screenshot, kelola backup, pencarian lanjutan, dan filter tersimpan.
