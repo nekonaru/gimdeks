@@ -47,6 +47,7 @@ public partial class ImportExportViewModel : ObservableObject
     private readonly DatabaseBackupService _backup;
     private readonly Services.AppSettingsService _settings;
     private readonly Services.PortableModeService _portable;
+    private readonly IImportHistoryRepository _history;
 
     [ObservableProperty]
     private string _filePath = "";
@@ -93,7 +94,8 @@ public partial class ImportExportViewModel : ObservableObject
         IGameRepository gameRepository,
         DatabaseBackupService backup,
         Services.AppSettingsService settings,
-        Services.PortableModeService portable)
+        Services.PortableModeService portable,
+        IImportHistoryRepository history)
     {
         _importService = importService;
         _exporter = new ExcelExporter();
@@ -103,6 +105,7 @@ public partial class ImportExportViewModel : ObservableObject
         _backup = backup;
         _settings = settings;
         _portable = portable;
+        _history = history;
         ImportModes = new[]
         {
             new ImportModeOption(ImportMode.Gabung, "Ui_Import_ModeGabung"),
@@ -112,10 +115,22 @@ public partial class ImportExportViewModel : ObservableObject
         Warnings = new ObservableCollection<string>();
         RingkasanRows = new ObservableCollection<RingkasanRowView>();
         SkippedSheets = new ObservableCollection<string>();
+        _ = LoadHistoryAsync();
     }
 
     /// <summary>Raised after any operation that changes stored data.</summary>
     public event Action? DataChanged;
+
+    public ObservableCollection<ImportHistory> History { get; } = new();
+
+    public async Task LoadHistoryAsync()
+    {
+        History.Clear();
+        foreach (var entry in await _history.GetAllAsync())
+        {
+            History.Add(entry);
+        }
+    }
 
     public IReadOnlyList<ImportModeOption> ImportModes { get; }
     public ObservableCollection<string> Warnings { get; }
@@ -217,6 +232,14 @@ public partial class ImportExportViewModel : ObservableObject
         {
             var result = await _importService.ImportAsync(FilePath, mode);
             _settings.SaveLastImportedPath(FilePath);
+            await _history.AddAsync(FilePath, mode.ToString(), System.Text.Json.JsonSerializer.Serialize(new
+            {
+                result.StoragesAdded,
+                result.GamesAdded,
+                result.GamesSkippedAsDuplicate,
+                AllMatch = result.Ringkasan?.AllMatch ?? true,
+            }));
+            await LoadHistoryAsync();
             var skippedText = result.GamesSkippedAsDuplicate > 0 ? Services.Loc.Format("Ui_Import_SkippedDup", result.GamesSkippedAsDuplicate) : "";
             StatusText = Services.Loc.Format("Ui_Import_Done", result.StoragesAdded, result.GamesAdded, skippedText);
             DataChanged?.Invoke();

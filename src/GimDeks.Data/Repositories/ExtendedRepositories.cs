@@ -81,6 +81,17 @@ public sealed class GameNoteRepository(SqliteConnectionFactory factory) : IGameN
         return rows.Select(r => new GameNote((long)r.id, (long)r.game_id, (string)r.isi, (string)r.dibuat_pada)).ToList();
     }
 
+    public async Task<Dictionary<long, string>> GetAllTextByGameAsync(CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        var rows = await connection.QueryAsync(new CommandDefinition(
+            "SELECT game_id AS GameId, GROUP_CONCAT(isi, char(10)) AS Isi FROM catatan_game GROUP BY game_id;",
+            cancellationToken: ct));
+        return rows.ToDictionary<dynamic, long, string>(
+            r => (long)r.GameId,
+            r => (string)r.Isi);
+    }
+
     public async Task<long> AddAsync(long gameId, string isi, CancellationToken ct = default)
     {
         using var connection = factory.CreateConnection();

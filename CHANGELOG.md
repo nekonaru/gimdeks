@@ -4,6 +4,23 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v2.1.0
+
+Keep the collection organized with screenshot galleries, backup management, advanced search, and saved filters.
+
+## New features
+
+- **Screenshot gallery.** Add local images to a game from its detail window, browse thumbnails, and remove them. Files are stored under the local covers folder and never uploaded.
+- **Backup Manager.** A dedicated page lists local backups with date, size, and a preview of storage and game counts. Create a backup, open the folder, or restore with confirmation and an automatic safety copy.
+- **Advanced search.** Search by name with regular expressions, by dated notes, and by size range from one dialog.
+- **Saved filters.** Save the current filter set under a name and reapply it from the game list.
+- **Import history.** Every successful import records its source, mode, and result. The history is shown on the Import / Export page.
+- **Storage shortcuts.** Refresh connected drives and open the linked drive in Explorer from the Storage page.
+
+## Improvements
+
+- **Note-aware filtering.** Advanced note search covers both the Excel compatible Notes field and dated notes added in the detail window.
+
 ## v2.0.0
 
 Track how long you play, mark favorites, and find any game or action instantly. This is the first major update with a new schema version.

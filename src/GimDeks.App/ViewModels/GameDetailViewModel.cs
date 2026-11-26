@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GimDeks.Core.Interfaces;
@@ -28,19 +29,27 @@ public sealed class SessionView
     public string StartText => Session.Mulai.Length >= 16 ? Session.Mulai[..16].Replace('T', ' ') : Session.Mulai;
 }
 
+public sealed class ImageItem
+{
+    public required GameImage Image { get; init; }
+    public required string Path { get; init; }
+}
+
 public partial class GameDetailViewModel : ObservableObject
 {
     private readonly IGameRepository _games;
     private readonly IGameNoteRepository _notes;
+    private readonly IGameImageRepository _images;
     private readonly IPlaySessionRepository _sessions;
     private readonly Services.SessionTrackerService _tracker;
 
     public GameDetailViewModel(Game game, IGameRepository games, IGameNoteRepository notes,
-        IPlaySessionRepository sessions, Services.SessionTrackerService tracker)
+        IGameImageRepository images, IPlaySessionRepository sessions, Services.SessionTrackerService tracker)
     {
         Game = game;
         _games = games;
         _notes = notes;
+        _images = images;
         _sessions = sessions;
         _tracker = tracker;
     }
@@ -48,6 +57,10 @@ public partial class GameDetailViewModel : ObservableObject
     public Game Game { get; }
     public ObservableCollection<NoteView> Notes { get; } = new();
     public ObservableCollection<SessionView> Sessions { get; } = new();
+    public ObservableCollection<ImageItem> Images { get; } = new();
+
+    [ObservableProperty]
+    private string _selectedImagePath = "";
 
     [ObservableProperty]
     private string _newNote = "";
@@ -76,6 +89,18 @@ public partial class GameDetailViewModel : ObservableObject
             {
                 Sessions.Add(new SessionView { Session = session });
             }
+
+            Images.Clear();
+            var gallery = Services.CoverFileService.GalleryDirectory(Game.Id);
+            foreach (var image in await _images.GetByGameAsync(Game.Id))
+            {
+                var path = Path.Combine(gallery, image.NamaFile);
+                if (File.Exists(path))
+                {
+                    Images.Add(new ImageItem { Image = image, Path = path });
+                }
+            }
+            SelectedImagePath = Images.FirstOrDefault()?.Path ?? "";
         }
         finally
         {
@@ -105,6 +130,47 @@ public partial class GameDetailViewModel : ObservableObject
             return;
         }
         await _notes.DeleteAsync(note.Note.Id);
+        await LoadAsync();
+    }
+
+    [RelayCommand]
+    private async Task AddImageAsync()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Filter = "Images (*.png;*.jpg;*.jpeg;*.webp)|*.png;*.jpg;*.jpeg;*.webp",
+            Title = Services.Loc.Get("Ui_Detail_AddImage"),
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        try
+        {
+            var directory = Services.CoverFileService.GalleryDirectory(Game.Id);
+            Directory.CreateDirectory(directory);
+            var name = Guid.NewGuid().ToString("N") + Path.GetExtension(dialog.FileName).ToLowerInvariant();
+            File.Copy(dialog.FileName, Path.Combine(directory, name), overwrite: true);
+            await _images.AddAsync(Game.Id, name);
+            await LoadAsync();
+        }
+        catch (Exception exception)
+        {
+            Services.CrashLog.Write(exception);
+            StatusText = Services.Loc.Get("Ui_Detail_ImageFailed");
+        }
+    }
+
+    [RelayCommand]
+    private async Task DeleteImageAsync(ImageItem? item)
+    {
+        if (item is null)
+        {
+            return;
+        }
+        await _images.DeleteAsync(item.Image.Id);
+        try { if (File.Exists(item.Path)) File.Delete(item.Path); } catch { /* best effort */ }
         await LoadAsync();
     }
 

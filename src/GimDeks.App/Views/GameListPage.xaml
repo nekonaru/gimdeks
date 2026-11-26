@@ -75,6 +75,16 @@
                           ItemsSource="{Binding SortOptions}"
                           SelectedItem="{Binding SelectedSort}"
                           DisplayMemberPath="Label" Width="150" Margin="0,0,8,0" />
+                <Button Content="{DynamicResource Ui_Button_AdvancedSearch}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Command="{Binding OpenAdvancedSearchCommand}" Margin="0,0,8,0" />
+                <ComboBox Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          materialDesign:HintAssist.Hint="{DynamicResource Ui_Advanced_Presets}"
+                          ItemsSource="{Binding Presets}" SelectedItem="{Binding SelectedPreset}"
+                          DisplayMemberPath="Nama" Width="130" Margin="0,0,8,0" />
+                <TextBox Width="100" materialDesign:HintAssist.Hint="{DynamicResource Ui_Advanced_PresetName}"
+                         x:Name="PresetNameBox" Margin="0,0,8,0" />
+                <Button Content="{DynamicResource Ui_Advanced_SavePreset}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Command="{Binding SavePresetCommand}" CommandParameter="{Binding Text, ElementName=PresetNameBox}" Margin="0,0,8,0" />
                 <Button Content="{DynamicResource Ui_Button_Add}" Style="{StaticResource MaterialDesignRaisedButton}"
                         Command="{Binding AddGameCommand}" Margin="0,0,8,0">
                     <Button.ContentTemplate>

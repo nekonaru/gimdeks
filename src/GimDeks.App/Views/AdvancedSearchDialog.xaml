@@ -1,0 +1,36 @@
+<Window x:Class="GimDeks.App.Views.AdvancedSearchDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="{DynamicResource Ui_Advanced_Title}" Width="480" SizeToContent="Height"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize" ShowInTaskbar="False"
+        Background="{DynamicResource MaterialDesign.Brush.Background}">
+    <StackPanel Margin="20">
+        <TextBlock Text="{DynamicResource Ui_Advanced_Name}" Opacity="0.8" />
+        <TextBox x:Name="NameBox" materialDesign:HintAssist.Hint="{DynamicResource Ui_GameList_SearchHint}" Margin="0,4,0,10" />
+        <TextBlock Text="{DynamicResource Ui_Advanced_Note}" Opacity="0.8" />
+        <TextBox x:Name="NoteBox" materialDesign:HintAssist.Hint="{DynamicResource Ui_Advanced_NoteHint}" Margin="0,4,0,10" />
+        <Grid Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="{DynamicResource Ui_Filter_MinGb}" Opacity="0.8" />
+                <TextBox x:Name="MinBox" Margin="0,4,0,0" />
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="{DynamicResource Ui_Filter_MaxGb}" Opacity="0.8" />
+                <TextBox x:Name="MaxBox" Margin="0,4,0,0" />
+            </StackPanel>
+        </Grid>
+        <CheckBox x:Name="RegexBox" Content="{DynamicResource Ui_Advanced_Regex}" Margin="0,0,0,14" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="{DynamicResource Ui_Button_Cancel}" Style="{StaticResource MaterialDesignFlatButton}"
+                    Click="CancelButton_OnClick" Margin="0,0,8,0" />
+            <Button Content="{DynamicResource Ui_Button_Save}" Style="{StaticResource MaterialDesignRaisedButton}"
+                    Click="SaveButton_OnClick" />
+        </StackPanel>
+    </StackPanel>
+</Window>

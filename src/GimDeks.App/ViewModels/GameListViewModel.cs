@@ -59,6 +59,11 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     private readonly IStorageRepository _storageRepository;
     private readonly ITagRepository _tagRepository;
     private readonly Services.SessionTrackerService _sessionTracker;
+    private readonly IFilterPresetRepository _presets;
+    private readonly IGameNoteRepository _notes;
+    private Dictionary<long, string> _notesByGame = new();
+    private string _noteQuery = "";
+    private bool _regexSearch;
     private readonly SemaphoreSlim _filtersLock = new(1, 1);
     private readonly SemaphoreSlim _reloadLock = new(1, 1);
     private readonly SemaphoreSlim _launchLock = new(1, 1);
@@ -95,14 +100,21 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     private string _summaryText = "";
 
     [ObservableProperty]
+    private FilterPreset? _selectedPreset;
+
+    partial void OnSelectedPresetChanged(FilterPreset? value) => _ = ApplyPresetAsync(value);
+
+    [ObservableProperty]
     private string _statusText = "";
 
-    public GameListViewModel(IGameRepository gameRepository, IStorageRepository storageRepository, ITagRepository tagRepository, Services.SessionTrackerService sessionTracker)
+    public GameListViewModel(IGameRepository gameRepository, IStorageRepository storageRepository, ITagRepository tagRepository, Services.SessionTrackerService sessionTracker, IFilterPresetRepository presets, IGameNoteRepository notes)
     {
         _gameRepository = gameRepository;
         _storageRepository = storageRepository;
         _tagRepository = tagRepository;
         _sessionTracker = sessionTracker;
+        _presets = presets;
+        _notes = notes;
         StatusOptions = new[]
         {
             FilterOption.All,
@@ -191,6 +203,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         _allGames = (await _gameRepository.GetAllAsync()).ToList();
         _allStorages = (await _storageRepository.GetAllAsync()).ToList();
         _tagsByGame = await MapTagsByGameAsync(_allGames.Select(g => g.Id).ToList());
+        _notesByGame = await _notes.GetAllTextByGameAsync();
 
         StorageOptions.Add(FilterOption.All);
         foreach (var storage in _allStorages)
@@ -207,6 +220,8 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         {
             TagOptions.Add(new FilterOption(tag.Id.ToString(CultureInfo.InvariantCulture), tag.Nama));
         }
+
+        await LoadPresetsAsync();
 
         long? gameToSelect = null;
         _suppressFilterChanges = true;
@@ -252,6 +267,8 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         SelectedSelesai = FilterOption.All;
         MinSize = "";
         MaxSize = "";
+        _noteQuery = "";
+        _regexSearch = false;
     }
 
     private void SelectGameById(long gameId)
@@ -324,9 +341,34 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
 
         if (!string.IsNullOrWhiteSpace(search))
         {
+            if (_regexSearch)
+            {
+                try
+                {
+                    var regex = new System.Text.RegularExpressions.Regex(search,
+                        System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+                    filtered = filtered.Where(g => regex.IsMatch(g.Nama) || (g.Versi is not null && regex.IsMatch(g.Versi)));
+                }
+                catch (ArgumentException)
+                {
+                    filtered = filtered.Where(g => false);
+                }
+            }
+            else
+            {
+                filtered = filtered.Where(g =>
+                    g.Nama.Contains(search, StringComparison.OrdinalIgnoreCase)
+                    || (g.Versi?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false));
+            }
+        }
+
+        if (_noteQuery.Length > 0)
+        {
             filtered = filtered.Where(g =>
-                g.Nama.Contains(search, StringComparison.OrdinalIgnoreCase)
-                || (g.Versi?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false));
+            {
+                var text = (g.Catatan ?? "") + "\n" + (_notesByGame.TryGetValue(g.Id, out var note) ? note : "");
+                return text.Contains(_noteQuery, StringComparison.OrdinalIgnoreCase);
+            });
         }
 
         if (SelectedStatus != FilterOption.All)
@@ -506,6 +548,102 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         await ReloadAsync();
     }
 
+    public IReadOnlyList<FilterPreset> Presets { get; private set; } = Array.Empty<FilterPreset>();
+
+    [RelayCommand]
+    private async Task LoadPresetsAsync()
+    {
+        Presets = await _presets.GetAllAsync();
+    }
+
+    [RelayCommand]
+    private async Task OpenAdvancedSearchAsync()
+    {
+        var dialog = new Views.AdvancedSearchDialog { Owner = System.Windows.Application.Current.MainWindow };
+        if (dialog.ShowDialog() != true || dialog.Result is not { } criteria)
+        {
+            return;
+        }
+
+        _suppressFilterChanges = true;
+        try
+        {
+            SearchText = criteria.Name;
+            MinSize = criteria.MinGb;
+            MaxSize = criteria.MaxGb;
+            _noteQuery = criteria.Note;
+            _regexSearch = criteria.Regex;
+        }
+        finally
+        {
+            _suppressFilterChanges = false;
+        }
+        await ApplyFiltersAsync();
+    }
+
+    [RelayCommand]
+    private async Task SavePresetAsync(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            StatusText = Services.Loc.Get("Ui_Advanced_PresetNameRequired");
+            return;
+        }
+
+        var json = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            SearchText,
+            SelectedStatus = SelectedStatus.Value,
+            SelectedStorage = SelectedStorage.Value,
+            SelectedTag = SelectedTag.Value,
+            SelectedSelesai = SelectedSelesai.Value,
+            MinSize,
+            MaxSize,
+            NoteQuery = _noteQuery,
+            RegexSearch = _regexSearch,
+        });
+        await _presets.SaveAsync(name.Trim(), json);
+        await LoadPresetsAsync();
+        StatusText = Services.Loc.Format("Ui_Advanced_PresetSaved", name.Trim());
+    }
+
+    [RelayCommand]
+    private async Task ApplyPresetAsync(FilterPreset? preset)
+    {
+        if (preset is null)
+        {
+            return;
+        }
+
+        try
+        {
+            using var document = System.Text.Json.JsonDocument.Parse(preset.DefinisiJson);
+            var root = document.RootElement;
+            _suppressFilterChanges = true;
+            try
+            {
+                SearchText = root.GetProperty("SearchText").GetString() ?? "";
+                MinSize = root.GetProperty("MinSize").GetString() ?? "";
+                MaxSize = root.GetProperty("MaxSize").GetString() ?? "";
+                _noteQuery = root.GetProperty("NoteQuery").GetString() ?? "";
+                _regexSearch = root.GetProperty("RegexSearch").GetBoolean();
+                SelectedStatus = StatusOptions.FirstOrDefault(o => o.Value == root.GetProperty("SelectedStatus").GetString()) ?? FilterOption.All;
+                SelectedTag = TagOptions.FirstOrDefault(o => o.Value == root.GetProperty("SelectedTag").GetString()) ?? FilterOption.All;
+                SelectedSelesai = SelesaiOptions.FirstOrDefault(o => o.Value == root.GetProperty("SelectedSelesai").GetString()) ?? FilterOption.All;
+            }
+            finally
+            {
+                _suppressFilterChanges = false;
+            }
+            await ApplyFiltersAsync();
+        }
+        catch (Exception exception)
+        {
+            Services.CrashLog.Write(exception);
+            StatusText = Services.Loc.Get("Ui_Advanced_PresetFailed");
+        }
+    }
+
     public async Task SaveFavoritAsync(GameRow row)
     {
         await _gameRepository.UpdateAsync(row.Game);
@@ -525,6 +663,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             SelectedRows[0].Game,
             app.GetRequiredService<IGameRepository>(),
             app.GetRequiredService<IGameNoteRepository>(),
+            app.GetRequiredService<IGameImageRepository>(),
             app.GetRequiredService<IPlaySessionRepository>(),
             app.GetRequiredService<Services.SessionTrackerService>());
         new Views.GameDetailWindow(vm) { Owner = System.Windows.Application.Current.MainWindow }.Show();

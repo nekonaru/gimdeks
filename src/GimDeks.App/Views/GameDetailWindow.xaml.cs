@@ -13,4 +13,12 @@ public partial class GameDetailWindow : Window
     }
 
     private void CloseButton_OnClick(object sender, RoutedEventArgs e) => Close();
+
+    private void Thumbnail_OnClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (sender is System.Windows.Controls.Image { DataContext: ImageItem item } && DataContext is GameDetailViewModel vm)
+        {
+            vm.SelectedImagePath = item.Path;
+        }
+    }
 }

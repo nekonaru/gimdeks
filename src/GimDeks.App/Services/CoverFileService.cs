@@ -13,6 +13,9 @@ public sealed class CoverFileService
     public static string CoverDirectory =>
         Path.Combine(GimDeks.Data.DatabasePaths.AppDataDirectory, "covers");
 
+    public static string GalleryDirectory(long gameId) =>
+        Path.Combine(CoverDirectory, gameId + "-gallery");
+
     public string SaveCover(long gameId, string sourcePath)
     {
         var extension = Path.GetExtension(sourcePath).ToLowerInvariant();

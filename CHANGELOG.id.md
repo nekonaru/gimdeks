@@ -4,6 +4,23 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v2.1.0
+
+Rapikan koleksi dengan galeri screenshot, kelola backup, pencarian lanjutan, dan filter tersimpan.
+
+## Fitur baru
+
+- **Galeri screenshot.** Tambah gambar lokal dari jendela detail game, lihat thumbnail, dan hapusnya. File disimpan di folder covers lokal dan tidak pernah diunggah.
+- **Kelola Backup.** Halaman khusus menampilkan backup lokal dengan tanggal, ukuran, serta pratinjau jumlah storage dan game. Buat backup, buka folder, atau pulihkan dengan konfirmasi dan salinan pengaman otomatis.
+- **Pencarian lanjutan.** Cari berdasarkan nama dengan regular expression, catatan bertanggal, dan rentang ukuran dari satu dialog.
+- **Filter tersimpan.** Simpan filter aktif dengan nama dan terapkan lagi dari daftar game.
+- **Riwayat import.** Setiap import berhasil mencatat sumber, mode, dan hasilnya. Riwayat tampil di halaman Import / Export.
+- **Pintasan storage.** Segarkan drive yang terhubung dan buka drive tertaut di Explorer dari halaman Storage.
+
+## Peningkatan
+
+- **Filter yang mengenali catatan.** Pencarian catatan lanjutan mencakup kolom Catatan yang kompatibel dengan Excel dan catatan bertanggal dari jendela detail.
+
 ## v2.0.0
 
 Catat berapa lama kamu main, tandai favorit, dan temukan game atau aksi apa pun dengan cepat. Ini pembaruan mayor pertama dengan versi skema baru.

@@ -46,8 +46,12 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Button Grid.Row="2" Content="{DynamicResource Ui_Storage_Add}" Style="{StaticResource MaterialDesignRaisedButton}"
-                    Command="{Binding AddStorageCommand}" />
+            <StackPanel Grid.Row="2" Orientation="Horizontal">
+                <Button Content="{DynamicResource Ui_Storage_Add}" Style="{StaticResource MaterialDesignRaisedButton}"
+                        Command="{Binding AddStorageCommand}" Margin="0,0,6,0" />
+                <Button Content="{DynamicResource Ui_Storage_RefreshDrives}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Command="{Binding RefreshDrivesCommand}" ToolTip="{DynamicResource Ui_Storage_RefreshDrives}" Padding="10,4" />
+            </StackPanel>
         </Grid>
 
         <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
@@ -89,6 +93,7 @@
                                 <ColumnDefinition Width="220" />
                                 <ColumnDefinition Width="14" />
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <ComboBox Grid.Column="0" ItemsSource="{Binding DriveOptions}"
                                       SelectedValue="{Binding SelectedDriveLetter, Mode=TwoWay}"
@@ -97,6 +102,8 @@
                                       Style="{StaticResource MaterialDesignOutlinedComboBox}"
                                       materialDesign:HintAssist.Hint="{DynamicResource Ui_Storage_Drive}" />
                             <TextBlock Grid.Column="2" Text="{Binding DriveStatusText}" VerticalAlignment="Center" Opacity="0.85" />
+                            <Button Grid.Column="3" Content="{DynamicResource Ui_Storage_OpenFolder}" Style="{StaticResource MaterialDesignFlatButton}"
+                                    Command="{Binding OpenStorageFolderCommand}" Padding="8,2" />
                         </Grid>
                         <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
                             <Button Content="{DynamicResource Ui_Storage_Save}" Style="{StaticResource MaterialDesignRaisedButton}"
