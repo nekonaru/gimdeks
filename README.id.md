@@ -83,6 +83,9 @@ GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan S
 | **Klik dua kali untuk ubah** | Klik dua kali baris game untuk membuka editornya. |
 | **Tandai selesai secara massal** | Pilih beberapa game sekaligus dan centang flag selesai untuk semuanya, langsung dari toolbar. |
 | **Pilihan acak** | Bingung mau main apa? Dashboard memilih salah satu game Sudah Ada yang belum selesai secara acak dan menyorotnya di daftar game. |
+| **Galeri screenshot** | Tambah gambar lokal ke game dan lihat di jendela detail. File tetap di disk. |
+| **Kelola Backup** | Buat, pratinjau, dan pulihkan snapshot database lokal dari satu halaman. |
+| **Pencarian lanjutan dan filter tersimpan** | Cari berdasarkan nama, regex, catatan, dan rentang ukuran, lalu simpan filter untuk nanti. |
 | **Sesi main** | Peluncuran memulai sesi yang dilacak. Durasi dan riwayat tampil di panel detail, dan total waktu bisa diurutkan di daftar. |
 | **Favorit dan rating** | Tandai favorit, beri rating 0 sampai 5, atur prioritas, lalu saring atau urutkan berdasarkan itu. |
 | **Pencarian cepat** | Tekan Ctrl+P untuk menemukan game atau aksi umum dari satu palette berbasis keyboard. |

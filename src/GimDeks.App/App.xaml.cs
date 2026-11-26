@@ -93,8 +93,10 @@ public partial class App : Application
         services.AddSingleton<StatisticsViewModel>();
         services.AddSingleton<HealthViewModel>();
         services.AddSingleton<ScanGamesViewModel>();
+        services.AddSingleton<BackupManagerViewModel>();
 
         return services.BuildServiceProvider();
     }
 
 }
+

@@ -111,6 +111,20 @@
                     </StackPanel>
                 </StackPanel>
             </Border>
+            <Border Background="{DynamicResource MaterialDesign.Brush.Card.Background}" CornerRadius="12" Padding="18">
+                <StackPanel>
+                    <TextBlock Text="{DynamicResource Ui_Import_History}" FontSize="11" Opacity="0.6" />
+                    <DataGrid ItemsSource="{Binding History}" AutoGenerateColumns="False" IsReadOnly="True"
+                              Height="120" Margin="0,8,0,0" HeadersVisibility="Column"
+                              Background="Transparent" RowBackground="Transparent" GridLinesVisibility="Horizontal">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{DynamicResource Ui_Import_HistoryTime}" Binding="{Binding Waktu}" Width="160" />
+                            <DataGridTextColumn Header="{DynamicResource Ui_Import_HistoryMode}" Binding="{Binding Mode}" Width="110" />
+                            <DataGridTextColumn Header="{DynamicResource Ui_Import_HistoryFile}" Binding="{Binding Path}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

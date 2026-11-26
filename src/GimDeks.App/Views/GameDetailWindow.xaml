@@ -30,6 +30,30 @@
 
         <ScrollViewer Grid.Row="1" Margin="0,14,0,0" VerticalScrollBarVisibility="Auto">
             <StackPanel>
+                <TextBlock Text="{DynamicResource Ui_Detail_Gallery}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
+                <Image Source="{Binding SelectedImagePath}" Height="180" Stretch="Uniform" />
+                <ItemsControl ItemsSource="{Binding Images}" Margin="0,6,0,14">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:ImageItem}">
+                            <Border BorderBrush="#243B34" BorderThickness="1" CornerRadius="6" Margin="0,0,6,6">
+                                <StackPanel>
+                                    <Image Source="{Binding Path}" Width="72" Height="52" Stretch="Uniform" MouseLeftButtonUp="Thumbnail_OnClick" />
+                                    <Button Content="{DynamicResource Ui_Button_Delete}" Style="{StaticResource MaterialDesignFlatButton}"
+                                            Command="{Binding DataContext.DeleteImageCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" FontSize="10" Padding="6,1" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Button Content="{DynamicResource Ui_Detail_AddImage}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Command="{Binding AddImageCommand}" HorizontalAlignment="Left" Margin="0,0,0,14" />
+
                 <TextBlock Text="{DynamicResource Ui_Detail_Notes}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
                 <ItemsControl ItemsSource="{Binding Notes}">
                     <ItemsControl.ItemTemplate>

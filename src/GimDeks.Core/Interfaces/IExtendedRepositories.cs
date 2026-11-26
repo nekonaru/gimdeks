@@ -22,6 +22,7 @@ public interface IPlaySessionRepository
 public interface IGameNoteRepository
 {
     Task<IReadOnlyList<GameNote>> GetByGameAsync(long gameId, CancellationToken ct = default);
+    Task<Dictionary<long, string>> GetAllTextByGameAsync(CancellationToken ct = default);
     Task<long> AddAsync(long gameId, string isi, CancellationToken ct = default);
     Task DeleteAsync(long id, CancellationToken ct = default);
 }

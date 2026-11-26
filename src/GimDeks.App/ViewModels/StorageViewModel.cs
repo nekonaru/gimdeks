@@ -312,6 +312,41 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
     }
 
     [RelayCommand]
+    private void RefreshDrives()
+    {
+        if (SelectedItem is null)
+        {
+            return;
+        }
+        _ = LoadDriveOptionsAsync(SelectedItem.Storage.Id, _selectionToken);
+        StatusText = Services.Loc.Get("Ui_Storage_DrivesRefreshed");
+    }
+
+    [RelayCommand]
+    private void OpenStorageFolder()
+    {
+        var letter = SelectedDriveLetter;
+        if (string.IsNullOrWhiteSpace(letter))
+        {
+            StatusText = Services.Loc.Get("Ui_Storage_NotConnected");
+            return;
+        }
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "explorer.exe",
+                Arguments = letter + @":\",
+                UseShellExecute = false,
+            });
+        }
+        catch (Exception exception)
+        {
+            Services.CrashLog.Write(exception);
+        }
+    }
+
+    [RelayCommand]
     private async Task AddStorageAsync()
     {
         var storages = await _storageRepository.GetAllAsync();
