@@ -471,4 +471,12 @@ Data yang dikirim ke internet hanya judul game. Lanjutkan?</sys:String>
   <sys:String x:Key="Ui_Import_HistoryTime">Waktu</sys:String>
   <sys:String x:Key="Ui_Import_HistoryMode">Mode</sys:String>
   <sys:String x:Key="Ui_Import_HistoryFile">File sumber</sys:String>
+  <sys:String x:Key="Ui_Import_ImportCsv">Import CSV</sys:String>
+  <sys:String x:Key="Ui_Import_CsvTitle">Import CSV</sys:String>
+  <sys:String x:Key="Ui_Import_CsvConfirm">Import {0} game dari CSV ini? Backup dibuat terlebih dahulu.</sys:String>
+  <sys:String x:Key="Ui_Import_CsvEmpty">Tidak ada baris game ditemukan di CSV ini.</sys:String>
+  <sys:String x:Key="Ui_Import_CsvDone">{0} game diimport, {1} duplikat dilewati.</sys:String>
+  <sys:String x:Key="Ui_Dashboard_TrendNone">Belum ada snapshot kapasitas tersimpan.</sys:String>
+  <sys:String x:Key="Ui_Dashboard_TrendFlat">Kapasitas tidak berubah sejak snapshot terakhir.</sys:String>
+  <sys:String x:Key="Ui_Dashboard_Trend">{0} GB sejak snapshot terakhir</sys:String>
 </ResourceDictionary>

@@ -48,6 +48,7 @@ public partial class ImportExportViewModel : ObservableObject
     private readonly Services.AppSettingsService _settings;
     private readonly Services.PortableModeService _portable;
     private readonly IImportHistoryRepository _history;
+    private readonly CsvImportService _csvImport;
 
     [ObservableProperty]
     private string _filePath = "";
@@ -73,6 +74,7 @@ public partial class ImportExportViewModel : ObservableObject
         BrowseCommand.NotifyCanExecuteChanged();
         PreviewCommand.NotifyCanExecuteChanged();
         ImportCommand.NotifyCanExecuteChanged();
+        ImportCsvCommand.NotifyCanExecuteChanged();
         ExportCommand.NotifyCanExecuteChanged();
         ExportCsvCommand.NotifyCanExecuteChanged();
         BackupCommand.NotifyCanExecuteChanged();
@@ -95,7 +97,8 @@ public partial class ImportExportViewModel : ObservableObject
         DatabaseBackupService backup,
         Services.AppSettingsService settings,
         Services.PortableModeService portable,
-        IImportHistoryRepository history)
+        IImportHistoryRepository history,
+        CsvImportService csvImport)
     {
         _importService = importService;
         _exporter = new ExcelExporter();
@@ -106,6 +109,7 @@ public partial class ImportExportViewModel : ObservableObject
         _settings = settings;
         _portable = portable;
         _history = history;
+        _csvImport = csvImport;
         ImportModes = new[]
         {
             new ImportModeOption(ImportMode.Gabung, "Ui_Import_ModeGabung"),
@@ -244,6 +248,57 @@ public partial class ImportExportViewModel : ObservableObject
             StatusText = Services.Loc.Format("Ui_Import_Done", result.StoragesAdded, result.GamesAdded, skippedText);
             DataChanged?.Invoke();
             await PreviewAsync(); // refresh the preview panel with the new state
+        }
+        catch (Exception exception)
+        {
+            StatusText = Services.Loc.Format("Ui_Import_ImportFailed", exception.Message);
+            DialogService.Error(Services.Loc.Get("Ui_Dialog_ImportFailed"), exception.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRun))]
+    private async Task ImportCsvAsync()
+    {
+        var dialog = new OpenFileDialog
+        {
+            Filter = "CSV (*.csv)|*.csv",
+            Title = Services.Loc.Get("Ui_Import_CsvTitle"),
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        IsBusy = true;
+        try
+        {
+            var preview = _csvImport.Preview(dialog.FileName);
+            if (preview.Rows.Count == 0)
+            {
+                StatusText = Services.Loc.Get("Ui_Import_CsvEmpty");
+                return;
+            }
+
+            if (!DialogService.Confirm(Services.Loc.Get("Ui_Import_CsvTitle"),
+                    Services.Loc.Format("Ui_Import_CsvConfirm", preview.Rows.Count)))
+            {
+                return;
+            }
+
+            var result = await _csvImport.ImportAsync(dialog.FileName);
+            _settings.SaveLastImportedPath(dialog.FileName);
+            await _history.AddAsync(dialog.FileName, "CSV", System.Text.Json.JsonSerializer.Serialize(new
+            {
+                result.Added,
+                result.Skipped,
+            }));
+            await LoadHistoryAsync();
+            StatusText = Services.Loc.Format("Ui_Import_CsvDone", result.Added, result.Skipped);
+            DataChanged?.Invoke();
         }
         catch (Exception exception)
         {

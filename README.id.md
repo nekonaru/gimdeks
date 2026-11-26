@@ -83,6 +83,8 @@ GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan S
 | **Klik dua kali untuk ubah** | Klik dua kali baris game untuk membuka editornya. |
 | **Tandai selesai secara massal** | Pilih beberapa game sekaligus dan centang flag selesai untuk semuanya, langsung dari toolbar. |
 | **Pilihan acak** | Bingung mau main apa? Dashboard memilih salah satu game Sudah Ada yang belum selesai secara acak dan menyorotnya di daftar game. |
+| **Import CSV** | Import kembali CSV semicolon yang diekspor GimDeks, dengan backup dan perlindungan duplikat. |
+| **Tren kapasitas** | Snapshot harian menampilkan perubahan total ukuran koleksi sejak hari tercatat terakhir. |
 | **Galeri screenshot** | Tambah gambar lokal ke game dan lihat di jendela detail. File tetap di disk. |
 | **Kelola Backup** | Buat, pratinjau, dan pulihkan snapshot database lokal dari satu halaman. |
 | **Pencarian lanjutan dan filter tersimpan** | Cari berdasarkan nama, regex, catatan, dan rentang ukuran, lalu simpan filter untuk nanti. |
