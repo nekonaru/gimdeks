@@ -6,6 +6,8 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="24,20">
             <TextBlock Text="{DynamicResource Ui_Statistics_Title}" FontSize="30" FontWeight="SemiBold" />
+            <Button Content="{DynamicResource Ui_Stats_ExportReport}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Command="{Binding ExportReportCommand}" HorizontalAlignment="Right" Margin="0,-36,0,0" />
             <TextBlock Text="{DynamicResource Ui_Statistics_Subtitle}" Opacity="0.7" Margin="0,2,0,16" />
 
             <StackPanel Orientation="Horizontal" Margin="0,0,0,18">

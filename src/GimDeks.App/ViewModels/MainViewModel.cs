@@ -377,6 +377,12 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void OpenMini()
+    {
+        new Views.MiniPlayerWindow(App.Services.GetRequiredService<MiniPlayerViewModel>()).Show();
+    }
+
+    [RelayCommand]
     private void Undo()
     {
         App.Services.GetRequiredService<UndoRedoService>().Undo();

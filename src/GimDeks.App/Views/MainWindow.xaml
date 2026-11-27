@@ -37,6 +37,7 @@
         <KeyBinding Modifiers="Ctrl" Key="P" Command="{Binding OpenPaletteCommand}" />
         <KeyBinding Modifiers="Ctrl" Key="Z" Command="{Binding UndoCommand}" />
         <KeyBinding Modifiers="Ctrl" Key="Y" Command="{Binding RedoCommand}" />
+        <KeyBinding Modifiers="Ctrl" Key="M" Command="{Binding OpenMiniCommand}" />
     </Window.InputBindings>
 
     <Window.Resources>

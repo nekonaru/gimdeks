@@ -60,6 +60,48 @@ public partial class StatisticsViewModel : ObservableObject, IRefreshable
     public ObservableCollection<StorageShare> StorageShares { get; }
     public ObservableCollection<BiggestGame> BiggestGames { get; }
 
+    [RelayCommand]
+    private void ExportReport()
+    {
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            Filter = "HTML report (*.html)|*.html",
+            FileName = "gimdeks-report.html",
+            Title = Services.Loc.Get("Ui_Stats_ReportTitle"),
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        try
+        {
+            var lines = new List<string>
+            {
+                "<!doctype html><html><head><meta charset='utf-8'><title>GimDeks</title>",
+                "<style>body{font-family:Segoe UI,Arial,sans-serif;margin:40px;color:#14221f}h1{color:#0e6b58}table{border-collapse:collapse;width:100%}td,th{padding:8px;border-bottom:1px solid #ddd;text-align:left}</style>",
+                "</head><body><h1>GimDeks</h1>",
+                $"<p>{SummaryText}</p><p>{TotalGamesText} | {TotalSizeText} | {AverageSizeText} | {CompletionText}</p>",
+                "<h2>Storage</h2><table><tr><th>Storage</th><th>Games</th><th>GB</th><th>Share</th></tr>",
+            };
+            foreach (var share in StorageShares)
+            {
+                lines.Add($"<tr><td>{System.Net.WebUtility.HtmlEncode(share.Nama)}</td><td>{share.CountText}</td><td>{share.TotalText}</td><td>{share.ShareText}</td></tr>");
+            }
+            lines.Add("</table><h2>Biggest games</h2><table><tr><th>Game</th><th>Storage</th><th>GB</th></tr>");
+            foreach (var game in BiggestGames)
+            {
+                lines.Add($"<tr><td>{System.Net.WebUtility.HtmlEncode(game.Nama)}</td><td>{System.Net.WebUtility.HtmlEncode(game.StorageName)}</td><td>{game.UkuranText}</td></tr>");
+            }
+            lines.Add("</table></body></html>");
+            System.IO.File.WriteAllText(dialog.FileName, string.Join(Environment.NewLine, lines));
+        }
+        catch (Exception exception)
+        {
+            Services.CrashLog.Write(exception);
+        }
+    }
+
     public Task RefreshAsync() => ReloadAsync();
 
     [RelayCommand]

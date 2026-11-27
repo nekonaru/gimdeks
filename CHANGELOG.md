@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v3.2.0
+
+Quick play and report exports to close out the visual roadmap.
+
+## New features
+
+- **Quick Play window.** Ctrl+M opens a small always-on-top window with your favorite games and a launch button for each. It has its own random pick that only considers favorites with a valid local executable.
+- **HTML report.** The Statistics page exports a printable HTML report with collection totals, storage share, and the biggest games.
+
 ## v3.1.0
 
 Add the data depth that the visual shell was built for: activity log, launch profiles, custom fields, and portable collection bundles.
