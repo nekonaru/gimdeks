@@ -514,4 +514,23 @@ Data yang dikirim ke internet hanya judul game. Lanjutkan?</sys:String>
   <sys:String x:Key="Ui_Onboard_Language">Pilih bahasa</sys:String>
   <sys:String x:Key="Ui_Onboard_Offline">Data tersimpan di file SQLite lokal. Hanya pencarian cover Steam opsional yang memakai jaringan.</sys:String>
   <sys:String x:Key="Ui_Onboard_Start">Mulai</sys:String>
+  <sys:String x:Key="Ui_Button_ToggleView">Ganti tampilan</sys:String>
+  <sys:String x:Key="Ui_NavSection_Collection">KOLEKSI</sys:String>
+  <sys:String x:Key="Ui_NavSection_Play">MAIN</sys:String>
+  <sys:String x:Key="Ui_NavSection_Maintain">PERAWATAN</sys:String>
+  <sys:String x:Key="Ui_NavSection_System">SISTEM</sys:String>
+  <sys:String x:Key="Ui_Undo_Add">Tambah game</sys:String>
+  <sys:String x:Key="Ui_Undo_Edit">Edit game</sys:String>
+  <sys:String x:Key="Ui_Undo_Favorite">Ubah favorit</sys:String>
+  <sys:String x:Key="Ui_Undo_Delete">Hapus {0} game</sys:String>
+  <sys:String x:Key="Ui_Journey_Title">Mulai dari sini</sys:String>
+  <sys:String x:Key="Ui_Journey_Progress">{0} dari {1} langkah selesai</sys:String>
+  <sys:String x:Key="Ui_Journey_Import">Import file Excel kamu</sys:String>
+  <sys:String x:Key="Ui_Journey_Covers">Tambah beberapa cover</sys:String>
+  <sys:String x:Key="Ui_Journey_Link">Tautkan game yang terpasang</sys:String>
+  <sys:String x:Key="Ui_Journey_Favorites">Pilih beberapa favorit</sys:String>
+  <sys:String x:Key="Ui_Journey_Play">Luncurkan dan catat sesi</sys:String>
+  <sys:String x:Key="Ui_Journey_Next">Berikutnya: {0}</sys:String>
+  <sys:String x:Key="Ui_Journey_Done">Perpustakaanmu siap. Selamat main.</sys:String>
+  <sys:String x:Key="Ui_Journey_Go">Buka</sys:String>
 </ResourceDictionary>

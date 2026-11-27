@@ -1,10 +1,14 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GimDeks.App.Services;
+using System.ComponentModel;
 using System.IO;
+using System.Windows.Data;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GimDeks.App.ViewModels;
 
-public sealed record NavItem(Page Page, string LabelKey, string IconKind);
+public sealed record NavItem(Page Page, string LabelKey, string IconKind, string SectionKey);
 
 public partial class MainViewModel : ObservableObject
 {
@@ -76,20 +80,22 @@ public partial class MainViewModel : ObservableObject
         LanguageLabel = GetLanguageLabel(localization.CurrentLanguage);
         NavItems = new[]
         {
-            new NavItem(Page.Dashboard, "Ui_Nav_Dashboard", "ViewDashboard"),
-            new NavItem(Page.GameList, "Ui_Nav_GameList", "ControllerClassic"),
-            new NavItem(Page.Storage, "Ui_Nav_Storage", "Harddisk"),
-            new NavItem(Page.Dikecualikan, "Ui_Nav_Dikecualikan", "Block"),
-            new NavItem(Page.Dieliminasi, "Ui_Nav_Dieliminasi", "DeleteSweep"),
-            new NavItem(Page.Duplicates, "Ui_Nav_Duplicates", "ContentDuplicate"),
-            new NavItem(Page.SaranHdd, "Ui_Nav_SaranHdd", "ChartBar"),
-            new NavItem(Page.Statistics, "Ui_Nav_Statistics", "ChartLine"),
-            new NavItem(Page.Health, "Ui_Nav_Health", "Medical"),
-            new NavItem(Page.ScanGames, "Ui_Nav_ScanGames", "FolderSearch"),
-            new NavItem(Page.Backups, "Ui_Nav_Backups", "Backup"),
-            new NavItem(Page.Settings, "Ui_Nav_Settings", "Settings"),
-            new NavItem(Page.ImportExport, "Ui_Nav_ImportExport", "ImportExport"),
+            new NavItem(Page.Dashboard, "Ui_Nav_Dashboard", "ViewDashboard", "Ui_NavSection_Collection"),
+            new NavItem(Page.GameList, "Ui_Nav_GameList", "ControllerClassic", "Ui_NavSection_Collection"),
+            new NavItem(Page.Storage, "Ui_Nav_Storage", "Harddisk", "Ui_NavSection_Collection"),
+            new NavItem(Page.Dikecualikan, "Ui_Nav_Dikecualikan", "Block", "Ui_NavSection_Collection"),
+            new NavItem(Page.Dieliminasi, "Ui_Nav_Dieliminasi", "DeleteSweep", "Ui_NavSection_Collection"),
+            new NavItem(Page.Duplicates, "Ui_Nav_Duplicates", "ContentDuplicate", "Ui_NavSection_Collection"),
+            new NavItem(Page.SaranHdd, "Ui_Nav_SaranHdd", "ChartBar", "Ui_NavSection_Play"),
+            new NavItem(Page.Statistics, "Ui_Nav_Statistics", "ChartLine", "Ui_NavSection_Play"),
+            new NavItem(Page.Health, "Ui_Nav_Health", "Medical", "Ui_NavSection_Maintain"),
+            new NavItem(Page.ScanGames, "Ui_Nav_ScanGames", "FolderSearch", "Ui_NavSection_Maintain"),
+            new NavItem(Page.Backups, "Ui_Nav_Backups", "Backup", "Ui_NavSection_Maintain"),
+            new NavItem(Page.ImportExport, "Ui_Nav_ImportExport", "ImportExport", "Ui_NavSection_Maintain"),
+            new NavItem(Page.Settings, "Ui_Nav_Settings", "Settings", "Ui_NavSection_System"),
         };
+        NavItemsView = CollectionViewSource.GetDefaultView(NavItems);
+        NavItemsView.GroupDescriptions.Add(new PropertyGroupDescription(nameof(NavItem.SectionKey)));
         CurrentViewModel = dashboard;
         UpdateNavigationTexts();
         dashboard.OpenStorageGamesRequested += storageId => NavigateTo(Page.GameList, storageId);
@@ -98,6 +104,7 @@ public partial class MainViewModel : ObservableObject
             GameList.SetPendingGame(gameId);
             NavigateTo(Page.GameList);
         };
+        dashboard.JourneyActionRequested += page => NavigateTo(page);
         importExport.DataChanged += RefreshAll;
         health.OpenIssueRequested += OpenHealthIssue;
         scanGames.DataChanged += RefreshAll;
@@ -143,6 +150,7 @@ public partial class MainViewModel : ObservableObject
         string.Equals(lang, "en", StringComparison.OrdinalIgnoreCase) ? "EN" : "ID";
 
     public IReadOnlyList<NavItem> NavItems { get; }
+    public ICollectionView NavItemsView { get; }
     public DashboardViewModel Dashboard { get; }
     public GameListViewModel GameList { get; }
     public StorageViewModel Storage { get; }
@@ -360,6 +368,20 @@ public partial class MainViewModel : ObservableObject
     {
         LanguageLabel = GetLanguageLabel(_localization.CurrentLanguage);
         UpdateNavigationTexts();
+    }
+
+    [RelayCommand]
+    private void Undo()
+    {
+        App.Services.GetRequiredService<UndoRedoService>().Undo();
+        GameList.RefreshAsync().GetAwaiter().GetResult();
+    }
+
+    [RelayCommand]
+    private void Redo()
+    {
+        App.Services.GetRequiredService<UndoRedoService>().Redo();
+        GameList.RefreshAsync().GetAwaiter().GetResult();
     }
 
     [RelayCommand]

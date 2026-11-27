@@ -4,6 +4,23 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v3.0.0
+
+A visual and interaction overhaul: cover grid, sectioned navigation, undo and redo, a guided getting-started flow, and shared motion tokens.
+
+## New features
+
+- **Cover grid view.** Switch between the detailed table and a cover shelf with three item sizes and grouping by storage, status, favorite, or tag. Clicking a cover opens the game detail.
+- **Sectioned sidebar.** Navigation is grouped into Collection, Play, Maintain, and System with localized section headers.
+- **Undo and redo.** Adding, editing, deleting, and toggling favorites can be reversed with Ctrl+Z and repeated with Ctrl+Y.
+- **Getting started journey.** The dashboard shows five concrete steps and the single next best action, with a button that navigates there.
+
+## Improvements
+
+- **Shared design tokens.** Page motion now uses one set of duration tokens instead of scattered literal values.
+- **Calmer motion.** Page transitions are shorter and move 16 px instead of 20 px, reducing perceived lag.
+- **Grid selection.** The cover shelf keeps selection in the same view model as the table, so toolbar actions work in both views.
+
 ## v2.3.1
 
 Performance and native feel pass. No new features.

@@ -78,6 +78,7 @@ public partial class App : Application
         services.AddSingleton<IImportHistoryRepository, ImportHistoryRepository>();
         services.AddSingleton<ICapacitySnapshotRepository, CapacitySnapshotRepository>();
         services.AddSingleton<SessionTrackerService>();
+        services.AddSingleton<UndoRedoService>();
         services.AddSingleton<ExcelImporter>();
         services.AddSingleton<ExcelImportService>();
         services.AddSingleton<AppSettingsService>();

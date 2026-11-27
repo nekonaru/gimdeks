@@ -514,4 +514,23 @@ Only the game title is sent to the internet. Continue?</sys:String>
   <sys:String x:Key="Ui_Onboard_Language">Choose your language</sys:String>
   <sys:String x:Key="Ui_Onboard_Offline">Your data stays in a local SQLite file. Only the optional Steam cover search uses the network.</sys:String>
   <sys:String x:Key="Ui_Onboard_Start">Start</sys:String>
+  <sys:String x:Key="Ui_Button_ToggleView">Switch view</sys:String>
+  <sys:String x:Key="Ui_NavSection_Collection">COLLECTION</sys:String>
+  <sys:String x:Key="Ui_NavSection_Play">PLAY</sys:String>
+  <sys:String x:Key="Ui_NavSection_Maintain">MAINTAIN</sys:String>
+  <sys:String x:Key="Ui_NavSection_System">SYSTEM</sys:String>
+  <sys:String x:Key="Ui_Undo_Add">Add game</sys:String>
+  <sys:String x:Key="Ui_Undo_Edit">Edit game</sys:String>
+  <sys:String x:Key="Ui_Undo_Favorite">Toggle favorite</sys:String>
+  <sys:String x:Key="Ui_Undo_Delete">Delete {0} games</sys:String>
+  <sys:String x:Key="Ui_Journey_Title">Getting started</sys:String>
+  <sys:String x:Key="Ui_Journey_Progress">{0} of {1} steps done</sys:String>
+  <sys:String x:Key="Ui_Journey_Import">Import your Excel file</sys:String>
+  <sys:String x:Key="Ui_Journey_Covers">Add a few covers</sys:String>
+  <sys:String x:Key="Ui_Journey_Link">Link installed games</sys:String>
+  <sys:String x:Key="Ui_Journey_Favorites">Pick some favorites</sys:String>
+  <sys:String x:Key="Ui_Journey_Play">Launch and track a session</sys:String>
+  <sys:String x:Key="Ui_Journey_Next">Next: {0}</sys:String>
+  <sys:String x:Key="Ui_Journey_Done">Your library is ready. Enjoy.</sys:String>
+  <sys:String x:Key="Ui_Journey_Go">Go</sys:String>
 </ResourceDictionary>

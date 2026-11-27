@@ -4,6 +4,23 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v3.0.0
+
+Penyegaran visual dan interaksi: tampilan rak cover, navigasi bersection, undo redo, alur memoir bawaan, dan token motion terpusat.
+
+## Fitur baru
+
+- **Tampilan rak cover.** Beralih antara tabel detail dan rak cover, dengan tiga ukuran item dan pengelompokan per storage, status, favorit, atau tag. Klik cover membuka detail game.
+- **Sidebar bersection.** Navigasi dikelompokkan menjadi Koleksi, Main, Perawatan, dan Sistem dengan header berbahasa lokal.
+- **Undo dan redo.** Menambah, mengedit, menghapus, dan mengubah favorit bisa dibatalkan dengan Ctrl+Z dan diulang dengan Ctrl+Y.
+- **Alur mulai dari sini.** Dashboard menampilkan lima langkah nyata dan satu aksi berikutnya yang paling masuk akal, lengkap dengan tombol navigasi.
+
+## Peningkatan
+
+- **Token desain terpusat.** Motion halaman memakai satu set durasi, bukan nilai yang tersebar.
+- **Motion lebih tenang.** Transisi halaman lebih pendek dan bergeser 16 px, bukan 20 px, agar terasa lebih cepat.
+- **Seleksi di dua tampilan.** Rak cover memakai view model yang sama dengan tabel, sehingga aksi toolbar berjalan di keduanya.
+
 ## v2.3.1
 
 Putaran performa dan kenyamanan native. Tidak ada fitur baru.

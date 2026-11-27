@@ -79,6 +79,10 @@ GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan S
 | --- | --- |
 | **Dashboard** | Satu kartu per storage: jumlah game, total GB, sisa ruang, progress bar, dan lencana peringatan saat melebihi batas. |
 | **Daftar Game** | Tabel yang bisa diurutkan, dicari, dan difilter (status, storage, rentang ukuran) dengan virtualisasi untuk ribuan game. |
+| **Tampilan rak cover** | Beralih ke grid cover dengan pengelompokan dan detail sekali klik. |
+| **Navigasi bersection** | Koleksi, Main, Perawatan, dan Sistem membuat sidebar lebih mudah dipindai. |
+| **Undo dan redo** | Batalkan edit dengan Ctrl+Z dan ulangi dengan Ctrl+Y. |
+| **Alur mulai dari sini** | Dashboard menampilkan langkah berikutnya dari import hingga sesi main pertama. |
 | **CRUD dengan multi-pilih** | Tambah, ubah, hapus, pindah antar storage, dan ubah status dalam jumlah banyak dengan konfirmasi. |
 | **Klik dua kali untuk ubah** | Klik dua kali baris game untuk membuka editornya. |
 | **Tandai selesai secara massal** | Pilih beberapa game sekaligus dan centang flag selesai untuk semuanya, langsung dari toolbar. |
