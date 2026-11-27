@@ -562,4 +562,9 @@ Data yang dikirim ke internet hanya judul game. Lanjutkan?</sys:String>
   <sys:String x:Key="Ui_Settings_FieldName">Nama field</sys:String>
   <sys:String x:Key="Ui_Settings_AddField">Tambah field</sys:String>
   <sys:String x:Key="Ui_Settings_FieldAdded">Field ditambahkan.</sys:String>
+  <sys:String x:Key="Ui_Mini_Title">Main Cepat</sys:String>
+  <sys:String x:Key="Ui_Mini_Pick">Pilih favorit</sys:String>
+  <sys:String x:Key="Ui_Mini_NoCandidates">Tidak ada favorit dengan path executable yang valid.</sys:String>
+  <sys:String x:Key="Ui_Stats_ExportReport">Ekspor laporan</sys:String>
+  <sys:String x:Key="Ui_Stats_ReportTitle">Simpan laporan HTML</sys:String>
 </ResourceDictionary>

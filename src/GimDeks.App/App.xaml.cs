@@ -106,6 +106,7 @@ public partial class App : Application
         services.AddSingleton<BackupManagerViewModel>();
         services.AddSingleton<SettingsViewModel>();
         services.AddSingleton<ActivityViewModel>();
+        services.AddSingleton<MiniPlayerViewModel>();
 
         return services.BuildServiceProvider();
     }

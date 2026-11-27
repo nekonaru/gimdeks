@@ -4,6 +4,15 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v3.2.0
+
+Jendela main cepat dan ekspor laporan untuk menutup peta jalan visual.
+
+## Fitur baru
+
+- **Jendela Main Cepat.** Ctrl+M membuka jendela kecil always-on-top berisi game favorit dan tombol luncurkan untuk masing-masing. Tombol acak hanya mempertimbangkan favorit dengan executable lokal yang valid.
+- **Laporan HTML.** Halaman Statistik mengekspor laporan HTML yang bisa dicetak, berisi total koleksi, porsi storage, dan game terbesar.
+
 ## v3.1.0
 
 Menambah kedalaman data yang sudah disiapkan oleh tampilan v3: log aktivitas, profil peluncuran, field kustom, dan paket koleksi portabel.

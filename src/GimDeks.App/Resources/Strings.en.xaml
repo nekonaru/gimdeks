@@ -562,4 +562,9 @@ Only the game title is sent to the internet. Continue?</sys:String>
   <sys:String x:Key="Ui_Settings_FieldName">Field name</sys:String>
   <sys:String x:Key="Ui_Settings_AddField">Add field</sys:String>
   <sys:String x:Key="Ui_Settings_FieldAdded">Field added.</sys:String>
+  <sys:String x:Key="Ui_Mini_Title">Quick Play</sys:String>
+  <sys:String x:Key="Ui_Mini_Pick">Pick a favorite</sys:String>
+  <sys:String x:Key="Ui_Mini_NoCandidates">No favorite has a valid executable path.</sys:String>
+  <sys:String x:Key="Ui_Stats_ExportReport">Export report</sys:String>
+  <sys:String x:Key="Ui_Stats_ReportTitle">Save HTML report</sys:String>
 </ResourceDictionary>
