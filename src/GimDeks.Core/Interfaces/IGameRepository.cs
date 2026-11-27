@@ -9,6 +9,8 @@ public interface IGameRepository
     Task<IReadOnlyList<Game>> GetByStatusAsync(GameStatus status, CancellationToken ct = default);
     Task<Game?> GetByIdAsync(long id, CancellationToken ct = default);
     Task<long> AddAsync(Game game, CancellationToken ct = default);
+    Task<IReadOnlyList<long>> AddBatchAsync(IReadOnlyList<Game> games, CancellationToken ct = default);
+    Task UpdateSizesBatchAsync(IReadOnlyList<(long Id, double UkuranGb)> items, CancellationToken ct = default);
     Task UpdateAsync(Game game, CancellationToken ct = default);
     Task DeleteAsync(long id, CancellationToken ct = default);
     Task DeleteAllAsync(CancellationToken ct = default);

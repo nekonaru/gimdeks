@@ -42,16 +42,19 @@ public static class GameExecutableMatcher
         var usedGames = new HashSet<long>();
         var usedPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
+        // Exact pass: one dictionary lookup per game instead of rescanning all executables.
+        var byName = new Dictionary<string, ScannedExecutable>(StringComparer.OrdinalIgnoreCase);
+        foreach (var executable in scanned)
+        {
+            byName.TryAdd(executable.NormalizedName, executable);
+        }
+
         foreach (var candidate in candidates)
         {
-            var best = scanned
-                .Where(e => !usedPaths.Contains(e.Path))
-                .FirstOrDefault(e => string.Equals(e.NormalizedName, candidate.Key, StringComparison.OrdinalIgnoreCase));
-            if (best is not null)
+            if (byName.TryGetValue(candidate.Key, out var best) && usedPaths.Add(best.Path))
             {
                 exact.Add(new ExecutableMatch(candidate.Game, best, true));
                 usedGames.Add(candidate.Game.Id);
-                usedPaths.Add(best.Path);
             }
         }
 

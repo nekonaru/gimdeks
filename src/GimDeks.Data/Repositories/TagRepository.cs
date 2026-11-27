@@ -97,6 +97,47 @@ public sealed class TagRepository : ITagRepository
         return rows.ToList();
     }
 
+    public async Task<IReadOnlyDictionary<string, long>> EnsureManyAsync(IEnumerable<string> names, CancellationToken ct = default)
+    {
+        var result = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+        using var connection = _factory.CreateConnection();
+        using var transaction = connection.BeginTransaction();
+        foreach (var name in names.Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            var normalized = name.Trim();
+            if (normalized.Length == 0)
+            {
+                continue;
+            }
+            await connection.ExecuteAsync(new CommandDefinition(
+                "INSERT OR IGNORE INTO tag (nama) VALUES (@Nama);",
+                new { Nama = normalized }, transaction, cancellationToken: ct));
+            var id = await connection.QuerySingleAsync<long>(new CommandDefinition(
+                "SELECT id FROM tag WHERE nama = @Nama;",
+                new { Nama = normalized }, transaction, cancellationToken: ct));
+            result[normalized] = id;
+        }
+        transaction.Commit();
+        return result;
+    }
+
+    public async Task SetTagsForGamesBatchAsync(IReadOnlyList<(long GameId, long TagId)> pairs, CancellationToken ct = default)
+    {
+        if (pairs.Count == 0)
+        {
+            return;
+        }
+        using var connection = _factory.CreateConnection();
+        using var transaction = connection.BeginTransaction();
+        foreach (var pair in pairs)
+        {
+            await connection.ExecuteAsync(new CommandDefinition(
+                "INSERT OR IGNORE INTO game_tag (game_id, tag_id) VALUES (@GameId, @TagId);",
+                new { pair.GameId, pair.TagId }, transaction, cancellationToken: ct));
+        }
+        transaction.Commit();
+    }
+
     public async Task SetTagsForGameAsync(long gameId, IReadOnlyList<long> tagIds, CancellationToken ct = default)
     {
         using var connection = _factory.CreateConnection();

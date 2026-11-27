@@ -40,6 +40,49 @@ public sealed class GameRepository : IGameRepository
         return await connection.ExecuteScalarAsync<long>(new CommandDefinition(sql, Params(game), cancellationToken: ct));
     }
 
+    public async Task<IReadOnlyList<long>> AddBatchAsync(IReadOnlyList<Game> games, CancellationToken ct = default)
+    {
+        if (games.Count == 0)
+        {
+            return Array.Empty<long>();
+        }
+
+        using var connection = _factory.CreateConnection();
+        using var transaction = connection.BeginTransaction();
+        var ids = new List<long>(games.Count);
+        foreach (var game in games)
+        {
+            var id = await connection.ExecuteScalarAsync<long>(new CommandDefinition(
+                """
+                INSERT INTO game (nama, versi, ukuran_gb, status, storage_id, asal_storage, alasan, catatan, urutan, selesai, path_exe, dimainkan_pada, jumlah_main, favorit, rating, prioritas, folder_path, total_detik)
+                VALUES (@Nama, @Versi, @UkuranGb, @Status, @StorageId, @AsalStorage, @Alasan, @Catatan, @Urutan, @SelesaiMain, @PathExe, @DimainkanPada, @JumlahMain, @Favorit, @Rating, @Prioritas, @FolderPath, @TotalDetik);
+                SELECT last_insert_rowid();
+                """,
+                Params(game), transaction, cancellationToken: ct));
+            ids.Add(id);
+        }
+        transaction.Commit();
+        return ids;
+    }
+
+    public async Task UpdateSizesBatchAsync(IReadOnlyList<(long Id, double UkuranGb)> items, CancellationToken ct = default)
+    {
+        if (items.Count == 0)
+        {
+            return;
+        }
+
+        using var connection = _factory.CreateConnection();
+        using var transaction = connection.BeginTransaction();
+        foreach (var item in items)
+        {
+            await connection.ExecuteAsync(new CommandDefinition(
+                "UPDATE game SET ukuran_gb = @UkuranGb WHERE id = @Id;",
+                new { item.Id, item.UkuranGb }, transaction, cancellationToken: ct));
+        }
+        transaction.Commit();
+    }
+
     public async Task UpdateAsync(Game game, CancellationToken ct = default)
     {
         const string sql = """

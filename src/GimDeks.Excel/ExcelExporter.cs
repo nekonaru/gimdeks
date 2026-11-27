@@ -13,6 +13,7 @@ namespace GimDeks.Excel;
 public sealed class ExcelExporter
 {
     private static readonly CultureInfo Invariant = CultureInfo.InvariantCulture;
+    private static readonly XLColor AlternateRowColor = XLColor.FromArgb(242, 245, 244);
 
     public void Export(string filePath, IReadOnlyList<Storage> storages, IReadOnlyList<Game> games)
     {
@@ -130,7 +131,7 @@ public sealed class ExcelExporter
             sheet.Cell(row, 4).Value = TextForStatus(game.Status);
             if (index % 2 == 1)
             {
-                sheet.Range(row, 1, row, 4).Style.Fill.BackgroundColor = XLColor.FromArgb(242, 245, 244);
+                sheet.Range(row, 1, row, 4).Style.Fill.BackgroundColor = AlternateRowColor;
             }
         }
 

@@ -195,10 +195,10 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
             var today = DateTime.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             if (!snapshots.Any(s => s.Tanggal.StartsWith(today, StringComparison.Ordinal)))
             {
-                foreach (var card in Storages)
-                {
-                    await _snapshots.AddAsync(card.Storage.Id, card.GameCount, card.TotalGb);
-                }
+                var items = Storages
+                    .Select(card => (card.Storage.Id, card.GameCount, card.TotalGb))
+                    .ToList();
+                await Task.Run(() => _snapshots.AddBatchAsync(items));
             }
 
             var latest = snapshots.OrderByDescending(s => s.Tanggal).FirstOrDefault();

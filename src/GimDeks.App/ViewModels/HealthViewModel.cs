@@ -70,6 +70,9 @@ public partial class HealthViewModel : ObservableObject, IRefreshable
         var storages = await _storages.GetAllAsync();
         var driveLinks = await _links.GetAllAsync();
         var readyDrives = _driveService.GetReadyDriveLetters();
+        var driveByLetter = _driveService.GetReadyDrives()
+            .ToDictionary(d => d.Letter, StringComparer.OrdinalIgnoreCase);
+        var threshold = _settings.Load().LowSpaceThresholdGb;
 
         Issues.Clear();
 
@@ -112,8 +115,7 @@ public partial class HealthViewModel : ObservableObject, IRefreshable
 
             if (!string.IsNullOrWhiteSpace(letter))
             {
-                var drive = _driveService.FindDrive(letter);
-                var threshold = _settings.Load().LowSpaceThresholdGb;
+                driveByLetter.TryGetValue(letter, out var drive);
                 if (drive is not null && threshold is { } limit)
                 {
                     var freeGb = drive.FreeBytes / 1024.0 / 1024.0 / 1024.0;

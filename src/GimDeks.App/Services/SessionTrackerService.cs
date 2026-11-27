@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Windows.Threading;
 using GimDeks.Core.Interfaces;
 using GimDeks.Core.Models;
 
@@ -8,14 +7,14 @@ namespace GimDeks.App.Services;
 /// <summary>
 /// Launches a validated local executable and records a play session until the
 /// process exits. Only a process this service started is ever tracked.
+/// Process waiting and database writes run off the UI thread.
 /// </summary>
 public sealed class SessionTrackerService
 {
-    private sealed record ActiveSession(Process Process, long SessionId, DateTime Started);
+    private sealed record ActiveSession(CancellationTokenSource Cancellation);
 
     private readonly IPlaySessionRepository _sessions;
     private readonly IGameRepository _games;
-    private readonly DispatcherTimer _timer;
     private readonly Dictionary<long, ActiveSession> _active = new();
 
     public event Action? SessionEnded;
@@ -24,8 +23,6 @@ public sealed class SessionTrackerService
     {
         _sessions = sessions;
         _games = games;
-        _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        _timer.Tick += OnTick;
     }
 
     public bool IsRunning(long gameId) => _active.ContainsKey(gameId);
@@ -37,69 +34,69 @@ public sealed class SessionTrackerService
             return false;
         }
 
-        var process = GameLauncherService.LaunchAndGetProcess(game.PathExe);
+        var process = await Task.Run(() => GameLauncherService.LaunchAndGetProcess(game.PathExe));
         if (process is null)
         {
             return false;
         }
 
-        var sessionId = await _sessions.StartAsync(game.Id, "launcher");
-        _active[game.Id] = new ActiveSession(process, sessionId, DateTime.UtcNow);
+        var sessionId = await Task.Run(() => _sessions.StartAsync(game.Id, "launcher"));
         game.JumlahMain += 1;
         game.DimainkanPada = DateTime.UtcNow;
-        await _games.UpdateAsync(game);
-        if (!_timer.IsEnabled)
-        {
-            _timer.Start();
-        }
+        await Task.Run(() => _games.UpdateAsync(game));
+
+        var cancellation = new CancellationTokenSource();
+        _active[game.Id] = new ActiveSession(cancellation);
+        _ = TrackAsync(game.Id, process, sessionId, cancellation.Token);
         return true;
     }
 
-    public async Task CloseOpenSessionsAsync()
+    private async Task TrackAsync(long gameId, Process process, long sessionId, CancellationToken token)
     {
-        _timer.Stop();
-        foreach (var session in _active.Values)
+        try
         {
-            try { session.Process.Dispose(); } catch { /* best effort */ }
-        }
-        _active.Clear();
-        await _sessions.CloseOpenSessionsAsync();
-    }
-
-    private async void OnTick(object? sender, EventArgs e)
-    {
-        foreach (var pair in _active.ToArray())
-        {
-            var active = pair.Value;
-            if (!active.Process.HasExited)
+            await process.WaitForExitAsync(token).ConfigureAwait(false);
+            if (token.IsCancellationRequested)
             {
-                continue;
+                return;
             }
 
-            var seconds = Math.Max(1, (int)(DateTime.UtcNow - active.Started).TotalSeconds);
-            try
+            var seconds = Math.Max(1, (int)(DateTime.UtcNow - process.StartTime.ToUniversalTime()).TotalSeconds);
+            await Task.Run(async () =>
             {
-                await _sessions.EndAsync(active.SessionId, seconds);
-                var game = await _games.GetByIdAsync(pair.Key);
+                await _sessions.EndAsync(sessionId, seconds);
+                var game = await _games.GetByIdAsync(gameId);
                 if (game is not null)
                 {
                     game.TotalDetik += seconds;
                     await _games.UpdateAsync(game);
                 }
-            }
-            catch (Exception exception)
-            {
-                CrashLog.Write(exception);
-            }
-
-            _active.Remove(pair.Key);
-            try { active.Process.Dispose(); } catch { /* best effort */ }
+            }, token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            // App is closing; the open session is closed by CloseOpenSessionsAsync.
+        }
+        catch (Exception exception)
+        {
+            CrashLog.Write(exception);
+        }
+        finally
+        {
+            _active.Remove(gameId);
+            try { process.Dispose(); } catch { /* best effort */ }
             SessionEnded?.Invoke();
         }
+    }
 
-        if (_active.Count == 0)
+    public async Task CloseOpenSessionsAsync()
+    {
+        foreach (var session in _active.Values)
         {
-            _timer.Stop();
+            session.Cancellation.Cancel();
+            session.Cancellation.Dispose();
         }
+        _active.Clear();
+        await Task.Run(() => _sessions.CloseOpenSessionsAsync());
     }
 }

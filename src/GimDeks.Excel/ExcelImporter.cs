@@ -323,10 +323,11 @@ public sealed partial class ExcelImporter
             double uk = 0;
             if (ukuranCol is { } ukCol)
             {
-                var raw = ReadNumber(workbook, worksheet.Cell(row, ukCol));
-                if (raw is null && !worksheet.Cell(row, ukCol).IsEmpty())
+                var ukCell = worksheet.Cell(row, ukCol);
+                var raw = ReadNumber(workbook, ukCell);
+                if (raw is null && !ukCell.IsEmpty())
                 {
-                    warnings.Add($"Sheet {sheetName} row {row}: size \"{worksheet.Cell(row, ukCol).GetString().Trim()}\" could not be read; treated as 0.");
+                    warnings.Add($"Sheet {sheetName} row {row}: size \"{ukCell.GetString().Trim()}\" could not be read; treated as 0.");
                 }
 
                 uk = raw ?? 0;
@@ -373,7 +374,7 @@ public sealed partial class ExcelImporter
                 }
 
                 // Formulas were recalculated once at preview start; never per cell.
-                return ToDouble(cell.CachedValue) ?? ToDouble(cell.Value);
+                return ToDouble(cell.Value);
             }
 
             return ToDouble(cell.Value);

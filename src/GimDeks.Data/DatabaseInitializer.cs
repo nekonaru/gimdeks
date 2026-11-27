@@ -143,6 +143,12 @@ public sealed class DatabaseInitializer
         """
         ALTER TABLE storage ADD COLUMN grup TEXT;
         """,
+
+        // 6: history lookup indexes
+        """
+        CREATE INDEX ix_riwayat_dari ON riwayat(dari_storage_id);
+        CREATE INDEX ix_riwayat_ke ON riwayat(ke_storage_id);
+        """,
     };
 
     private readonly SqliteConnectionFactory _factory;

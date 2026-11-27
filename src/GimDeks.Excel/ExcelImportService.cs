@@ -43,26 +43,35 @@ public sealed class ExcelImportService
     public ImportPreview Preview(string filePath)
     {
         var info = new FileInfo(filePath);
-        var hash = ComputeHash(filePath);
         lock (_previewLock)
         {
             if (_cachedPreview is not null
                 && string.Equals(_cachedPreviewPath, filePath, StringComparison.OrdinalIgnoreCase)
                 && _cachedPreviewLength == info.Length
-                && _cachedPreviewWriteUtc == info.LastWriteTimeUtc
-                && string.Equals(_cachedPreviewHash, hash, StringComparison.Ordinal))
+                && _cachedPreviewWriteUtc == info.LastWriteTimeUtc)
             {
-                return _cachedPreview;
+                // Metadata alone can be preserved by a rewrite, so only now hash the file.
+                var hash = ComputeHash(filePath);
+                if (string.Equals(_cachedPreviewHash, hash, StringComparison.Ordinal))
+                {
+                    return _cachedPreview;
+                }
+                return RefreshPreview(filePath, info, hash);
             }
 
-            var preview = _importer.Preview(filePath);
-            _cachedPreviewPath = filePath;
-            _cachedPreviewLength = info.Length;
-            _cachedPreviewWriteUtc = info.LastWriteTimeUtc;
-            _cachedPreviewHash = hash;
-            _cachedPreview = preview;
-            return preview;
+            return RefreshPreview(filePath, info, ComputeHash(filePath));
         }
+    }
+
+    private ImportPreview RefreshPreview(string filePath, FileInfo info, string hash)
+    {
+        var preview = _importer.Preview(filePath);
+        _cachedPreviewPath = filePath;
+        _cachedPreviewLength = info.Length;
+        _cachedPreviewWriteUtc = info.LastWriteTimeUtc;
+        _cachedPreviewHash = hash;
+        _cachedPreview = preview;
+        return preview;
     }
 
     private static string ComputeHash(string filePath)
@@ -91,8 +100,8 @@ public sealed class ExcelImportService
         var existing = (await gameRepo.GetAllAsync(ct))
             .ToDictionary(g => (GameNameNormalizer.Normalize(g.Nama), g.StorageId), g => g);
 
-        var added = 0;
-        var updated = 0;
+        var newGames = new List<Game>();
+        var sizeUpdates = new List<(long Id, double UkuranGb)>();
         foreach (var previewGame in preview.Games)
         {
             var game = previewGame.Game;
@@ -106,23 +115,22 @@ public sealed class ExcelImportService
             {
                 if (Math.Abs(current.UkuranGb - game.UkuranGb) > 0.001)
                 {
-                    current.UkuranGb = game.UkuranGb;
-                    await gameRepo.UpdateAsync(current, ct);
-                    updated++;
+                    sizeUpdates.Add((current.Id, game.UkuranGb));
                 }
                 continue;
             }
-
-            await gameRepo.AddAsync(game, ct);
-            added++;
+            newGames.Add(game);
         }
+
+        await gameRepo.AddBatchAsync(newGames, ct);
+        await gameRepo.UpdateSizesBatchAsync(sizeUpdates, ct);
 
         ClearPreviewCache();
         return new ImportResult
         {
             StoragesAdded = 0,
-            GamesAdded = added,
-            GamesSkippedAsDuplicate = updated,
+            GamesAdded = newGames.Count,
+            GamesSkippedAsDuplicate = sizeUpdates.Count,
             Ringkasan = preview.Ringkasan,
             BackupPath = backupPath,
         };
