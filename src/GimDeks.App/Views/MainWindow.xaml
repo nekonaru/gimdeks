@@ -35,6 +35,8 @@
         <KeyBinding Modifiers="Ctrl" Key="D8" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.ImportExport}" />
         <KeyBinding Modifiers="Ctrl" Key="D9" Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:Page.Statistics}" />
         <KeyBinding Modifiers="Ctrl" Key="P" Command="{Binding OpenPaletteCommand}" />
+        <KeyBinding Modifiers="Ctrl" Key="Z" Command="{Binding UndoCommand}" />
+        <KeyBinding Modifiers="Ctrl" Key="Y" Command="{Binding RedoCommand}" />
     </Window.InputBindings>
 
     <Window.Resources>
@@ -109,7 +111,7 @@
                 </StackPanel>
 
                 <ListBox Grid.Row="1"
-                         ItemsSource="{Binding NavItems}"
+                         ItemsSource="{Binding NavItemsView}"
                          SelectedValue="{Binding CurrentPage, Mode=OneWay}"
                          SelectedValuePath="Page"
                          SelectionChanged="NavList_OnSelectionChanged"
@@ -118,6 +120,17 @@
                          HorizontalContentAlignment="Stretch"
                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                          ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name, Converter={StaticResource LocKeyConverter}}"
+                                               FontSize="10" FontWeight="SemiBold" Opacity="0.5"
+                                               Margin="14,12,0,4" />
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </ListBox.GroupStyle>
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="8,1">

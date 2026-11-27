@@ -89,6 +89,19 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
     [ObservableProperty]
     private string _trendText = "";
 
+    [ObservableProperty]
+    private double _journeyFraction;
+
+    [ObservableProperty]
+    private string _journeyProgressText = "";
+
+    [ObservableProperty]
+    private string _journeyNextText = "";
+
+    private Page _journeyNextPage = Page.Dashboard;
+
+    public event Action<Page>? JourneyActionRequested;
+
     public DashboardViewModel(IStorageRepository storageRepository, IGameRepository gameRepository, IDriveLinkRepository driveLinks, Services.DriveService driveService, ICapacitySnapshotRepository snapshots)
     {
         _storageRepository = storageRepository;
@@ -184,7 +197,31 @@ public partial class DashboardViewModel : ObservableObject, IRefreshable
             games.Count(g => g.SelesaiMain));
         HasAnyGames = games.Count > 0;
         StatusText = Services.Loc.Format("Ui_Dashboard_StorageCount", Storages.Count);
+        UpdateJourney(games);
         await UpdateTrendAsync(totalGb);
+    }
+
+    [RelayCommand]
+    private void RunJourneyNext() => JourneyActionRequested?.Invoke(_journeyNextPage);
+
+    private void UpdateJourney(IReadOnlyList<Game> games)
+    {
+        var checks = new (bool Done, string Label, Page Page)[]
+        {
+            (Storages.Count > 0, Services.Loc.Get("Ui_Journey_Import"), Page.ImportExport),
+            (games.Any(g => Services.SteamCoverService.FindCoverPath(g.Id) is not null), Services.Loc.Get("Ui_Journey_Covers"), Page.GameList),
+            (games.Any(g => !string.IsNullOrWhiteSpace(g.PathExe)), Services.Loc.Get("Ui_Journey_Link"), Page.ScanGames),
+            (games.Any(g => g.Favorit), Services.Loc.Get("Ui_Journey_Favorites"), Page.GameList),
+            (games.Any(g => g.JumlahMain > 0), Services.Loc.Get("Ui_Journey_Play"), Page.Dashboard),
+        };
+        var completed = checks.Count(c => c.Done);
+        JourneyFraction = completed / (double)checks.Length;
+        JourneyProgressText = Services.Loc.Format("Ui_Journey_Progress", completed, checks.Length);
+        var next = checks.FirstOrDefault(c => !c.Done);
+        _journeyNextPage = next == default ? Page.Dashboard : next.Page;
+        JourneyNextText = next == default
+            ? Services.Loc.Get("Ui_Journey_Done")
+            : Services.Loc.Format("Ui_Journey_Next", next.Label);
     }
 
     private async Task UpdateTrendAsync(double totalGb)

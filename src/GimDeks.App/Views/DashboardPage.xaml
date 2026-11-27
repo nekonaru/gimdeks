@@ -30,6 +30,24 @@
                 </Border>
             </StackPanel>
 
+            <Border Background="{StaticResource GimDeksCard}" CornerRadius="14" Padding="18" Margin="0,0,0,20">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="{DynamicResource Ui_Journey_Title}" FontSize="16" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding JourneyNextText}" Opacity="0.8" Margin="0,4,0,8" />
+                        <TextBlock Text="{Binding JourneyProgressText}" FontSize="11" Opacity="0.55" />
+                        <ProgressBar Height="6" Margin="0,8,0,0" Maximum="1"
+                                     Value="{Binding JourneyFraction}" Foreground="{StaticResource GimDeksTileTeal}" />
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="{DynamicResource Ui_Journey_Go}" Style="{StaticResource MaterialDesignRaisedButton}"
+                            Command="{Binding RunJourneyNextCommand}" VerticalAlignment="Center" Margin="16,0,0,0" />
+                </Grid>
+            </Border>
+
             <Border Background="{StaticResource GimDeksCardGradient}" CornerRadius="14" Padding="18" Margin="0,0,0,20"
                     Visibility="{Binding HasAnyGames, Converter={StaticResource BooleanToVisibilityConverter}}"
                     BorderThickness="0,1,0,0" BorderBrush="{StaticResource GimDeksTileTeal}">

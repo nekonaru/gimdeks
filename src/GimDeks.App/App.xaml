@@ -66,8 +66,8 @@
                     <EventTrigger RoutedEvent="Loaded">
                         <BeginStoryboard>
                             <Storyboard>
-                                <DoubleAnimation Duration="0:0:0.22" From="0" To="1" Storyboard.TargetProperty="Opacity" />
-                                <DoubleAnimation Duration="0:0:0.25" From="20" To="0" Storyboard.TargetProperty="RenderTransform.Y" />
+                                <DoubleAnimation Duration="{x:Static views:Motion.Page}" From="0" To="1" Storyboard.TargetProperty="Opacity" />
+                                <DoubleAnimation Duration="{x:Static views:Motion.Page}" From="16" To="0" Storyboard.TargetProperty="RenderTransform.Y" />
                             </Storyboard>
                         </BeginStoryboard>
                     </EventTrigger>

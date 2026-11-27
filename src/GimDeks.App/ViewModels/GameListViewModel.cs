@@ -63,6 +63,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     private readonly Services.SessionTrackerService _sessionTracker;
     private readonly IFilterPresetRepository _presets;
     private readonly IGameNoteRepository _notes;
+    private readonly Services.UndoRedoService _undo;
     private Dictionary<long, string> _notesByGame = new();
     private string _noteQuery = "";
     private bool _regexSearch;
@@ -111,9 +112,12 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     partial void OnSelectedPresetChanged(FilterPreset? value) => _ = ApplyPresetAsync(value);
 
     [ObservableProperty]
+    private bool _isGridView;
+
+    [ObservableProperty]
     private string _statusText = "";
 
-    public GameListViewModel(IGameRepository gameRepository, IStorageRepository storageRepository, ITagRepository tagRepository, Services.SessionTrackerService sessionTracker, IFilterPresetRepository presets, IGameNoteRepository notes)
+    public GameListViewModel(IGameRepository gameRepository, IStorageRepository storageRepository, ITagRepository tagRepository, Services.SessionTrackerService sessionTracker, IFilterPresetRepository presets, IGameNoteRepository notes, Services.UndoRedoService undo)
     {
         _gameRepository = gameRepository;
         _storageRepository = storageRepository;
@@ -121,6 +125,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         _sessionTracker = sessionTracker;
         _presets = presets;
         _notes = notes;
+        _undo = undo;
         _filterDebounce.Tick += OnFilterDebounceTick;
         StatusOptions = new[]
         {
@@ -675,9 +680,43 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         }
     }
 
+    private static Game Clone(Game game) => new()
+    {
+        Id = game.Id,
+        Nama = game.Nama,
+        Versi = game.Versi,
+        UkuranGb = game.UkuranGb,
+        Status = game.Status,
+        StorageId = game.StorageId,
+        AsalStorage = game.AsalStorage,
+        Alasan = game.Alasan,
+        Catatan = game.Catatan,
+        Urutan = game.Urutan,
+        DibuatPada = game.DibuatPada,
+        PathExe = game.PathExe,
+        DimainkanPada = game.DimainkanPada,
+        JumlahMain = game.JumlahMain,
+        Favorit = game.Favorit,
+        Rating = game.Rating,
+        Prioritas = game.Prioritas,
+        FolderPath = game.FolderPath,
+        TotalDetik = game.TotalDetik,
+        SelesaiMain = game.SelesaiMain,
+    };
+
+    private void PushGameUndo(string label, Game before, Game after)
+    {
+        _undo.Push(label,
+            () => { _gameRepository.UpdateAsync(Clone(before)).GetAwaiter().GetResult(); ReloadAsync().GetAwaiter().GetResult(); },
+            () => { _gameRepository.UpdateAsync(Clone(after)).GetAwaiter().GetResult(); ReloadAsync().GetAwaiter().GetResult(); });
+    }
+
     public async Task SaveFavoritAsync(GameRow row)
     {
+        var before = Clone(row.Game);
         await _gameRepository.UpdateAsync(row.Game);
+        var after = Clone(row.Game);
+        PushGameUndo(Services.Loc.Get("Ui_Undo_Favorite"), before, after);
     }
 
     [RelayCommand]
@@ -746,6 +785,24 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             Services.CrashLog.Write(exception);
             StatusText = Services.Loc.Format("Ui_GameList_ExportFailed", exception.Message);
         }
+    }
+
+    [RelayCommand]
+    private void ToggleView()
+    {
+        IsGridView = !IsGridView;
+    }
+
+    [RelayCommand]
+    private void OpenGame(GameRow? row)
+    {
+        if (row is null)
+        {
+            return;
+        }
+        SelectedRows.Clear();
+        SelectedRows.Add(row);
+        OpenDetail();
     }
 
     [RelayCommand]
@@ -852,6 +909,11 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
 
         var id = await _gameRepository.AddAsync(game);
         await SaveTagsAsync(id, dialog.ResultTagText);
+        var added = Clone(game);
+        added.Id = id;
+        _undo.Push(Services.Loc.Get("Ui_Undo_Add"),
+            () => { _gameRepository.DeleteAsync(id).GetAwaiter().GetResult(); ReloadAsync().GetAwaiter().GetResult(); },
+            () => { _gameRepository.AddAsync(Clone(added)).GetAwaiter().GetResult(); ReloadAsync().GetAwaiter().GetResult(); });
         await ReloadAsync();
     }
 
@@ -872,10 +934,12 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             return;
         }
 
+        var before = Clone(original);
         game.Id = original.Id;
         game.DibuatPada = original.DibuatPada;
         await _gameRepository.UpdateAsync(game);
         await SaveTagsAsync(game.Id, dialog.ResultTagText);
+        PushGameUndo(Services.Loc.Get("Ui_Undo_Edit"), before, Clone(game));
         await ReloadAsync();
     }
 
@@ -909,11 +973,15 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             return;
         }
 
+        var deleted = SelectedRows.Select(r => Clone(r.Game)).ToList();
         foreach (var row in SelectedRows.ToList())
         {
             await _gameRepository.DeleteAsync(row.Game.Id);
         }
 
+        _undo.Push(Services.Loc.Format("Ui_Undo_Delete", deleted.Count),
+            () => { _gameRepository.AddBatchAsync(deleted).GetAwaiter().GetResult(); ReloadAsync().GetAwaiter().GetResult(); },
+            () => { foreach (var game in deleted) { var current = _allGames.FirstOrDefault(g => g.Nama == game.Nama && g.StorageId == game.StorageId); if (current is not null) _gameRepository.DeleteAsync(current.Id).GetAwaiter().GetResult(); } ReloadAsync().GetAwaiter().GetResult(); });
         await ReloadAsync();
     }
 
