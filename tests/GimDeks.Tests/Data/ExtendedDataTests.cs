@@ -24,11 +24,13 @@ public sealed class ExtendedDataTests : IDisposable
 
         using var connection = factory.CreateConnection();
         var version = connection.ExecuteScalar<long>("PRAGMA user_version;");
-        Assert.Equal(4, version);
+        Assert.Equal(5, version);
 
         var tables = connection.Query<string>(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('sesi_main','catatan_game','gambar_game','preset_filter','histori_import','snapshot_kapasitas');").ToList();
         Assert.Equal(6, tables.Count);
+        var columns = connection.Query<string>("SELECT name FROM pragma_table_info('storage');").ToList();
+        Assert.Contains("grup", columns);
         Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
     }
 

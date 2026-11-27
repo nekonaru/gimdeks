@@ -121,6 +121,10 @@
                         ToolTip="{DynamicResource Ui_Button_DownloadCoverTooltip}" />
                 <Button Content="{DynamicResource Ui_Button_Delete}" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding DeleteGamesCommand}" IsEnabled="{Binding HasSelection}" Foreground="#FF8A8A" BorderBrush="#FF8A8A" />
+                <Button Content="{DynamicResource Ui_GameList_ExportSelectedXlsx}" Style="{StaticResource MaterialDesignFlatButton}"
+                        Command="{Binding ExportSelectedExcelCommand}" IsEnabled="{Binding HasSelection}" Padding="8,3" />
+                <Button Content="{DynamicResource Ui_GameList_ExportSelectedCsv}" Style="{StaticResource MaterialDesignFlatButton}"
+                        Command="{Binding ExportSelectedCsvCommand}" IsEnabled="{Binding HasSelection}" Padding="8,3" />
             </StackPanel>
         </StackPanel>
 

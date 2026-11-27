@@ -65,6 +65,9 @@ public partial class ImportExportViewModel : ObservableObject
     [ObservableProperty]
     private string _previewSummary = "";
 
+    [ObservableProperty]
+    private string _diffText = "";
+
     public bool CanRun => !IsBusy;
 
     partial void OnIsBusyChanged(bool value) => NotifyCanExecuteChangedForAll();
@@ -74,7 +77,10 @@ public partial class ImportExportViewModel : ObservableObject
         BrowseCommand.NotifyCanExecuteChanged();
         PreviewCommand.NotifyCanExecuteChanged();
         ImportCommand.NotifyCanExecuteChanged();
+        PreviewDiffCommand.NotifyCanExecuteChanged();
+        ImportIncrementalCommand.NotifyCanExecuteChanged();
         ImportCsvCommand.NotifyCanExecuteChanged();
+        CreateTemplateCommand.NotifyCanExecuteChanged();
         ExportCommand.NotifyCanExecuteChanged();
         ExportCsvCommand.NotifyCanExecuteChanged();
         BackupCommand.NotifyCanExecuteChanged();
@@ -213,6 +219,65 @@ public partial class ImportExportViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(CanRun))]
+    private async Task PreviewDiffAsync()
+    {
+        if (!EnsureFile())
+        {
+            return;
+        }
+
+        IsBusy = true;
+        try
+        {
+            var (newCount, changedCount) = await _importService.DiffAsync(FilePath);
+            DiffText = Services.Loc.Format("Ui_Import_Diff", newCount, changedCount);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRun))]
+    private async Task ImportIncrementalAsync()
+    {
+        if (!EnsureFile())
+        {
+            return;
+        }
+
+        if (!DialogService.Confirm(Services.Loc.Get("Ui_Import_Title"), Services.Loc.Get("Ui_Import_IncrementalConfirm")))
+        {
+            return;
+        }
+
+        IsBusy = true;
+        try
+        {
+            var result = await _importService.ImportIncrementalAsync(FilePath);
+            _settings.SaveLastImportedPath(FilePath);
+            await _history.AddAsync(FilePath, "Inkremental", System.Text.Json.JsonSerializer.Serialize(new
+            {
+                result.GamesAdded,
+                result.GamesSkippedAsDuplicate,
+            }));
+            await LoadHistoryAsync();
+            StatusText = Services.Loc.Format("Ui_Import_IncrementalDone", result.GamesAdded, result.GamesSkippedAsDuplicate);
+            DiffText = "";
+            DataChanged?.Invoke();
+            await PreviewAsync();
+        }
+        catch (Exception exception)
+        {
+            StatusText = Services.Loc.Format("Ui_Import_ImportFailed", exception.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRun))]
     private async Task ImportAsync()
     {
         if (!EnsureFile())
@@ -257,6 +322,31 @@ public partial class ImportExportViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRun))]
+    private void CreateTemplate()
+    {
+        var dialog = new SaveFileDialog
+        {
+            Filter = "Excel (*.xlsx)|*.xlsx",
+            FileName = "Koleksi Game Template.xlsx",
+            Title = Services.Loc.Get("Ui_Import_TemplateTitle"),
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        try
+        {
+            ExcelTemplateService.Create(dialog.FileName);
+            StatusText = Services.Loc.Get("Ui_Import_TemplateCreated");
+        }
+        catch (Exception exception)
+        {
+            StatusText = Services.Loc.Format("Ui_Import_ImportFailed", exception.Message);
         }
     }
 

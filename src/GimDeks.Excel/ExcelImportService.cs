@@ -17,6 +17,7 @@ public sealed class ExcelImportService
     private readonly ExcelImporter _importer;
     private readonly SqliteConnectionFactory _factory;
     private readonly IStorageRepository _storageRepository;
+    private readonly IGameRepository? _gameRepository;
     private readonly DatabaseBackupService _backup;
     private readonly object _previewLock = new();
     private string? _cachedPreviewPath;
@@ -29,11 +30,13 @@ public sealed class ExcelImportService
         ExcelImporter importer,
         SqliteConnectionFactory factory,
         IStorageRepository storageRepository,
-        DatabaseBackupService backup)
+        DatabaseBackupService backup,
+        IGameRepository? gameRepository = null)
     {
         _importer = importer;
         _factory = factory;
         _storageRepository = storageRepository;
+        _gameRepository = gameRepository;
         _backup = backup;
     }
 
@@ -73,6 +76,85 @@ public sealed class ExcelImportService
         {
             return string.Empty;
         }
+    }
+
+    /// <summary>
+    /// Adds only games that are not in the database yet and refreshes the size
+    /// of games that are already present. No delete, no overwrite of notes.
+    /// </summary>
+    public async Task<ImportResult> ImportIncrementalAsync(string filePath, CancellationToken ct = default)
+    {
+        var gameRepo = _gameRepository ?? throw new InvalidOperationException("A game repository is required for incremental import.");
+        var preview = Preview(filePath);
+        var backupPath = await _backup.BackupAsync(ct);
+        var storages = (await _storageRepository.GetAllAsync(ct)).ToDictionary(s => s.Nama, s => s.Id, StringComparer.OrdinalIgnoreCase);
+        var existing = (await gameRepo.GetAllAsync(ct))
+            .ToDictionary(g => (GameNameNormalizer.Normalize(g.Nama), g.StorageId), g => g);
+
+        var added = 0;
+        var updated = 0;
+        foreach (var previewGame in preview.Games)
+        {
+            var game = previewGame.Game;
+            if (!storages.TryGetValue(previewGame.SheetName, out var storageId))
+            {
+                continue;
+            }
+            game.StorageId = storageId;
+            var key = (GameNameNormalizer.Normalize(game.Nama), (long?)storageId);
+            if (existing.TryGetValue(key, out var current))
+            {
+                if (Math.Abs(current.UkuranGb - game.UkuranGb) > 0.001)
+                {
+                    current.UkuranGb = game.UkuranGb;
+                    await gameRepo.UpdateAsync(current, ct);
+                    updated++;
+                }
+                continue;
+            }
+
+            await gameRepo.AddAsync(game, ct);
+            added++;
+        }
+
+        ClearPreviewCache();
+        return new ImportResult
+        {
+            StoragesAdded = 0,
+            GamesAdded = added,
+            GamesSkippedAsDuplicate = updated,
+            Ringkasan = preview.Ringkasan,
+            BackupPath = backupPath,
+        };
+    }
+
+    /// <summary>Preview how many rows an incremental import would add or update.</summary>
+    public async Task<(int NewCount, int ChangedCount)> DiffAsync(string filePath, CancellationToken ct = default)
+    {
+        var gameRepo = _gameRepository ?? throw new InvalidOperationException("A game repository is required for diff preview.");
+        var preview = Preview(filePath);
+        var storages = (await _storageRepository.GetAllAsync(ct)).ToDictionary(s => s.Nama, s => s.Id, StringComparer.OrdinalIgnoreCase);
+        var existing = (await gameRepo.GetAllAsync(ct))
+            .ToDictionary(g => (GameNameNormalizer.Normalize(g.Nama), g.StorageId), g => g);
+        var newCount = 0;
+        var changed = 0;
+        foreach (var row in preview.Games)
+        {
+            if (!storages.TryGetValue(row.SheetName, out var storageId))
+            {
+                continue;
+            }
+            var key = (GameNameNormalizer.Normalize(row.Game.Nama), (long?)storageId);
+            if (!existing.TryGetValue(key, out var current))
+            {
+                newCount++;
+            }
+            else if (Math.Abs(current.UkuranGb - row.Game.UkuranGb) > 0.001)
+            {
+                changed++;
+            }
+        }
+        return (newCount, changed);
     }
 
     private void ClearPreviewCache()

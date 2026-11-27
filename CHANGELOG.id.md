@@ -4,6 +4,25 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v2.3.0
+
+Menuntaskan peta jalan dengan pengaturan, import inkremental, ekspor seleksi, dan wizard pertama kali.
+
+## Fitur baru
+
+- **Halaman Pengaturan.** Atur peringatan ruang kosong rendah, retensi backup 1 sampai 200, tema, dan bahasa dari satu halaman.
+- **Import inkremental.** Bandingkan file Excel dengan database sebelum menulis. Lihat berapa game baru dan berapa ukuran yang berubah, lalu import hanya game baru dan perbarui ukuran tanpa menyentuh catatan atau status.
+- **Ekspor seleksi.** Ekspor hanya game yang dipilih ke Excel atau CSV dari daftar game.
+- **Template Excel kosong.** Buat workbook kosong dengan layout GimDeks.
+- **Wizard pertama kali.** Pilih Bahasa Indonesia atau English saat aplikasi pertama dibuka. Hanya muncul sekali dan diingat.
+- **Grup storage.** Beri label grup pada tiap storage dan edit di halaman Storage.
+
+## Peningkatan
+
+- **Retensi bisa diatur.** Batas pembersihan backup kini mengikuti pengaturan, bukan konstanta tetap.
+- **Pemeriksaan ruang rendah.** Drive tertaut di bawah ambang ruang kosong yang diatur muncul di Pemeriksaan dengan tautan langsung ke Storage.
+- **Halaman Backup diperbaiki.** Navigasi Backup kini menampilkan halamannya, bukan area kosong.
+
 ## v2.2.0
 
 Import CSV kembali ke GimDeks dan lihat perubahan kapasitas dari waktu ke waktu.

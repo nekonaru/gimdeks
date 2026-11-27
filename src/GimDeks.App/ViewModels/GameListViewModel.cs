@@ -6,6 +6,7 @@ using GimDeks.App.Services;
 using GimDeks.Core.Interfaces;
 using GimDeks.Core.Models;
 using GimDeks.Core.Rules;
+using GimDeks.Excel;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GimDeks.App.ViewModels;
@@ -647,6 +648,72 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     public async Task SaveFavoritAsync(GameRow row)
     {
         await _gameRepository.UpdateAsync(row.Game);
+    }
+
+    [RelayCommand]
+    private async Task ExportSelectedExcelAsync()
+    {
+        if (SelectedRows.Count == 0)
+        {
+            StatusText = Services.Loc.Get("Ui_GameList_SelectOneToLaunch");
+            return;
+        }
+
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            Filter = "Excel (*.xlsx)|*.xlsx",
+            FileName = "gimdeks-selection.xlsx",
+            Title = Services.Loc.Get("Ui_GameList_ExportSelected"),
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        try
+        {
+            var storages = await _storageRepository.GetAllAsync();
+            new ExcelExporter().Export(dialog.FileName, storages.ToList(), SelectedRows.Select(r => r.Game).ToList());
+            StatusText = Services.Loc.Format("Ui_GameList_Exported", SelectedRows.Count);
+        }
+        catch (Exception exception)
+        {
+            Services.CrashLog.Write(exception);
+            StatusText = Services.Loc.Format("Ui_GameList_ExportFailed", exception.Message);
+        }
+    }
+
+    [RelayCommand]
+    private async Task ExportSelectedCsvAsync()
+    {
+        if (SelectedRows.Count == 0)
+        {
+            StatusText = Services.Loc.Get("Ui_GameList_SelectOneToLaunch");
+            return;
+        }
+
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            Filter = "CSV (*.csv)|*.csv",
+            FileName = "gimdeks-selection.csv",
+            Title = Services.Loc.Get("Ui_GameList_ExportSelected"),
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        try
+        {
+            var exporter = App.Services.GetRequiredService<CsvExporter>();
+            await exporter.ExportSelectedAsync(dialog.FileName, SelectedRows.Select(r => r.Game).ToList());
+            StatusText = Services.Loc.Format("Ui_GameList_Exported", SelectedRows.Count);
+        }
+        catch (Exception exception)
+        {
+            Services.CrashLog.Write(exception);
+            StatusText = Services.Loc.Format("Ui_GameList_ExportFailed", exception.Message);
+        }
     }
 
     [RelayCommand]

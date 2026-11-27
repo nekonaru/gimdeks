@@ -4,6 +4,25 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v2.3.0
+
+Finish the roadmap with settings, incremental import, selection export, and a first launch wizard.
+
+## New features
+
+- **Settings page.** Configure the low free space warning, backup retention from 1 to 200, theme, and language from one page.
+- **Incremental import.** Compare an Excel file with the current database before writing. See how many games are new and how many sizes changed, then import only new games and refresh changed sizes without touching notes or status.
+- **Selection export.** Export only the selected games to Excel or CSV from the game list.
+- **Blank Excel template.** Generate an empty workbook in the GimDeks layout.
+- **First launch wizard.** Choose Indonesian or English on first run. It appears once and is remembered.
+- **Storage groups.** Label each storage with a group and edit it on the Storage page.
+
+## Improvements
+
+- **Configurable retention.** The backup prune limit now follows the setting instead of a fixed constant.
+- **Health low space check.** Linked drives below the configured free space threshold appear in Health Check with a direct link to Storage.
+- **Backup page fixed.** The Backup navigation now resolves to its page instead of showing empty content.
+
 ## v2.2.0
 
 Import CSV files back into GimDeks and see how capacity changes over time.

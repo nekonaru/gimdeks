@@ -36,7 +36,18 @@ public partial class MainWindow : Window
         App.Services.GetRequiredService<Services.ThemingService>().Apply(_viewModel.IsLightTheme);
         var target = IsValidPage(loaded.LastPage) ? (AppPage)loaded.LastPage : AppPage.Dashboard;
         _viewModel.NavigateTo(target);
+        Loaded += OnFirstLoaded;
         Closing += OnClosing;
+    }
+
+    private void OnFirstLoaded(object sender, System.Windows.RoutedEventArgs e)
+    {
+        Loaded -= OnFirstLoaded;
+        if (_settings.Load().ShowOnboarding)
+        {
+            new OnboardingWindow().ShowDialog();
+            _viewModel.RefreshTexts();
+        }
     }
 
     private static bool IsValidPage(int value) =>

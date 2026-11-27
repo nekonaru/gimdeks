@@ -68,6 +68,12 @@
         <DataTemplate DataType="{x:Type vm:ScanGamesViewModel}">
             <views:ScanGamesPage />
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:BackupManagerViewModel}">
+            <views:BackupManagerPage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsPage />
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:HddSuggestionViewModel}">
             <views:HddSuggestionPage />
         </DataTemplate>

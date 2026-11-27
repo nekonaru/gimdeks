@@ -138,6 +138,11 @@ public sealed class DatabaseInitializer
         );
         CREATE INDEX ix_snapshot_storage_tanggal ON snapshot_kapasitas(storage_id, tanggal);
         """,
+
+        // 5: storage group label
+        """
+        ALTER TABLE storage ADD COLUMN grup TEXT;
+        """,
     };
 
     private readonly SqliteConnectionFactory _factory;

@@ -75,6 +75,9 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
     private string _editBatas = "";
 
     [ObservableProperty]
+    private string _editGrup = "";
+
+    [ObservableProperty]
     private string _statusText = "";
 
     [ObservableProperty]
@@ -137,6 +140,7 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         }
 
         EditNama = value.Storage.Nama;
+        EditGrup = value.Storage.Grup ?? "";
         EditTipe = TipeOptions.FirstOrDefault(o => o.Type == value.Storage.Tipe) ?? TipeOptions[0];
         EditKapasitas = value.Storage.KapasitasGb?.ToString("0.#", GimDeks.App.Services.AppCulture.Current) ?? "";
         EditBatas = value.Storage.BatasGb?.ToString("0.#", GimDeks.App.Services.AppCulture.Current) ?? "";
@@ -404,6 +408,7 @@ public partial class StorageViewModel : ObservableObject, IRefreshable
         updated.Tipe = EditTipe.Type;
         updated.KapasitasGb = kapasitas.Value;
         updated.BatasGb = batas.Value;
+        updated.Grup = string.IsNullOrWhiteSpace(EditGrup) ? null : EditGrup.Trim();
         await _storageRepository.UpdateAsync(updated);
         StatusText = Services.Loc.Format("Ui_Storage_Saved", nama);
         await ReloadAsync();
