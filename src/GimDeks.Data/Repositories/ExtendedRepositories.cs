@@ -177,6 +177,99 @@ public sealed class ImportHistoryRepository(SqliteConnectionFactory factory) : I
     }
 }
 
+public sealed class ActivityRepository(SqliteConnectionFactory factory) : IActivityRepository
+{
+    public async Task<IReadOnlyList<ActivityEntry>> GetRecentAsync(int count, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        var rows = await connection.QueryAsync(new CommandDefinition(
+            "SELECT * FROM aktivitas ORDER BY waktu DESC, id DESC LIMIT @Count;", new { Count = count }));
+        return rows.Select(r => new ActivityEntry((long)r.id, (string)r.waktu, (string)r.aksi,
+            r.game_id is null ? null : (long)r.game_id, (string)r.detail)).ToList();
+    }
+
+    public async Task<long> AddAsync(string aksi, long? gameId, string detail, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        return await connection.ExecuteScalarAsync<long>(new CommandDefinition(
+            "INSERT INTO aktivitas (aksi, game_id, detail) VALUES (@Aksi, @GameId, @Detail); SELECT last_insert_rowid();",
+            new { Aksi = aksi, GameId = gameId, Detail = detail }, cancellationToken: ct));
+    }
+}
+
+public sealed class LaunchProfileRepository(SqliteConnectionFactory factory) : ILaunchProfileRepository
+{
+    public async Task<IReadOnlyList<LaunchProfile>> GetByGameAsync(long gameId, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        var rows = await connection.QueryAsync(new CommandDefinition(
+            "SELECT * FROM profil_luncur WHERE game_id = @GameId ORDER BY urutan, id;", new { GameId = gameId }));
+        return rows.Select(r => new LaunchProfile((long)r.id, (long)r.game_id, (string)r.nama,
+            (string)r.path_exe, r.argumen is null ? null : (string)r.argumen,
+            r.urutan is null ? 0 : Convert.ToInt32(r.urutan))).ToList();
+    }
+
+    public async Task<long> AddAsync(long gameId, string nama, string pathExe, string? argumen, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        return await connection.ExecuteScalarAsync<long>(new CommandDefinition(
+            "INSERT INTO profil_luncur (game_id, nama, path_exe, argumen, urutan) VALUES (@GameId, @Nama, @PathExe, @Argumen, (SELECT COALESCE(MAX(urutan), -1) + 1 FROM profil_luncur WHERE game_id = @GameId)); SELECT last_insert_rowid();",
+            new { GameId = gameId, Nama = nama, PathExe = pathExe, Argumen = argumen }, cancellationToken: ct));
+    }
+
+    public async Task DeleteAsync(long id, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        await connection.ExecuteAsync(new CommandDefinition("DELETE FROM profil_luncur WHERE id = @Id;", new { Id = id }));
+    }
+}
+
+public sealed class CustomFieldRepository(SqliteConnectionFactory factory) : ICustomFieldRepository
+{
+    public async Task<IReadOnlyList<CustomField>> GetAllAsync(CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        var rows = await connection.QueryAsync(new CommandDefinition("SELECT * FROM field_kustom ORDER BY urutan, id;", cancellationToken: ct));
+        return rows.Select(r => new CustomField((long)r.id, (string)r.nama, (string)r.tipe,
+            r.urutan is null ? 0 : Convert.ToInt32(r.urutan))).ToList();
+    }
+
+    public async Task<long> AddAsync(string nama, string tipe, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        return await connection.ExecuteScalarAsync<long>(new CommandDefinition(
+            "INSERT INTO field_kustom (nama, tipe, urutan) VALUES (@Nama, @Tipe, (SELECT COALESCE(MAX(urutan), -1) + 1 FROM field_kustom)); SELECT last_insert_rowid();",
+            new { Nama = nama.Trim(), Tipe = tipe }, cancellationToken: ct));
+    }
+
+    public async Task DeleteAsync(long id, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        await connection.ExecuteAsync(new CommandDefinition("DELETE FROM field_kustom WHERE id = @Id;", new { Id = id }));
+    }
+
+    public async Task<IReadOnlyDictionary<long, string?>> GetValuesAsync(long gameId, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        var rows = await connection.QueryAsync(new CommandDefinition(
+            "SELECT field_id, nilai FROM nilai_field WHERE game_id = @GameId;", new { GameId = gameId }));
+        return rows.ToDictionary<dynamic, long, string?>(r => (long)r.field_id, r => r.nilai is null ? null : (string)r.nilai);
+    }
+
+    public async Task SetValuesAsync(long gameId, IReadOnlyDictionary<long, string?> values, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        using var transaction = connection.BeginTransaction();
+        foreach (var pair in values)
+        {
+            await connection.ExecuteAsync(new CommandDefinition(
+                "INSERT INTO nilai_field (game_id, field_id, nilai) VALUES (@GameId, @FieldId, @Nilai) ON CONFLICT(game_id, field_id) DO UPDATE SET nilai = excluded.nilai;",
+                new { GameId = gameId, FieldId = pair.Key, Nilai = pair.Value }, transaction, cancellationToken: ct));
+        }
+        transaction.Commit();
+    }
+}
+
 public sealed class CapacitySnapshotRepository(SqliteConnectionFactory factory) : ICapacitySnapshotRepository
 {
     public async Task<long> AddAsync(long storageId, int jumlahGame, double totalGb, CancellationToken ct = default)

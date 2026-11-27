@@ -79,6 +79,10 @@ GimDeks manages a game collection across multiple drives (external HDDs, laptop 
 | --- | --- |
 | **Dashboard** | One card per storage: game count, GB used, remaining space, progress bar, and a badge when the storage is over its limit. |
 | **Game list** | Sortable, searchable, filterable table (status, storage, size range) with virtualization for thousands of games. |
+| **Activity log** | Every edit is recorded with time and detail in a System page. |
+| **Launch profiles** | Several local executables per game, each with a name and arguments. |
+| **Custom fields** | Define your own fields in Settings and fill them in the game editor, locally only. |
+| **Collection bundle** | Export and import the whole offline collection as a checksum-verified zip. |
 | **Cover shelf view** | Switch to a cover grid with grouping and one-click detail. |
 | **Sectioned navigation** | Collection, Play, Maintain and System groups keep the sidebar scannable. |
 | **Undo and redo** | Reverse edits with Ctrl+Z and repeat them with Ctrl+Y. |

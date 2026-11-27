@@ -15,4 +15,5 @@ public enum Page
     ScanGames,
     Backups,
     Settings,
+    Activity,
 }

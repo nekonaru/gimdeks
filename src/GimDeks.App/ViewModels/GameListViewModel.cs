@@ -64,6 +64,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     private readonly IFilterPresetRepository _presets;
     private readonly IGameNoteRepository _notes;
     private readonly Services.UndoRedoService _undo;
+    private readonly IActivityRepository _activity;
     private Dictionary<long, string> _notesByGame = new();
     private string _noteQuery = "";
     private bool _regexSearch;
@@ -117,7 +118,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     [ObservableProperty]
     private string _statusText = "";
 
-    public GameListViewModel(IGameRepository gameRepository, IStorageRepository storageRepository, ITagRepository tagRepository, Services.SessionTrackerService sessionTracker, IFilterPresetRepository presets, IGameNoteRepository notes, Services.UndoRedoService undo)
+    public GameListViewModel(IGameRepository gameRepository, IStorageRepository storageRepository, ITagRepository tagRepository, Services.SessionTrackerService sessionTracker, IFilterPresetRepository presets, IGameNoteRepository notes, Services.UndoRedoService undo, IActivityRepository activity)
     {
         _gameRepository = gameRepository;
         _storageRepository = storageRepository;
@@ -126,6 +127,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         _presets = presets;
         _notes = notes;
         _undo = undo;
+        _activity = activity;
         _filterDebounce.Tick += OnFilterDebounceTick;
         StatusOptions = new[]
         {
@@ -715,6 +717,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     {
         var before = Clone(row.Game);
         await _gameRepository.UpdateAsync(row.Game);
+        _ = _activity.AddAsync("favorite", row.Game.Id, row.Game.Favorit ? "1" : "0");
         var after = Clone(row.Game);
         PushGameUndo(Services.Loc.Get("Ui_Undo_Favorite"), before, after);
     }
@@ -821,7 +824,8 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             app.GetRequiredService<IGameNoteRepository>(),
             app.GetRequiredService<IGameImageRepository>(),
             app.GetRequiredService<IPlaySessionRepository>(),
-            app.GetRequiredService<Services.SessionTrackerService>());
+            app.GetRequiredService<Services.SessionTrackerService>(),
+            app.GetRequiredService<ILaunchProfileRepository>());
         new Views.GameDetailWindow(vm) { Owner = System.Windows.Application.Current.MainWindow }.Show();
     }
 
@@ -908,7 +912,9 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         }
 
         var id = await _gameRepository.AddAsync(game);
+        _ = _activity.AddAsync("add", id, game.Nama);
         await SaveTagsAsync(id, dialog.ResultTagText);
+        await dialog.SaveCustomFieldsAsync(id);
         var added = Clone(game);
         added.Id = id;
         _undo.Push(Services.Loc.Get("Ui_Undo_Add"),
@@ -938,7 +944,9 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         game.Id = original.Id;
         game.DibuatPada = original.DibuatPada;
         await _gameRepository.UpdateAsync(game);
+        _ = _activity.AddAsync("edit", game.Id, game.Nama);
         await SaveTagsAsync(game.Id, dialog.ResultTagText);
+        await dialog.SaveCustomFieldsAsync(game.Id);
         PushGameUndo(Services.Loc.Get("Ui_Undo_Edit"), before, Clone(game));
         await ReloadAsync();
     }
@@ -977,6 +985,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         foreach (var row in SelectedRows.ToList())
         {
             await _gameRepository.DeleteAsync(row.Game.Id);
+            _ = _activity.AddAsync("delete", row.Game.Id, row.Game.Nama);
         }
 
         _undo.Push(Services.Loc.Format("Ui_Undo_Delete", deleted.Count),

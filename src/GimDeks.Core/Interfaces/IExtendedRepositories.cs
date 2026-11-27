@@ -7,6 +7,10 @@ public sealed record GameNote(long Id, long GameId, string Isi, string DibuatPad
 public sealed record GameImage(long Id, long GameId, string NamaFile, int Urutan);
 public sealed record FilterPreset(long Id, string Nama, string DefinisiJson);
 public sealed record ImportHistory(long Id, string Path, string Mode, string HasilJson, string Waktu);
+public sealed record ActivityEntry(long Id, string Waktu, string Aksi, long? GameId, string Detail);
+public sealed record LaunchProfile(long Id, long GameId, string Nama, string PathExe, string? Argumen, int Urutan);
+public sealed record CustomField(long Id, string Nama, string Tipe, int Urutan);
+public sealed record CustomValue(long GameId, long FieldId, string? Nilai);
 public sealed record CapacitySnapshot(long Id, long StorageId, string Tanggal, int JumlahGame, double TotalGb);
 
 public interface IPlaySessionRepository
@@ -45,6 +49,28 @@ public interface IImportHistoryRepository
 {
     Task<IReadOnlyList<ImportHistory>> GetAllAsync(CancellationToken ct = default);
     Task<long> AddAsync(string path, string mode, string hasilJson, CancellationToken ct = default);
+}
+
+public interface IActivityRepository
+{
+    Task<IReadOnlyList<ActivityEntry>> GetRecentAsync(int count, CancellationToken ct = default);
+    Task<long> AddAsync(string aksi, long? gameId, string detail, CancellationToken ct = default);
+}
+
+public interface ILaunchProfileRepository
+{
+    Task<IReadOnlyList<LaunchProfile>> GetByGameAsync(long gameId, CancellationToken ct = default);
+    Task<long> AddAsync(long gameId, string nama, string pathExe, string? argumen, CancellationToken ct = default);
+    Task DeleteAsync(long id, CancellationToken ct = default);
+}
+
+public interface ICustomFieldRepository
+{
+    Task<IReadOnlyList<CustomField>> GetAllAsync(CancellationToken ct = default);
+    Task<long> AddAsync(string nama, string tipe, CancellationToken ct = default);
+    Task DeleteAsync(long id, CancellationToken ct = default);
+    Task<IReadOnlyDictionary<long, string?>> GetValuesAsync(long gameId, CancellationToken ct = default);
+    Task SetValuesAsync(long gameId, IReadOnlyDictionary<long, string?> values, CancellationToken ct = default);
 }
 
 public interface ICapacitySnapshotRepository

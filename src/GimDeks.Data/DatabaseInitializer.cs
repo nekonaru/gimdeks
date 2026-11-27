@@ -149,6 +149,43 @@ public sealed class DatabaseInitializer
         CREATE INDEX ix_riwayat_dari ON riwayat(dari_storage_id);
         CREATE INDEX ix_riwayat_ke ON riwayat(ke_storage_id);
         """,
+
+        // 7: activity log, launch profiles and custom fields
+        """
+        CREATE TABLE aktivitas (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          waktu TEXT NOT NULL DEFAULT (datetime('now')),
+          aksi TEXT NOT NULL,
+          game_id INTEGER REFERENCES game(id) ON DELETE SET NULL,
+          detail TEXT NOT NULL DEFAULT ''
+        );
+        CREATE INDEX ix_aktivitas_waktu ON aktivitas(waktu);
+        CREATE INDEX ix_aktivitas_game ON aktivitas(game_id);
+
+        CREATE TABLE profil_luncur (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          game_id INTEGER NOT NULL REFERENCES game(id) ON DELETE CASCADE,
+          nama TEXT NOT NULL,
+          path_exe TEXT NOT NULL,
+          argumen TEXT,
+          urutan INTEGER NOT NULL DEFAULT 0
+        );
+        CREATE INDEX ix_profil_luncur_game ON profil_luncur(game_id);
+
+        CREATE TABLE field_kustom (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          nama TEXT NOT NULL UNIQUE,
+          tipe TEXT NOT NULL,
+          urutan INTEGER NOT NULL DEFAULT 0
+        );
+
+        CREATE TABLE nilai_field (
+          game_id INTEGER NOT NULL REFERENCES game(id) ON DELETE CASCADE,
+          field_id INTEGER NOT NULL REFERENCES field_kustom(id) ON DELETE CASCADE,
+          nilai TEXT,
+          PRIMARY KEY (game_id, field_id)
+        );
+        """,
     };
 
     private readonly SqliteConnectionFactory _factory;

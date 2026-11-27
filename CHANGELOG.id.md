@@ -4,6 +4,21 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v3.1.0
+
+Menambah kedalaman data yang sudah disiapkan oleh tampilan v3: log aktivitas, profil peluncuran, field kustom, dan paket koleksi portabel.
+
+## Fitur baru
+
+- **Log aktivitas.** Penambahan, perubahan, penghapusan, dan perubahan favorit dicatat dengan waktu dan detail. Halaman baru di Sistem menampilkan 200 entri terakhir.
+- **Profil peluncuran.** Satu game bisa memiliki beberapa executable lokal dengan nama dan argumen, ditambah dan diluncurkan dari jendela detail.
+- **Field kustom.** Tentukan field teks, angka, tanggal, atau pilihan di Pengaturan, lalu isi di editor game. Nilai tetap lokal dan tidak pernah diekspor ke Excel.
+- **Paket koleksi.** Ekspor database, pengaturan, cover, dan galeri sebagai satu zip dengan manifest SHA256. Import memverifikasi setiap entri sebelum menimpa data lokal.
+
+## Peningkatan
+
+- **Skema versi 7.** Menambah tabel untuk aktivitas, profil peluncuran, dan field kustom dengan backup upgrade otomatis yang sudah ada.
+
 ## v3.0.0
 
 Penyegaran visual dan interaksi: tampilan rak cover, navigasi bersection, undo redo, alur memoir bawaan, dan token motion terpusat.

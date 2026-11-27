@@ -110,6 +110,8 @@
         <TextBlock Text="{DynamicResource Ui_GameDialog_Folder}" Style="{StaticResource MaterialDesignBody2TextBlock}" Opacity="0.8" />
         <TextBox x:Name="FolderTextBox" materialDesign:HintAssist.Hint="{DynamicResource Ui_GameDialog_FolderHint}" Margin="0,4,0,12" />
 
+        <StackPanel x:Name="CustomFieldsPanel" Margin="0,0,0,12" />
+
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />

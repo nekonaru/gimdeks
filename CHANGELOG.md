@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v3.1.0
+
+Add the data depth that the visual shell was built for: activity log, launch profiles, custom fields, and portable collection bundles.
+
+## New features
+
+- **Activity log.** Adds, edits, deletes, and favorite changes are recorded with time and detail. A new System page shows the latest 200 entries.
+- **Launch profiles.** A game can have several local executables with names and arguments, added and launched from the detail window.
+- **Custom fields.** Define your own text, number, date, or choice fields in Settings, then fill them in the game editor. Values stay local and are never exported to Excel.
+- **Collection bundle.** Export the database, settings, covers, and gallery as one zip with a SHA256 manifest. Import verifies every entry before overwriting local data.
+
+## Improvements
+
+- **Schema version 7.** Adds the tables for activity, launch profiles, and custom fields with the existing automatic upgrade backup.
+
 ## v3.0.0
 
 A visual and interaction overhaul: cover grid, sectioned navigation, undo and redo, a guided getting-started flow, and shared motion tokens.
