@@ -29,6 +29,12 @@ public sealed class SessionView
     public string StartText => Session.Mulai.Length >= 16 ? Session.Mulai[..16].Replace('T', ' ') : Session.Mulai;
 }
 
+public sealed class LaunchProfileRow
+{
+    public required LaunchProfile Profile { get; init; }
+    public string ArgsText => string.IsNullOrWhiteSpace(Profile.Argumen) ? "-" : Profile.Argumen;
+}
+
 public sealed class ImageItem
 {
     public required GameImage Image { get; init; }
@@ -42,9 +48,10 @@ public partial class GameDetailViewModel : ObservableObject
     private readonly IGameImageRepository _images;
     private readonly IPlaySessionRepository _sessions;
     private readonly Services.SessionTrackerService _tracker;
+    private readonly ILaunchProfileRepository _profiles;
 
     public GameDetailViewModel(Game game, IGameRepository games, IGameNoteRepository notes,
-        IGameImageRepository images, IPlaySessionRepository sessions, Services.SessionTrackerService tracker)
+        IGameImageRepository images, IPlaySessionRepository sessions, Services.SessionTrackerService tracker, ILaunchProfileRepository profiles)
     {
         Game = game;
         _games = games;
@@ -52,12 +59,14 @@ public partial class GameDetailViewModel : ObservableObject
         _images = images;
         _sessions = sessions;
         _tracker = tracker;
+        _profiles = profiles;
     }
 
     public Game Game { get; }
     public ObservableCollection<NoteView> Notes { get; } = new();
     public ObservableCollection<SessionView> Sessions { get; } = new();
     public ObservableCollection<ImageItem> Images { get; } = new();
+    public ObservableCollection<LaunchProfileRow> Profiles { get; } = new();
 
     [ObservableProperty]
     private string _selectedImagePath = "";
@@ -101,6 +110,12 @@ public partial class GameDetailViewModel : ObservableObject
                 }
             }
             SelectedImagePath = Images.FirstOrDefault()?.Path ?? "";
+
+            Profiles.Clear();
+            foreach (var profile in await _profiles.GetByGameAsync(Game.Id))
+            {
+                Profiles.Add(new LaunchProfileRow { Profile = profile });
+            }
         }
         finally
         {
@@ -131,6 +146,71 @@ public partial class GameDetailViewModel : ObservableObject
         }
         await _notes.DeleteAsync(note.Note.Id);
         await LoadAsync();
+    }
+
+    [RelayCommand]
+    private async Task AddProfileAsync()
+    {
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Filter = "Executable (*.exe)|*.exe",
+            Title = Services.Loc.Get("Ui_GameDialog_PathExeTitle"),
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+
+        var name = System.IO.Path.GetFileNameWithoutExtension(dialog.FileName);
+        await _profiles.AddAsync(Game.Id, name, dialog.FileName, null);
+        await LoadAsync();
+    }
+
+    [RelayCommand]
+    private async Task DeleteProfileAsync(LaunchProfileRow? row)
+    {
+        if (row is null)
+        {
+            return;
+        }
+        await _profiles.DeleteAsync(row.Profile.Id);
+        await LoadAsync();
+    }
+
+    [RelayCommand]
+    private async Task LaunchProfileAsync(LaunchProfileRow? row)
+    {
+        if (row is null)
+        {
+            return;
+        }
+        if (!Services.GameLauncherService.IsValidExecutable(row.Profile.PathExe))
+        {
+            StatusText = Services.Loc.Get("Ui_GameList_NoExe");
+            return;
+        }
+
+        try
+        {
+            var start = new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = row.Profile.PathExe,
+                WorkingDirectory = System.IO.Path.GetDirectoryName(row.Profile.PathExe) ?? "",
+                UseShellExecute = false,
+            };
+            if (!string.IsNullOrWhiteSpace(row.Profile.Argumen))
+            {
+                start.Arguments = row.Profile.Argumen;
+            }
+            System.Diagnostics.Process.Start(start);
+            StatusText = Services.Loc.Format("Ui_GameList_Launched", row.Profile.Nama);
+        }
+        catch (Exception exception)
+        {
+            Services.CrashLog.Write(exception);
+            StatusText = Services.Loc.Get("Ui_GameList_LaunchFailed");
+        }
+        await Task.CompletedTask;
     }
 
     [RelayCommand]

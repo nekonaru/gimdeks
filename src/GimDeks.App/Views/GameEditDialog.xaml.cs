@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using GimDeks.Core.Models;
 using GimDeks.Core.Rules;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace GimDeks.App.Views;
 
@@ -12,6 +13,7 @@ public partial class GameEditDialog : Window
 
     private readonly List<Storage> _storages;
     private readonly Game? _original;
+    private readonly Dictionary<long, TextBox> _customBoxes = new();
 
     public GameEditDialog(IReadOnlyList<Storage> storages, Game? original, string? tagText = null)
     {
@@ -29,6 +31,7 @@ public partial class GameEditDialog : Window
         };
         StorageComboBox.ItemsSource = BuildStorageItems(_storages);
         RatingComboBox.ItemsSource = Enumerable.Range(0, 6).Select(i => new RatingOption(i, i == 0 ? Services.Loc.Get("Ui_GameDialog_NoRating") : i + " / 5")).ToArray();
+        _ = LoadCustomFieldsAsync();
 
         if (original is not null)
         {
@@ -89,6 +92,40 @@ public partial class GameEditDialog : Window
             StorageComboBox.SelectedIndex = 0;
             StorageComboBox.IsEnabled = false;
         }
+    }
+
+    private async Task LoadCustomFieldsAsync()
+    {
+        var repo = App.Services.GetRequiredService<GimDeks.Core.Interfaces.ICustomFieldRepository>();
+        var fields = await repo.GetAllAsync();
+        if (fields.Count == 0)
+        {
+            return;
+        }
+        var values = _original is null ? new Dictionary<long, string?>() : await repo.GetValuesAsync(_original.Id);
+        foreach (var field in fields)
+        {
+            var label = new TextBlock { Text = field.Nama, Opacity = 0.8 };
+            var box = new TextBox
+            {
+                Margin = new Thickness(0, 4, 0, 10),
+                Text = values.TryGetValue(field.Id, out var value) ? value ?? "" : "",
+            };
+            _customBoxes[field.Id] = box;
+            CustomFieldsPanel.Children.Add(label);
+            CustomFieldsPanel.Children.Add(box);
+        }
+    }
+
+    public async Task SaveCustomFieldsAsync(long gameId)
+    {
+        if (_customBoxes.Count == 0)
+        {
+            return;
+        }
+        var repo = App.Services.GetRequiredService<GimDeks.Core.Interfaces.ICustomFieldRepository>();
+        var values = _customBoxes.ToDictionary(p => p.Key, p => string.IsNullOrWhiteSpace(p.Value.Text) ? null : p.Value.Text.Trim());
+        await repo.SetValuesAsync(gameId, values);
     }
 
     private void CancelButton_OnClick(object sender, RoutedEventArgs e)

@@ -113,6 +113,10 @@
                                 Command="{Binding ImportCsvCommand}" Margin="0,0,10,0" />
                         <Button Content="{DynamicResource Ui_Import_CreateTemplate}" Style="{StaticResource MaterialDesignOutlinedButton}"
                                 Command="{Binding CreateTemplateCommand}" />
+                        <Button Content="{DynamicResource Ui_Bundle_Export}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Command="{Binding ExportBundleCommand}" Margin="10,0,10,0" />
+                        <Button Content="{DynamicResource Ui_Bundle_Import}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                                Command="{Binding ImportBundleCommand}" />
                         <Button Content="{DynamicResource Ui_Import_BackupNow}" Style="{StaticResource MaterialDesignOutlinedButton}"
                                 Command="{Binding BackupCommand}" Margin="0,0,10,0" />
                         <Button Content="{DynamicResource Ui_Import_Restore}" Style="{StaticResource MaterialDesignOutlinedButton}"

@@ -24,7 +24,7 @@ public sealed class ExtendedDataTests : IDisposable
 
         using var connection = factory.CreateConnection();
         var version = connection.ExecuteScalar<long>("PRAGMA user_version;");
-        Assert.Equal(6, version);
+        Assert.Equal(7, version);
 
         var tables = connection.Query<string>(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('sesi_main','catatan_game','gambar_game','preset_filter','histori_import','snapshot_kapasitas');").ToList();
@@ -33,6 +33,9 @@ public sealed class ExtendedDataTests : IDisposable
         Assert.Contains("grup", columns);
         var indexes = connection.Query<string>("SELECT name FROM sqlite_master WHERE type = 'index' AND name IN ('ix_riwayat_dari','ix_riwayat_ke');").ToList();
         Assert.Equal(2, indexes.Count);
+        var newTables = connection.Query<string>(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('aktivitas','profil_luncur','field_kustom','nilai_field');").ToList();
+        Assert.Equal(4, newTables.Count);
         Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
     }
 

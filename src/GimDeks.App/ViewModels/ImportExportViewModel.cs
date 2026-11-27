@@ -49,6 +49,7 @@ public partial class ImportExportViewModel : ObservableObject
     private readonly Services.PortableModeService _portable;
     private readonly IImportHistoryRepository _history;
     private readonly CsvImportService _csvImport;
+    private readonly CollectionBundleService _bundle;
 
     [ObservableProperty]
     private string _filePath = "";
@@ -81,6 +82,8 @@ public partial class ImportExportViewModel : ObservableObject
         ImportIncrementalCommand.NotifyCanExecuteChanged();
         ImportCsvCommand.NotifyCanExecuteChanged();
         CreateTemplateCommand.NotifyCanExecuteChanged();
+        ExportBundleCommand.NotifyCanExecuteChanged();
+        ImportBundleCommand.NotifyCanExecuteChanged();
         ExportCommand.NotifyCanExecuteChanged();
         ExportCsvCommand.NotifyCanExecuteChanged();
         BackupCommand.NotifyCanExecuteChanged();
@@ -104,7 +107,8 @@ public partial class ImportExportViewModel : ObservableObject
         Services.AppSettingsService settings,
         Services.PortableModeService portable,
         IImportHistoryRepository history,
-        CsvImportService csvImport)
+        CsvImportService csvImport,
+        CollectionBundleService bundle)
     {
         _importService = importService;
         _exporter = new ExcelExporter();
@@ -116,6 +120,7 @@ public partial class ImportExportViewModel : ObservableObject
         _portable = portable;
         _history = history;
         _csvImport = csvImport;
+        _bundle = bundle;
         ImportModes = new[]
         {
             new ImportModeOption(ImportMode.Gabung, "Ui_Import_ModeGabung"),
@@ -318,6 +323,76 @@ public partial class ImportExportViewModel : ObservableObject
         {
             StatusText = Services.Loc.Format("Ui_Import_ImportFailed", exception.Message);
             DialogService.Error(Services.Loc.Get("Ui_Dialog_ImportFailed"), exception.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRun))]
+    private async Task ExportBundleAsync()
+    {
+        var dialog = new SaveFileDialog
+        {
+            Filter = "Collection bundle (*.zip)|*.zip",
+            FileName = "gimdeks-collection.zip",
+            Title = Services.Loc.Get("Ui_Bundle_ExportTitle"),
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+        IsBusy = true;
+        try
+        {
+            var path = dialog.FileName;
+            await Task.Run(() => _bundle.Export(path));
+            StatusText = Services.Loc.Get("Ui_Bundle_Exported");
+        }
+        catch (Exception exception)
+        {
+            StatusText = Services.Loc.Format("Ui_Import_ImportFailed", exception.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRun))]
+    private async Task ImportBundleAsync()
+    {
+        var dialog = new OpenFileDialog
+        {
+            Filter = "Collection bundle (*.zip)|*.zip",
+            Title = Services.Loc.Get("Ui_Bundle_ImportTitle"),
+        };
+        if (dialog.ShowDialog() != true)
+        {
+            return;
+        }
+        IsBusy = true;
+        try
+        {
+            var path = dialog.FileName;
+            var verification = await Task.Run(() => _bundle.Verify(path));
+            if (!verification.Ok)
+            {
+                StatusText = Services.Loc.Format("Ui_Bundle_Failed", verification.Message);
+                return;
+            }
+            if (!DialogService.Confirm(Services.Loc.Get("Ui_Bundle_ImportTitle"), Services.Loc.Get("Ui_Bundle_Confirm")))
+            {
+                return;
+            }
+            await Task.Run(() => _bundle.Import(path));
+            StatusText = Services.Loc.Get("Ui_Bundle_Imported");
+            DataChanged?.Invoke();
+        }
+        catch (Exception exception)
+        {
+            StatusText = Services.Loc.Format("Ui_Bundle_Failed", exception.Message);
         }
         finally
         {

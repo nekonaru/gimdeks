@@ -65,6 +65,7 @@ public partial class App : Application
             MaxBackups = Math.Clamp(initialSettings.BackupRetention, 1, 200),
         });
         services.AddSingleton<CsvExporter>();
+        services.AddSingleton<CollectionBundleService>();
         services.AddSingleton<CsvImportService>();
         services.AddSingleton<IStorageRepository, StorageRepository>();
         services.AddSingleton<IGameRepository, GameRepository>();
@@ -77,6 +78,9 @@ public partial class App : Application
         services.AddSingleton<IFilterPresetRepository, FilterPresetRepository>();
         services.AddSingleton<IImportHistoryRepository, ImportHistoryRepository>();
         services.AddSingleton<ICapacitySnapshotRepository, CapacitySnapshotRepository>();
+        services.AddSingleton<IActivityRepository, ActivityRepository>();
+        services.AddSingleton<ILaunchProfileRepository, LaunchProfileRepository>();
+        services.AddSingleton<ICustomFieldRepository, CustomFieldRepository>();
         services.AddSingleton<SessionTrackerService>();
         services.AddSingleton<UndoRedoService>();
         services.AddSingleton<ExcelImporter>();
@@ -101,6 +105,7 @@ public partial class App : Application
         services.AddSingleton<ScanGamesViewModel>();
         services.AddSingleton<BackupManagerViewModel>();
         services.AddSingleton<SettingsViewModel>();
+        services.AddSingleton<ActivityViewModel>();
 
         return services.BuildServiceProvider();
     }
