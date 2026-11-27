@@ -4,6 +4,26 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v2.3.1
+
+Putaran performa dan kenyamanan native. Tidak ada fitur baru.
+
+## Peningkatan
+
+- **Pengaturan di-cache.** File JSON dibaca sekali dan diperbarui di memori saat disimpan, menghilangkan pembacaan berulang dari navigasi, Pemeriksaan, dan watcher.
+- **Pencarian dengan jeda.** Mengetik di daftar game kini membangun ulang grid sekali setelah jeda singkat, bukan pada setiap huruf.
+- **Refresh digabung.** Perubahan data memicu satu refresh berurutan untuk semua halaman, dengan satu pengulangan jika ada perubahan lain saat masih berjalan.
+- **Kerja data di latar belakang.** Reload daftar game, pratinjau CSV, template Excel, ekspor seleksi, command palette, sesi main, dan snapshot kapasitas tidak lagi memblokir UI.
+- **Penulisan bertumpuk.** Import CSV dan inkremental kini menyisipkan game, tautan tag, dan pembaruan ukuran dalam satu transaksi per operasi.
+- **Cache pratinjau lebih murah.** Workbook di-hash hanya ketika metadata file sudah cocok dengan entri cache.
+- **Pencocokan dan parsing lebih cepat.** Pencocokan executable persis memakai dictionary, sel Excel dipakai ulang per baris, dan parse formula serta alokasi warna yang berulang dihilangkan.
+- **Indeks riwayat.** Indeks baru mempercepat pencarian riwayat per storage.
+- **Sidebar lebih bersih.** Daftar navigasi tidak lagi menampilkan scrollbar horizontal saat semua halaman muat.
+
+## Perbaikan bug
+
+- **Parsing angka.** Lokale dengan pemisah ribuan koma tidak lagi mengubah "1,5" menjadi 15 saat import.
+
 ## v2.3.0
 
 Menuntaskan peta jalan dengan pengaturan, import inkremental, ekspor seleksi, dan wizard pertama kali.

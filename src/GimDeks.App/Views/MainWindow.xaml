@@ -115,7 +115,9 @@
                          SelectionChanged="NavList_OnSelectionChanged"
                          Background="Transparent"
                          BorderThickness="0"
-                         HorizontalContentAlignment="Stretch">
+                         HorizontalContentAlignment="Stretch"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal" Margin="8,1">
@@ -138,8 +140,8 @@
                     </ListBox.ItemTemplate>
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="ListBoxItem">
-                            <Setter Property="Padding" Value="8,7" />
-                            <Setter Property="Margin" Value="0,3" />
+                            <Setter Property="Padding" Value="8,6" />
+                            <Setter Property="Margin" Value="0,2" />
                             <Setter Property="AutomationProperties.Name" Value="{Binding LabelKey, Converter={StaticResource LocKeyConverter}}" />
                             <Setter Property="Template">
                                 <Setter.Value>

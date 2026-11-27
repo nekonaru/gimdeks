@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GimDeks.App.Services;
@@ -65,6 +66,10 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
     private Dictionary<long, string> _notesByGame = new();
     private string _noteQuery = "";
     private bool _regexSearch;
+    private readonly DispatcherTimer _filterDebounce = new()
+    {
+        Interval = TimeSpan.FromMilliseconds(180),
+    };
     private readonly SemaphoreSlim _filtersLock = new(1, 1);
     private readonly SemaphoreSlim _reloadLock = new(1, 1);
     private readonly SemaphoreSlim _launchLock = new(1, 1);
@@ -116,6 +121,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         _sessionTracker = sessionTracker;
         _presets = presets;
         _notes = notes;
+        _filterDebounce.Tick += OnFilterDebounceTick;
         StatusOptions = new[]
         {
             FilterOption.All,
@@ -201,10 +207,20 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         var current = SelectedStorage;
         var currentTag = SelectedTag;
         StorageOptions.Clear();
-        _allGames = (await _gameRepository.GetAllAsync()).ToList();
-        _allStorages = (await _storageRepository.GetAllAsync()).ToList();
-        _tagsByGame = await MapTagsByGameAsync(_allGames.Select(g => g.Id).ToList());
-        _notesByGame = await _notes.GetAllTextByGameAsync();
+
+        // SQLite is not truly async: move connection open, PRAGMA and row mapping
+        // off the dispatcher, then update observable collections on the UI thread.
+        var gamesTask = Task.Run(async () => (await _gameRepository.GetAllAsync()).ToList());
+        var storagesTask = Task.Run(async () => (await _storageRepository.GetAllAsync()).ToList());
+        await Task.WhenAll(gamesTask, storagesTask);
+        _allGames = await gamesTask;
+        _allStorages = await storagesTask;
+        var gameIds = _allGames.Select(g => g.Id).ToList();
+        var tagsTask = Task.Run(async () => await MapTagsByGameAsync(gameIds));
+        var notesTask = Task.Run(async () => await _notes.GetAllTextByGameAsync());
+        await Task.WhenAll(tagsTask, notesTask);
+        _tagsByGame = await tagsTask;
+        _notesByGame = await notesTask;
 
         StorageOptions.Add(FilterOption.All);
         foreach (var storage in _allStorages)
@@ -222,7 +238,7 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             TagOptions.Add(new FilterOption(tag.Id.ToString(CultureInfo.InvariantCulture), tag.Nama));
         }
 
-        await LoadPresetsAsync();
+        Presets = await Task.Run(async () => await _presets.GetAllAsync());
 
         long? gameToSelect = null;
         _suppressFilterChanges = true;
@@ -294,7 +310,21 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         return tags.ToDictionary(kv => kv.Key, kv => string.Join(", ", kv.Value.Select(t => t.Nama)));
     }
 
-    partial void OnSearchTextChanged(string value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
+    partial void OnSearchTextChanged(string value)
+    {
+        if (_suppressFilterChanges)
+        {
+            return;
+        }
+        _filterDebounce.Stop();
+        _filterDebounce.Start();
+    }
+
+    private async void OnFilterDebounceTick(object? sender, EventArgs e)
+    {
+        _filterDebounce.Stop();
+        await ApplyFiltersAsync();
+    }
     partial void OnSelectedStatusChanged(FilterOption value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
     partial void OnSelectedStorageChanged(FilterOption value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
     partial void OnSelectedTagChanged(FilterOption value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
@@ -673,8 +703,10 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         try
         {
             var storages = await _storageRepository.GetAllAsync();
-            new ExcelExporter().Export(dialog.FileName, storages.ToList(), SelectedRows.Select(r => r.Game).ToList());
-            StatusText = Services.Loc.Format("Ui_GameList_Exported", SelectedRows.Count);
+            var games = SelectedRows.Select(r => r.Game).ToList();
+            var count = games.Count;
+            await Task.Run(() => new ExcelExporter().Export(dialog.FileName, storages.ToList(), games));
+            StatusText = Services.Loc.Format("Ui_GameList_Exported", count);
         }
         catch (Exception exception)
         {

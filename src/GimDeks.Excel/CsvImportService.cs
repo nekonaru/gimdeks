@@ -83,16 +83,19 @@ public sealed class CsvImportService
         return new CsvImportPreview(rows, warnings);
     }
 
-    public async Task<(int Added, int Skipped, string BackupPath)> ImportAsync(string filePath, CancellationToken ct = default)
+    public async Task<(int Added, int Skipped, string BackupPath)> ImportAsync(string filePath, CancellationToken ct = default) =>
+        await ImportAsync(Preview(filePath), filePath, ct);
+
+    public async Task<(int Added, int Skipped, string BackupPath)> ImportAsync(CsvImportPreview preview, string filePath, CancellationToken ct = default)
     {
-        var preview = Preview(filePath);
         var backupPath = await _backup.BackupAsync(ct);
         var storages = (await _storages.GetAllAsync(ct)).ToDictionary(s => s.Nama, s => s.Id, StringComparer.OrdinalIgnoreCase);
         var existing = (await _games.GetAllAsync(ct))
             .Select(g => (GameNameNormalizer.Normalize(g.Nama), g.StorageId))
             .ToHashSet();
 
-        var added = 0;
+        var newGames = new List<Game>();
+        var rowTags = new List<IReadOnlyList<string>>();
         var skipped = 0;
         foreach (var row in preview.Rows)
         {
@@ -104,7 +107,7 @@ public sealed class CsvImportService
                 continue;
             }
 
-            var game = new Game
+            newGames.Add(new Game
             {
                 Nama = row.Nama,
                 Versi = row.Versi,
@@ -112,17 +115,27 @@ public sealed class CsvImportService
                 Status = row.Status,
                 StorageId = storageId,
                 SelesaiMain = row.Selesai,
-            };
-            var gameId = await _games.AddAsync(game, ct);
-            foreach (var tagName in row.Tags)
-            {
-                var tagId = await _tags.EnsureAsync(tagName, ct);
-                await _tags.SetTagsForGameAsync(gameId, new[] { tagId }, ct);
-            }
-            added++;
+            });
+            rowTags.Add(row.Tags);
         }
 
-        return (added, skipped, backupPath);
+        var ids = await _games.AddBatchAsync(newGames, ct);
+        var tagNames = rowTags.SelectMany(t => t).Where(n => !string.IsNullOrWhiteSpace(n));
+        var tagIdsByName = await _tags.EnsureManyAsync(tagNames, ct);
+        var pairs = new List<(long GameId, long TagId)>();
+        for (var index = 0; index < ids.Count; index++)
+        {
+            foreach (var tagName in rowTags[index])
+            {
+                if (tagIdsByName.TryGetValue(tagName.Trim(), out var tagId))
+                {
+                    pairs.Add((ids[index], tagId));
+                }
+            }
+        }
+        await _tags.SetTagsForGamesBatchAsync(pairs, ct);
+
+        return (ids.Count, skipped, backupPath);
     }
 
     private static GameStatus ParseStatus(string text) => text.ToLowerInvariant() switch

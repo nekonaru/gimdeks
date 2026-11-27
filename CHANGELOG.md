@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v2.3.1
+
+Performance and native feel pass. No new features.
+
+## Improvements
+
+- **Cached settings.** The settings JSON is read once and updated in memory on save, removing repeated file reads from navigation, Health, and watcher setup.
+- **Debounced search.** Typing in the game list now rebuilds the grid once after a short pause instead of on every keystroke.
+- **Coalesced refreshes.** A data change triggers one serialized refresh of all pages, with a single repeat if another change arrives while it is running.
+- **Background data work.** Game list reload, CSV preview, Excel template creation, selection export, command palette loading, session tracking, and capacity snapshots no longer block the UI thread.
+- **Batched writes.** CSV and incremental import now insert games, tag links, and size updates in one transaction per operation instead of opening a connection per row.
+- **Cheaper preview cache.** The workbook is hashed only when file metadata already matches a cached entry.
+- **Faster matching and parsing.** Exact executable matching uses a name dictionary, Excel cells are reused per row, and repeated formula parses and color allocations are removed.
+- **History indexes.** New indexes speed up per-storage history lookups.
+- **Cleaner sidebar.** The navigation list no longer shows a horizontal scrollbar when all pages fit.
+
+## Bug fixes
+
+- **Number parsing.** A locale with comma thousands separators can no longer turn "1,5" into 15 during import.
+
 ## v2.3.0
 
 Finish the roadmap with settings, incremental import, selection export, and a first launch wizard.

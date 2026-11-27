@@ -179,11 +179,45 @@ public partial class MainViewModel : ObservableObject
         NavigateTo(page);
     }
 
+    private readonly SemaphoreSlim _refreshLock = new(1, 1);
+    private int _refreshRunning;
+    private bool _refreshAgain;
+
     private void RefreshAll()
     {
-        foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated, Duplicates, HddSuggestion, Statistics, Health, ScanGames, Backups, Settings })
+        if (Interlocked.CompareExchange(ref _refreshRunning, 1, 0) != 0)
         {
-            _ = SafeRefresh(vm);
+            Volatile.Write(ref _refreshAgain, true);
+            return;
+        }
+        _ = RunRefreshAllAsync();
+    }
+
+    private async Task RunRefreshAllAsync()
+    {
+        try
+        {
+            do
+            {
+                Volatile.Write(ref _refreshAgain, false);
+                await _refreshLock.WaitAsync().ConfigureAwait(true);
+                try
+                {
+                    foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated, Duplicates, HddSuggestion, Statistics, Health, ScanGames, Backups, Settings })
+                    {
+                        await SafeRefresh(vm);
+                    }
+                }
+                finally
+                {
+                    _refreshLock.Release();
+                }
+            }
+            while (Volatile.Read(ref _refreshAgain));
+        }
+        finally
+        {
+            Interlocked.Exchange(ref _refreshRunning, 0);
         }
     }
 

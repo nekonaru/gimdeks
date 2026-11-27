@@ -326,7 +326,7 @@ public partial class ImportExportViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(CanRun))]
-    private void CreateTemplate()
+    private async Task CreateTemplateAsync()
     {
         var dialog = new SaveFileDialog
         {
@@ -341,7 +341,8 @@ public partial class ImportExportViewModel : ObservableObject
 
         try
         {
-            ExcelTemplateService.Create(dialog.FileName);
+            var path = dialog.FileName;
+            await Task.Run(() => ExcelTemplateService.Create(path));
             StatusText = Services.Loc.Get("Ui_Import_TemplateCreated");
         }
         catch (Exception exception)
@@ -366,7 +367,7 @@ public partial class ImportExportViewModel : ObservableObject
         IsBusy = true;
         try
         {
-            var preview = _csvImport.Preview(dialog.FileName);
+            var preview = await Task.Run(() => _csvImport.Preview(dialog.FileName));
             if (preview.Rows.Count == 0)
             {
                 StatusText = Services.Loc.Get("Ui_Import_CsvEmpty");
@@ -379,7 +380,7 @@ public partial class ImportExportViewModel : ObservableObject
                 return;
             }
 
-            var result = await _csvImport.ImportAsync(dialog.FileName);
+            var result = await _csvImport.ImportAsync(preview, dialog.FileName);
             _settings.SaveLastImportedPath(dialog.FileName);
             await _history.AddAsync(dialog.FileName, "CSV", System.Text.Json.JsonSerializer.Serialize(new
             {

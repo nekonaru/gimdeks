@@ -50,5 +50,6 @@ public interface IImportHistoryRepository
 public interface ICapacitySnapshotRepository
 {
     Task<long> AddAsync(long storageId, int jumlahGame, double totalGb, CancellationToken ct = default);
+    Task AddBatchAsync(IReadOnlyList<(long StorageId, int JumlahGame, double TotalGb)> items, CancellationToken ct = default);
     Task<IReadOnlyList<CapacitySnapshot>> GetAllAsync(CancellationToken ct = default);
 }

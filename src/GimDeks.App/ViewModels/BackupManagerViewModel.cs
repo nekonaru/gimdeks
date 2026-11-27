@@ -9,6 +9,7 @@ namespace GimDeks.App.ViewModels;
 public sealed class BackupItem
 {
     public required string Path { get; init; }
+    public required long SizeBytes { get; init; }
     public string Name => System.IO.Path.GetFileName(Path);
     public string DateText
     {
@@ -18,21 +19,7 @@ public sealed class BackupItem
             return name.Length >= 15 ? name[..15] : name;
         }
     }
-    public string SizeText
-    {
-        get
-        {
-            try
-            {
-                var bytes = new System.IO.FileInfo(Path).Length;
-                return $"{bytes / 1024.0 / 1024.0:0.0} MB";
-            }
-            catch
-            {
-                return "-";
-            }
-        }
-    }
+    public string SizeText => $"{SizeBytes / 1024.0 / 1024.0:0.0} MB";
 }
 
 public partial class BackupManagerViewModel : ObservableObject, IRefreshable
@@ -71,7 +58,9 @@ public partial class BackupManagerViewModel : ObservableObject, IRefreshable
             Backups.Clear();
             foreach (var path in _backup.ListBackups())
             {
-                Backups.Add(new BackupItem { Path = path });
+                long size = 0;
+                try { size = new System.IO.FileInfo(path).Length; } catch { /* best effort */ }
+                Backups.Add(new BackupItem { Path = path, SizeBytes = size });
             }
             SelectedBackup = Backups.FirstOrDefault();
             StatusText = Services.Loc.Format("Ui_Backup_Count", Backups.Count);

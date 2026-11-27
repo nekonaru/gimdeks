@@ -17,13 +17,21 @@ public sealed class PaletteItem
 public partial class CommandPaletteWindow : Window
 {
     private readonly List<PaletteItem> _all = new();
+    private readonly MainViewModel _main;
 
     public CommandPaletteWindow()
     {
         InitializeComponent();
-        var services = App.Services;
-        var main = services.GetRequiredService<MainViewModel>();
-        var games = services.GetRequiredService<GimDeks.Core.Interfaces.IGameRepository>().GetAllAsync().GetAwaiter().GetResult();
+        _main = App.Services.GetRequiredService<MainViewModel>();
+        Results.ItemsSource = ResultsSource;
+        Loaded += OnLoaded;
+    }
+
+    private async void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        Loaded -= OnLoaded;
+        var games = await Task.Run(async () =>
+            await App.Services.GetRequiredService<GimDeks.Core.Interfaces.IGameRepository>().GetAllAsync());
 
         foreach (var game in games)
         {
@@ -34,21 +42,20 @@ public partial class CommandPaletteWindow : Window
                 Subtitle = Loc.Get("Ui_Palette_Game"),
                 Action = () =>
                 {
-                    main.GameList.SetPendingGame(id);
-                    main.NavigateTo(Page.GameList);
+                    _main.GameList.SetPendingGame(id);
+                    _main.NavigateTo(Page.GameList);
                 },
             });
         }
 
-        _all.Add(new PaletteItem { Title = Loc.Get("Ui_Palette_Theme"), Subtitle = Loc.Get("Ui_Palette_Action"), Action = () => main.ToggleThemeCommand.Execute(null) });
-        _all.Add(new PaletteItem { Title = Loc.Get("Ui_Palette_Language"), Subtitle = Loc.Get("Ui_Palette_Action"), Action = () => main.ToggleLanguageCommand.Execute(null) });
-        _all.Add(new PaletteItem { Title = Loc.Get("Ui_Palette_Export"), Subtitle = Loc.Get("Ui_Palette_Action"), Action = () => main.ExportCommand.Execute(null) });
-        _all.Add(new PaletteItem { Title = Loc.Get("Ui_Palette_Backup"), Subtitle = Loc.Get("Ui_Palette_Action"), Action = () => main.NavigateTo(Page.ImportExport) });
-        _all.Add(new PaletteItem { Title = Loc.Get("Ui_Palette_Health"), Subtitle = Loc.Get("Ui_Palette_Action"), Action = () => main.NavigateTo(Page.Health) });
-        _all.Add(new PaletteItem { Title = Loc.Get("Ui_Palette_Scan"), Subtitle = Loc.Get("Ui_Palette_Action"), Action = () => main.NavigateTo(Page.ScanGames) });
+        _all.Add(new PaletteItem { Title = Loc.Get("Ui_Palette_Theme"), Subtitle = Loc.Get("Ui_Palette_Action"), Action = () => _main.ToggleThemeCommand.Execute(null) });
+        _all.Add(new PaletteItem { Title = Loc.Get("Ui_Palette_Language"), Subtitle = Loc.Get("Ui_Palette_Action"), Action = () => _main.ToggleLanguageCommand.Execute(null) });
+        _all.Add(new PaletteItem { Title = Loc.Get("Ui_Palette_Export"), Subtitle = Loc.Get("Ui_Palette_Action"), Action = () => _main.ExportCommand.Execute(null) });
+        _all.Add(new PaletteItem { Title = Loc.Get("Ui_Palette_Backup"), Subtitle = Loc.Get("Ui_Palette_Action"), Action = () => _main.NavigateTo(Page.ImportExport) });
+        _all.Add(new PaletteItem { Title = Loc.Get("Ui_Palette_Health"), Subtitle = Loc.Get("Ui_Palette_Action"), Action = () => _main.NavigateTo(Page.Health) });
+        _all.Add(new PaletteItem { Title = Loc.Get("Ui_Palette_Scan"), Subtitle = Loc.Get("Ui_Palette_Action"), Action = () => _main.NavigateTo(Page.ScanGames) });
 
-        Results.ItemsSource = ResultsSource;
-        UpdateResults("");
+        UpdateResults(SearchBox.Text);
     }
 
     public ObservableCollection<PaletteItem> ResultsSource { get; } = new();

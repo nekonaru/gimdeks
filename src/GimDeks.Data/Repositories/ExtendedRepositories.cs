@@ -187,6 +187,25 @@ public sealed class CapacitySnapshotRepository(SqliteConnectionFactory factory) 
             new { StorageId = storageId, JumlahGame = jumlahGame, TotalGb = totalGb }, cancellationToken: ct));
     }
 
+    public async Task AddBatchAsync(IReadOnlyList<(long StorageId, int JumlahGame, double TotalGb)> items, CancellationToken ct = default)
+    {
+        if (items.Count == 0)
+        {
+            return;
+        }
+
+        using var connection = factory.CreateConnection();
+        using var transaction = connection.BeginTransaction();
+        foreach (var item in items)
+        {
+            await connection.ExecuteAsync(new CommandDefinition(
+                "INSERT INTO snapshot_kapasitas (storage_id, tanggal, jumlah_game, total_gb) VALUES (@StorageId, datetime('now'), @JumlahGame, @TotalGb);",
+                new { StorageId = item.StorageId, JumlahGame = item.JumlahGame, TotalGb = item.TotalGb },
+                transaction, cancellationToken: ct));
+        }
+        transaction.Commit();
+    }
+
     public async Task<IReadOnlyList<CapacitySnapshot>> GetAllAsync(CancellationToken ct = default)
     {
         using var connection = factory.CreateConnection();
