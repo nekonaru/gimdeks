@@ -55,11 +55,15 @@ public partial class App : Application
         var services = new ServiceCollection();
 
         var databasePath = DatabasePaths.ResolveDatabasePath();
+        var initialSettings = new AppSettingsService().Load();
         services.AddSingleton(new SqliteConnectionFactory(databasePath));
         services.AddSingleton<DatabaseInitializer>();
         services.AddSingleton(new DatabaseBackupService(
             new SqliteConnectionFactory(databasePath),
-            DatabasePaths.ResolveBackupsDirectory()));
+            DatabasePaths.ResolveBackupsDirectory())
+        {
+            MaxBackups = Math.Clamp(initialSettings.BackupRetention, 1, 200),
+        });
         services.AddSingleton<CsvExporter>();
         services.AddSingleton<CsvImportService>();
         services.AddSingleton<IStorageRepository, StorageRepository>();
@@ -95,6 +99,7 @@ public partial class App : Application
         services.AddSingleton<HealthViewModel>();
         services.AddSingleton<ScanGamesViewModel>();
         services.AddSingleton<BackupManagerViewModel>();
+        services.AddSingleton<SettingsViewModel>();
 
         return services.BuildServiceProvider();
     }

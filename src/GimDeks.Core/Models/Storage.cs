@@ -8,4 +8,5 @@ public sealed class Storage
     public double? KapasitasGb { get; set; }
     public double? BatasGb { get; set; }
     public int Urutan { get; set; }
+    public string? Grup { get; set; }
 }

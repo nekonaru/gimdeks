@@ -88,6 +88,9 @@
                                      materialDesign:HintAssist.Hint="{DynamicResource Ui_Storage_Limit}"
                                      Style="{StaticResource MaterialDesignOutlinedTextBox}" />
                         </Grid>
+                        <TextBox Text="{Binding EditGrup, UpdateSourceTrigger=PropertyChanged}" Margin="0,10,0,0"
+                                 materialDesign:HintAssist.Hint="{DynamicResource Ui_Storage_GroupHint}"
+                                 Style="{StaticResource MaterialDesignOutlinedTextBox}" />
                         <Grid Margin="0,10,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="220" />

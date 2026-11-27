@@ -15,6 +15,9 @@ public sealed class AppSettings
     public string? LastImportedPath { get; set; }
     public string UiLanguage { get; set; } = "id";
     public int LastPage { get; set; }
+    public double? LowSpaceThresholdGb { get; set; } = 100;
+    public int BackupRetention { get; set; } = 20;
+    public bool ShowOnboarding { get; set; } = true;
 }
 
 /// <summary>Persists window geometry and small UI preferences as JSON next to the database.</summary>

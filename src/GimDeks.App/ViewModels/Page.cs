@@ -14,4 +14,5 @@ public enum Page
     Health,
     ScanGames,
     Backups,
+    Settings,
 }

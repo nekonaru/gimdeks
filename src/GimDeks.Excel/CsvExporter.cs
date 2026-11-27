@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO;
 using System.Text;
 using GimDeks.Core.Interfaces;
@@ -58,6 +59,42 @@ public sealed class CsvExporter
             }));
         }
 
+        return filePath;
+    }
+
+    public async Task<string> ExportSelectedAsync(string filePath, IReadOnlyList<Game> games)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
+        var directory = Path.GetDirectoryName(Path.GetFullPath(filePath));
+        if (!string.IsNullOrEmpty(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+
+        var storages = (await _storages.GetAllAsync()).ToDictionary(storage => storage.Id, storage => storage.Nama);
+        var tagsByGame = games.Count == 0
+            ? new Dictionary<long, IReadOnlyList<Tag>>()
+            : (IReadOnlyDictionary<long, IReadOnlyList<Tag>>)await _tags.GetTagsForGamesAsync(games.Select(game => game.Id).ToList());
+
+        await using var writer = new StreamWriter(filePath, append: false, new UTF8Encoding(true));
+        writer.WriteLine("Nama;Versi;Ukuran (GB);Status;Storage;Tag;Selesai");
+        foreach (var game in games.OrderBy(g => g.Nama, StringComparer.OrdinalIgnoreCase))
+        {
+            var storageName = game.StorageId is { } id && storages.TryGetValue(id, out var nama) ? nama : "";
+            var tagText = tagsByGame.TryGetValue(game.Id, out var tags)
+                ? string.Join(", ", tags.Select(t => t.Nama))
+                : "";
+            writer.WriteLine(string.Join(";", new[]
+            {
+                Escape(game.Nama),
+                Escape(game.Versi ?? ""),
+                Escape(game.UkuranGb.ToString("0.0", CultureInfo.InvariantCulture)),
+                Escape(StatusText(game.Status)),
+                Escape(storageName),
+                Escape(tagText),
+                Escape(game.SelesaiMain ? "1" : "0"),
+            }));
+        }
         return filePath;
     }
 

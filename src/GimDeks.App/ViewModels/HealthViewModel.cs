@@ -97,17 +97,38 @@ public partial class HealthViewModel : ObservableObject, IRefreshable
 
         foreach (var (storageId, letter) in driveLinks)
         {
+            var linkedStorage = storages.FirstOrDefault(s => s.Id == storageId);
             if (!string.IsNullOrWhiteSpace(letter) && !readyDrives.Contains(letter))
             {
-                var storage = storages.FirstOrDefault(s => s.Id == storageId);
                 Issues.Add(new HealthIssue
                 {
                     Severity = HealthSeverity.Warning,
-                    Title = storage?.Nama ?? letter,
+                    Title = linkedStorage?.Nama ?? letter,
                     Detail = Services.Loc.Format("Ui_Health_DriveMissing", letter),
                     TargetPage = Page.Storage,
                     TargetId = storageId,
                 });
+            }
+
+            if (!string.IsNullOrWhiteSpace(letter))
+            {
+                var drive = _driveService.FindDrive(letter);
+                var threshold = _settings.Load().LowSpaceThresholdGb;
+                if (drive is not null && threshold is { } limit)
+                {
+                    var freeGb = drive.FreeBytes / 1024.0 / 1024.0 / 1024.0;
+                    if (freeGb < limit)
+                    {
+                        Issues.Add(new HealthIssue
+                        {
+                            Severity = HealthSeverity.Warning,
+                            Title = linkedStorage?.Nama ?? letter,
+                            Detail = Services.Loc.Format("Ui_Health_LowSpace", drive.FreeText),
+                            TargetPage = Page.Storage,
+                            TargetId = storageId,
+                        });
+                    }
+                }
             }
         }
 

@@ -13,7 +13,7 @@ public sealed class StorageRepository : IStorageRepository
     public async Task<IReadOnlyList<Storage>> GetAllAsync(CancellationToken ct = default)
     {
         const string sql = """
-            SELECT id, nama, tipe, kapasitas_gb, batas_gb, urutan
+            SELECT id, nama, tipe, kapasitas_gb, batas_gb, urutan, grup
             FROM storage
             ORDER BY urutan, nama;
             """;
@@ -24,7 +24,7 @@ public sealed class StorageRepository : IStorageRepository
 
     public async Task<Storage?> GetByIdAsync(long id, CancellationToken ct = default)
     {
-        const string sql = "SELECT id, nama, tipe, kapasitas_gb, batas_gb, urutan FROM storage WHERE id = @Id;";
+        const string sql = "SELECT id, nama, tipe, kapasitas_gb, batas_gb, urutan, grup FROM storage WHERE id = @Id;";
         using var connection = _factory.CreateConnection();
         var row = await connection.QuerySingleOrDefaultAsync(new CommandDefinition(sql, new { Id = id }, cancellationToken: ct));
         return row is null ? null : Map(row);
@@ -33,8 +33,8 @@ public sealed class StorageRepository : IStorageRepository
     public async Task<long> AddAsync(Storage storage, CancellationToken ct = default)
     {
         const string sql = """
-            INSERT INTO storage (nama, tipe, kapasitas_gb, batas_gb, urutan)
-            VALUES (@Nama, @Tipe, @KapasitasGb, @BatasGb, @Urutan);
+            INSERT INTO storage (nama, tipe, kapasitas_gb, batas_gb, urutan, grup)
+            VALUES (@Nama, @Tipe, @KapasitasGb, @BatasGb, @Urutan, @Grup);
             SELECT last_insert_rowid();
             """;
         using var connection = _factory.CreateConnection();
@@ -45,6 +45,7 @@ public sealed class StorageRepository : IStorageRepository
             KapasitasGb = storage.KapasitasGb,
             BatasGb = storage.BatasGb,
             Urutan = storage.Urutan,
+            Grup = storage.Grup,
         }, cancellationToken: ct));
     }
 
@@ -52,7 +53,7 @@ public sealed class StorageRepository : IStorageRepository
     {
         const string sql = """
             UPDATE storage
-            SET nama = @Nama, tipe = @Tipe, kapasitas_gb = @KapasitasGb, batas_gb = @BatasGb, urutan = @Urutan
+            SET nama = @Nama, tipe = @Tipe, kapasitas_gb = @KapasitasGb, batas_gb = @BatasGb, urutan = @Urutan, grup = @Grup
             WHERE id = @Id;
             """;
         using var connection = _factory.CreateConnection();
@@ -63,6 +64,7 @@ public sealed class StorageRepository : IStorageRepository
             KapasitasGb = storage.KapasitasGb,
             BatasGb = storage.BatasGb,
             Urutan = storage.Urutan,
+            Grup = storage.Grup,
             Id = storage.Id,
         }, cancellationToken: ct));
     }
@@ -93,5 +95,6 @@ public sealed class StorageRepository : IStorageRepository
         KapasitasGb = row.kapasitas_gb is null ? null : Convert.ToDouble(row.kapasitas_gb, System.Globalization.CultureInfo.InvariantCulture),
         BatasGb = row.batas_gb is null ? null : Convert.ToDouble(row.batas_gb, System.Globalization.CultureInfo.InvariantCulture),
         Urutan = (int)row.urutan,
+        Grup = row.grup is null ? null : (string)row.grup,
     };
 }

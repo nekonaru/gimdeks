@@ -53,7 +53,8 @@ public partial class MainViewModel : ObservableObject
         Services.AppSettingsService settings,
         HealthViewModel health,
         ScanGamesViewModel scanGames,
-        BackupManagerViewModel backups)
+        BackupManagerViewModel backups,
+        SettingsViewModel settingsVm)
     {
         _theming = theming;
         _localization = localization;
@@ -70,6 +71,7 @@ public partial class MainViewModel : ObservableObject
         Health = health;
         ScanGames = scanGames;
         Backups = backups;
+        Settings = settingsVm;
         IsLightTheme = theming.IsLightTheme;
         LanguageLabel = GetLanguageLabel(localization.CurrentLanguage);
         NavItems = new[]
@@ -85,6 +87,7 @@ public partial class MainViewModel : ObservableObject
             new NavItem(Page.Health, "Ui_Nav_Health", "Medical"),
             new NavItem(Page.ScanGames, "Ui_Nav_ScanGames", "FolderSearch"),
             new NavItem(Page.Backups, "Ui_Nav_Backups", "Backup"),
+            new NavItem(Page.Settings, "Ui_Nav_Settings", "Settings"),
             new NavItem(Page.ImportExport, "Ui_Nav_ImportExport", "ImportExport"),
         };
         CurrentViewModel = dashboard;
@@ -129,6 +132,7 @@ public partial class MainViewModel : ObservableObject
             Page.Health => "Ui_Nav_Health",
             Page.ScanGames => "Ui_Nav_ScanGames",
             Page.Backups => "Ui_Nav_Backups",
+            Page.Settings => "Ui_Nav_Settings",
             Page.ImportExport => "Ui_Nav_ImportExport",
             _ => "Ui_Nav_Dashboard",
         };
@@ -151,6 +155,7 @@ public partial class MainViewModel : ObservableObject
     public HealthViewModel Health { get; }
     public ScanGamesViewModel ScanGames { get; }
     public BackupManagerViewModel Backups { get; }
+    public SettingsViewModel Settings { get; }
 
     private void OpenHealthIssue(HealthIssue issue)
     {
@@ -176,7 +181,7 @@ public partial class MainViewModel : ObservableObject
 
     private void RefreshAll()
     {
-        foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated, Duplicates, HddSuggestion, Statistics, Health, ScanGames, Backups })
+        foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated, Duplicates, HddSuggestion, Statistics, Health, ScanGames, Backups, Settings })
         {
             _ = SafeRefresh(vm);
         }
@@ -263,6 +268,7 @@ public partial class MainViewModel : ObservableObject
             Page.Health => Health,
             Page.ScanGames => ScanGames,
             Page.Backups => Backups,
+            Page.Settings => Settings,
             _ => Dashboard,
         };
 
@@ -314,6 +320,12 @@ public partial class MainViewModel : ObservableObject
     private void ToggleTheme()
     {
         IsLightTheme = _theming.Toggle();
+    }
+
+    public void RefreshTexts()
+    {
+        LanguageLabel = GetLanguageLabel(_localization.CurrentLanguage);
+        UpdateNavigationTexts();
     }
 
     [RelayCommand]

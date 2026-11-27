@@ -9,7 +9,7 @@ namespace GimDeks.Data;
 /// </summary>
 public sealed class DatabaseBackupService
 {
-    private const int MaxBackups = 20;
+    public int MaxBackups { get; set; } = 20;
 
     private readonly SqliteConnectionFactory _factory;
     private readonly string _backupsDirectory;
