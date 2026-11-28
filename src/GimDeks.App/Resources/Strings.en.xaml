@@ -567,4 +567,26 @@ Only the game title is sent to the internet. Continue?</sys:String>
   <sys:String x:Key="Ui_Mini_NoCandidates">No favorite has a valid executable path.</sys:String>
   <sys:String x:Key="Ui_Stats_ExportReport">Export report</sys:String>
   <sys:String x:Key="Ui_Stats_ReportTitle">Save HTML report</sys:String>
+  <sys:String x:Key="Ui_Nav_Automation">Automation</sys:String>
+  <sys:String x:Key="Ui_Auto_Title">Automation Rules</sys:String>
+  <sys:String x:Key="Ui_Auto_Subtitle">Change local fields when a condition matches. Run the rules whenever you want.</sys:String>
+  <sys:String x:Key="Ui_Auto_NewRule">New rule</sys:String>
+  <sys:String x:Key="Ui_Auto_NameHint">Rule name</sys:String>
+  <sys:String x:Key="Ui_Auto_Field">Field</sys:String>
+  <sys:String x:Key="Ui_Auto_Operator">Condition</sys:String>
+  <sys:String x:Key="Ui_Auto_Value">Value</sys:String>
+  <sys:String x:Key="Ui_Auto_Action">Action</sys:String>
+  <sys:String x:Key="Ui_Auto_Argument">Argument</sys:String>
+  <sys:String x:Key="Ui_Auto_Run">Run rules</sys:String>
+  <sys:String x:Key="Ui_Auto_Toggle">Toggle</sys:String>
+  <sys:String x:Key="Ui_Auto_Count">{0} rules</sys:String>
+  <sys:String x:Key="Ui_Auto_Applied">{0} games updated.</sys:String>
+  <sys:String x:Key="Ui_Detail_Saves">Save folders</sys:String>
+  <sys:String x:Key="Ui_Detail_SaveHint">Local save folder path</sys:String>
+  <sys:String x:Key="Ui_Detail_AddSave">Add save</sys:String>
+  <sys:String x:Key="Ui_Detail_Mods">Mods</sys:String>
+  <sys:String x:Key="Ui_Detail_ModName">Mod name</sys:String>
+  <sys:String x:Key="Ui_Detail_ModPath">Local mod path</sys:String>
+  <sys:String x:Key="Ui_Detail_AddMod">Add mod</sys:String>
+  <sys:String x:Key="Ui_Dashboard_Chart">Capacity by storage</sys:String>
 </ResourceDictionary>

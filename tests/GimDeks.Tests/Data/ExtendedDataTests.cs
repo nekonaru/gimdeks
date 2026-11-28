@@ -24,7 +24,7 @@ public sealed class ExtendedDataTests : IDisposable
 
         using var connection = factory.CreateConnection();
         var version = connection.ExecuteScalar<long>("PRAGMA user_version;");
-        Assert.Equal(7, version);
+        Assert.Equal(8, version);
 
         var tables = connection.Query<string>(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('sesi_main','catatan_game','gambar_game','preset_filter','histori_import','snapshot_kapasitas');").ToList();
@@ -36,6 +36,48 @@ public sealed class ExtendedDataTests : IDisposable
         var newTables = connection.Query<string>(
             "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('aktivitas','profil_luncur','field_kustom','nilai_field');").ToList();
         Assert.Equal(4, newTables.Count);
+        var v8Tables = connection.Query<string>(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('aturan_otomatis','save_game','mod_game');").ToList();
+        Assert.Equal(3, v8Tables.Count);
+        Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+    }
+
+    [Fact]
+    public async Task AutomationSaveAndModRoundtrip()
+    {
+        var factory = new SqliteConnectionFactory(Path.Combine(_tempDir, "extras.db"));
+        new DatabaseInitializer(factory).EnsureCreated();
+        var games = new GameRepository(factory);
+        var rules = new AutomationRuleRepository(factory);
+        var saves = new SaveGameRepository(factory);
+        var mods = new ModRepository(factory);
+
+        var gameId = await games.AddAsync(new Core.Models.Game
+        {
+            Nama = "Extra Game",
+            Status = Core.Models.GameStatus.SudahAda,
+        });
+
+        var ruleId = await rules.AddAsync(new AutomationRule(0, "Big games", "ukuran_gb", "greater", "50", "set_priority", "3", true, 0));
+        var rule = Assert.Single(await rules.GetAllAsync());
+        Assert.Equal(ruleId, rule.Id);
+        Assert.True(rule.Aktif);
+        await rules.SetActiveAsync(ruleId, false);
+        Assert.False((await rules.GetAllAsync())[0].Aktif);
+        await rules.DeleteAsync(ruleId);
+        Assert.Empty(await rules.GetAllAsync());
+
+        var saveId = await saves.AddAsync(gameId, @"D:\Saves\Extra");
+        Assert.Single(await saves.GetByGameAsync(gameId));
+        await saves.DeleteAsync(saveId);
+        Assert.Empty(await saves.GetByGameAsync(gameId));
+
+        var modId = await mods.AddAsync(gameId, "Better UI", @"D:\Mods\ui");
+        await mods.SetActiveAsync(modId, true);
+        var mod = Assert.Single(await mods.GetByGameAsync(gameId));
+        Assert.True(mod.Aktif);
+        await mods.DeleteAsync(modId);
+        Assert.Empty(await mods.GetByGameAsync(gameId));
         Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
     }
 

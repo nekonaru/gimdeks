@@ -567,4 +567,26 @@ Data yang dikirim ke internet hanya judul game. Lanjutkan?</sys:String>
   <sys:String x:Key="Ui_Mini_NoCandidates">Tidak ada favorit dengan path executable yang valid.</sys:String>
   <sys:String x:Key="Ui_Stats_ExportReport">Ekspor laporan</sys:String>
   <sys:String x:Key="Ui_Stats_ReportTitle">Simpan laporan HTML</sys:String>
+  <sys:String x:Key="Ui_Nav_Automation">Otomatisasi</sys:String>
+  <sys:String x:Key="Ui_Auto_Title">Aturan Otomatis</sys:String>
+  <sys:String x:Key="Ui_Auto_Subtitle">Ubah field lokal saat suatu kondisi cocok. Jalankan aturan kapan saja.</sys:String>
+  <sys:String x:Key="Ui_Auto_NewRule">Aturan baru</sys:String>
+  <sys:String x:Key="Ui_Auto_NameHint">Nama aturan</sys:String>
+  <sys:String x:Key="Ui_Auto_Field">Field</sys:String>
+  <sys:String x:Key="Ui_Auto_Operator">Kondisi</sys:String>
+  <sys:String x:Key="Ui_Auto_Value">Nilai</sys:String>
+  <sys:String x:Key="Ui_Auto_Action">Aksi</sys:String>
+  <sys:String x:Key="Ui_Auto_Argument">Argumen</sys:String>
+  <sys:String x:Key="Ui_Auto_Run">Jalankan aturan</sys:String>
+  <sys:String x:Key="Ui_Auto_Toggle">Aktif/nonaktif</sys:String>
+  <sys:String x:Key="Ui_Auto_Count">{0} aturan</sys:String>
+  <sys:String x:Key="Ui_Auto_Applied">{0} game diperbarui.</sys:String>
+  <sys:String x:Key="Ui_Detail_Saves">Folder save</sys:String>
+  <sys:String x:Key="Ui_Detail_SaveHint">Path folder save lokal</sys:String>
+  <sys:String x:Key="Ui_Detail_AddSave">Tambah save</sys:String>
+  <sys:String x:Key="Ui_Detail_Mods">Mod</sys:String>
+  <sys:String x:Key="Ui_Detail_ModName">Nama mod</sys:String>
+  <sys:String x:Key="Ui_Detail_ModPath">Path mod lokal</sys:String>
+  <sys:String x:Key="Ui_Detail_AddMod">Tambah mod</sys:String>
+  <sys:String x:Key="Ui_Dashboard_Chart">Kapasitas per storage</sys:String>
 </ResourceDictionary>

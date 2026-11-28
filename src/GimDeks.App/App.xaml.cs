@@ -81,6 +81,9 @@ public partial class App : Application
         services.AddSingleton<IActivityRepository, ActivityRepository>();
         services.AddSingleton<ILaunchProfileRepository, LaunchProfileRepository>();
         services.AddSingleton<ICustomFieldRepository, CustomFieldRepository>();
+        services.AddSingleton<IAutomationRuleRepository, AutomationRuleRepository>();
+        services.AddSingleton<ISaveGameRepository, SaveGameRepository>();
+        services.AddSingleton<IModRepository, ModRepository>();
         services.AddSingleton<SessionTrackerService>();
         services.AddSingleton<UndoRedoService>();
         services.AddSingleton<ExcelImporter>();
@@ -107,6 +110,8 @@ public partial class App : Application
         services.AddSingleton<SettingsViewModel>();
         services.AddSingleton<ActivityViewModel>();
         services.AddSingleton<MiniPlayerViewModel>();
+        services.AddSingleton<AutomationService>();
+        services.AddSingleton<AutomationViewModel>();
 
         return services.BuildServiceProvider();
     }

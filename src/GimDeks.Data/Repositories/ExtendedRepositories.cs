@@ -177,6 +177,97 @@ public sealed class ImportHistoryRepository(SqliteConnectionFactory factory) : I
     }
 }
 
+public sealed class AutomationRuleRepository(SqliteConnectionFactory factory) : IAutomationRuleRepository
+{
+    public async Task<IReadOnlyList<AutomationRule>> GetAllAsync(CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        var rows = await connection.QueryAsync(new CommandDefinition("SELECT * FROM aturan_otomatis ORDER BY urutan, id;", cancellationToken: ct));
+        return rows.Select(r => new AutomationRule((long)r.id, (string)r.nama, (string)r.field, (string)r.@operator,
+            (string)r.nilai, (string)r.aksi, r.argumen is null ? null : (string)r.argumen,
+            Convert.ToInt64(r.aktif) != 0, r.urutan is null ? 0 : Convert.ToInt32(r.urutan))).ToList();
+    }
+
+    public async Task<long> AddAsync(AutomationRule rule, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        return await connection.ExecuteScalarAsync<long>(new CommandDefinition(
+            "INSERT INTO aturan_otomatis (nama, field, operator, nilai, aksi, argumen, aktif, urutan) VALUES (@Nama,@Field,@Operator,@Nilai,@Aksi,@Argumen,@Aktif,(SELECT COALESCE(MAX(urutan),-1)+1 FROM aturan_otomatis)); SELECT last_insert_rowid();",
+            new { rule.Nama, rule.Field, rule.Operator, rule.Nilai, rule.Aksi, rule.Argumen, Aktif = rule.Aktif ? 1 : 0 }, cancellationToken: ct));
+    }
+
+    public async Task DeleteAsync(long id, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        await connection.ExecuteAsync(new CommandDefinition("DELETE FROM aturan_otomatis WHERE id = @Id;", new { Id = id }));
+    }
+
+    public async Task SetActiveAsync(long id, bool active, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        await connection.ExecuteAsync(new CommandDefinition("UPDATE aturan_otomatis SET aktif = @Aktif WHERE id = @Id;",
+            new { Aktif = active ? 1 : 0, Id = id }));
+    }
+}
+
+public sealed class SaveGameRepository(SqliteConnectionFactory factory) : ISaveGameRepository
+{
+    public async Task<IReadOnlyList<SaveGameEntry>> GetByGameAsync(long gameId, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        var rows = await connection.QueryAsync(new CommandDefinition(
+            "SELECT * FROM save_game WHERE game_id = @GameId ORDER BY id DESC;", new { GameId = gameId }));
+        return rows.Select(r => new SaveGameEntry((long)r.id, (long)r.game_id, (string)r.path, (string)r.dibuat_pada)).ToList();
+    }
+
+    public async Task<long> AddAsync(long gameId, string path, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        return await connection.ExecuteScalarAsync<long>(new CommandDefinition(
+            "INSERT INTO save_game (game_id, path) VALUES (@GameId, @Path); SELECT last_insert_rowid();",
+            new { GameId = gameId, Path = path }, cancellationToken: ct));
+    }
+
+    public async Task DeleteAsync(long id, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        await connection.ExecuteAsync(new CommandDefinition("DELETE FROM save_game WHERE id = @Id;", new { Id = id }));
+    }
+}
+
+public sealed class ModRepository(SqliteConnectionFactory factory) : IModRepository
+{
+    public async Task<IReadOnlyList<ModEntry>> GetByGameAsync(long gameId, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        var rows = await connection.QueryAsync(new CommandDefinition(
+            "SELECT * FROM mod_game WHERE game_id = @GameId ORDER BY id;", new { GameId = gameId }));
+        return rows.Select(r => new ModEntry((long)r.id, (long)r.game_id, (string)r.nama, (string)r.path,
+            Convert.ToInt64(r.aktif) != 0, r.catatan is null ? null : (string)r.catatan)).ToList();
+    }
+
+    public async Task<long> AddAsync(long gameId, string nama, string path, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        return await connection.ExecuteScalarAsync<long>(new CommandDefinition(
+            "INSERT INTO mod_game (game_id, nama, path) VALUES (@GameId, @Nama, @Path); SELECT last_insert_rowid();",
+            new { GameId = gameId, Nama = nama, Path = path }, cancellationToken: ct));
+    }
+
+    public async Task SetActiveAsync(long id, bool active, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        await connection.ExecuteAsync(new CommandDefinition("UPDATE mod_game SET aktif = @Aktif WHERE id = @Id;",
+            new { Aktif = active ? 1 : 0, Id = id }));
+    }
+
+    public async Task DeleteAsync(long id, CancellationToken ct = default)
+    {
+        using var connection = factory.CreateConnection();
+        await connection.ExecuteAsync(new CommandDefinition("DELETE FROM mod_game WHERE id = @Id;", new { Id = id }));
+    }
+}
+
 public sealed class ActivityRepository(SqliteConnectionFactory factory) : IActivityRepository
 {
     public async Task<IReadOnlyList<ActivityEntry>> GetRecentAsync(int count, CancellationToken ct = default)
@@ -308,4 +399,5 @@ public sealed class CapacitySnapshotRepository(SqliteConnectionFactory factory) 
             (int)r.jumlah_game, Convert.ToDouble(r.total_gb, System.Globalization.CultureInfo.InvariantCulture))).ToList();
     }
 }
+
 

@@ -4,6 +4,22 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## v3.3.0
+
+Automation, local add-ons, and the last navigation and search refinements.
+
+## New features
+
+- **Automation rules.** Define conditions on status, name, size, favorite, rating, or executable path and apply actions such as setting status, favorite, priority, or rating. A System page manages rules and runs them on demand.
+- **Save and mod manager.** The game detail window now tracks local save folders and mods with active toggles. Paths stay on this PC.
+- **Capacity chart.** The dashboard draws a progress bar per storage from the same data as the cards.
+- **Detached game list.** Ctrl+Shift+D opens the game list in a second window for a dual monitor setup.
+- **Fuzzy search.** Search now also matches game names by subsequence, so short fragments find games without exact substrings.
+
+## Improvements
+
+- **Schema version 8.** Adds tables for automation rules, save folders, and mods with the existing automatic upgrade backup.
+
 ## v3.2.0
 
 Quick play and report exports to close out the visual roadmap.

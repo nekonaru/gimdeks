@@ -16,4 +16,5 @@ public enum Page
     Backups,
     Settings,
     Activity,
+    Automation,
 }

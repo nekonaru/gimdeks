@@ -79,6 +79,11 @@ GimDeks manages a game collection across multiple drives (external HDDs, laptop 
 | --- | --- |
 | **Dashboard** | One card per storage: game count, GB used, remaining space, progress bar, and a badge when the storage is over its limit. |
 | **Game list** | Sortable, searchable, filterable table (status, storage, size range) with virtualization for thousands of games. |
+| **Automation rules** | Define conditions and actions that update local game fields on demand. |
+| **Save and mod manager** | Track local save folders and mods per game from the detail window. |
+| **Capacity chart** | Dashboard bars show used capacity per storage. |
+| **Detached game list** | Ctrl+Shift+D opens the list in a second window for dual monitors. |
+| **Fuzzy search** | Short fragments find games by subsequence. |
 | **Quick Play window** | Ctrl+M opens an always-on-top favorite launcher with its own random pick. |
 | **HTML report** | Export a printable collection report from Statistics. |
 | **Activity log** | Every edit is recorded with time and detail in a System page. |

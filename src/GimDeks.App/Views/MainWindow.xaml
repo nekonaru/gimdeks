@@ -38,6 +38,7 @@
         <KeyBinding Modifiers="Ctrl" Key="Z" Command="{Binding UndoCommand}" />
         <KeyBinding Modifiers="Ctrl" Key="Y" Command="{Binding RedoCommand}" />
         <KeyBinding Modifiers="Ctrl" Key="M" Command="{Binding OpenMiniCommand}" />
+        <KeyBinding Modifiers="Control+Shift" Key="D" Command="{Binding DetachGameListCommand}" />
     </Window.InputBindings>
 
     <Window.Resources>
@@ -79,6 +80,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ActivityViewModel}">
             <views:ActivityPage />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AutomationViewModel}">
+            <views:AutomationPage />
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:HddSuggestionViewModel}">
             <views:HddSuggestionPage />

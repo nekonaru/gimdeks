@@ -332,6 +332,27 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
         _filterDebounce.Stop();
         await ApplyFiltersAsync();
     }
+    private static bool FuzzyMatch(string text, string query)
+    {
+        if (query.Length < 3 || text.Length < query.Length)
+        {
+            return false;
+        }
+        var index = 0;
+        foreach (var ch in text)
+        {
+            if (index < query.Length && char.ToUpperInvariant(ch) == char.ToUpperInvariant(query[index]))
+            {
+                index++;
+            }
+            if (index == query.Length)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     partial void OnSelectedStatusChanged(FilterOption value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
     partial void OnSelectedStorageChanged(FilterOption value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
     partial void OnSelectedTagChanged(FilterOption value) { if (!_suppressFilterChanges) { _ = ApplyFiltersAsync(); } }
@@ -396,7 +417,8 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             {
                 filtered = filtered.Where(g =>
                     g.Nama.Contains(search, StringComparison.OrdinalIgnoreCase)
-                    || (g.Versi?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false));
+                    || (g.Versi?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false)
+                    || FuzzyMatch(g.Nama, search));
             }
         }
 
@@ -825,7 +847,9 @@ public partial class GameListViewModel : ObservableObject, IRefreshable
             app.GetRequiredService<IGameImageRepository>(),
             app.GetRequiredService<IPlaySessionRepository>(),
             app.GetRequiredService<Services.SessionTrackerService>(),
-            app.GetRequiredService<ILaunchProfileRepository>());
+            app.GetRequiredService<ILaunchProfileRepository>(),
+            app.GetRequiredService<ISaveGameRepository>(),
+            app.GetRequiredService<IModRepository>());
         new Views.GameDetailWindow(vm) { Owner = System.Windows.Application.Current.MainWindow }.Show();
     }
 

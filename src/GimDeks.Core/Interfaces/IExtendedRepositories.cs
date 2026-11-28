@@ -11,6 +11,9 @@ public sealed record ActivityEntry(long Id, string Waktu, string Aksi, long? Gam
 public sealed record LaunchProfile(long Id, long GameId, string Nama, string PathExe, string? Argumen, int Urutan);
 public sealed record CustomField(long Id, string Nama, string Tipe, int Urutan);
 public sealed record CustomValue(long GameId, long FieldId, string? Nilai);
+public sealed record AutomationRule(long Id, string Nama, string Field, string Operator, string Nilai, string Aksi, string? Argumen, bool Aktif, int Urutan);
+public sealed record SaveGameEntry(long Id, long GameId, string Path, string DibuatPada);
+public sealed record ModEntry(long Id, long GameId, string Nama, string Path, bool Aktif, string? Catatan);
 public sealed record CapacitySnapshot(long Id, long StorageId, string Tanggal, int JumlahGame, double TotalGb);
 
 public interface IPlaySessionRepository
@@ -49,6 +52,29 @@ public interface IImportHistoryRepository
 {
     Task<IReadOnlyList<ImportHistory>> GetAllAsync(CancellationToken ct = default);
     Task<long> AddAsync(string path, string mode, string hasilJson, CancellationToken ct = default);
+}
+
+public interface IAutomationRuleRepository
+{
+    Task<IReadOnlyList<AutomationRule>> GetAllAsync(CancellationToken ct = default);
+    Task<long> AddAsync(AutomationRule rule, CancellationToken ct = default);
+    Task DeleteAsync(long id, CancellationToken ct = default);
+    Task SetActiveAsync(long id, bool active, CancellationToken ct = default);
+}
+
+public interface ISaveGameRepository
+{
+    Task<IReadOnlyList<SaveGameEntry>> GetByGameAsync(long gameId, CancellationToken ct = default);
+    Task<long> AddAsync(long gameId, string path, CancellationToken ct = default);
+    Task DeleteAsync(long id, CancellationToken ct = default);
+}
+
+public interface IModRepository
+{
+    Task<IReadOnlyList<ModEntry>> GetByGameAsync(long gameId, CancellationToken ct = default);
+    Task<long> AddAsync(long gameId, string nama, string path, CancellationToken ct = default);
+    Task SetActiveAsync(long id, bool active, CancellationToken ct = default);
+    Task DeleteAsync(long id, CancellationToken ct = default);
 }
 
 public interface IActivityRepository

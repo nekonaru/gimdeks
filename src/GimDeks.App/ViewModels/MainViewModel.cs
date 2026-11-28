@@ -59,7 +59,8 @@ public partial class MainViewModel : ObservableObject
         ScanGamesViewModel scanGames,
         BackupManagerViewModel backups,
         SettingsViewModel settingsVm,
-        ActivityViewModel activity)
+        ActivityViewModel activity,
+        AutomationViewModel automation)
     {
         _theming = theming;
         _localization = localization;
@@ -78,6 +79,7 @@ public partial class MainViewModel : ObservableObject
         Backups = backups;
         Settings = settingsVm;
         Activity = activity;
+        Automation = automation;
         IsLightTheme = theming.IsLightTheme;
         LanguageLabel = GetLanguageLabel(localization.CurrentLanguage);
         NavItems = new[]
@@ -95,6 +97,7 @@ public partial class MainViewModel : ObservableObject
             new NavItem(Page.Backups, "Ui_Nav_Backups", "Backup", "Ui_NavSection_Maintain"),
             new NavItem(Page.ImportExport, "Ui_Nav_ImportExport", "ImportExport", "Ui_NavSection_Maintain"),
             new NavItem(Page.Activity, "Ui_Nav_Activity", "History", "Ui_NavSection_System"),
+            new NavItem(Page.Automation, "Ui_Nav_Automation", "Robot", "Ui_NavSection_System"),
             new NavItem(Page.Settings, "Ui_Nav_Settings", "Settings", "Ui_NavSection_System"),
         };
         NavItemsView = CollectionViewSource.GetDefaultView(NavItems);
@@ -143,6 +146,7 @@ public partial class MainViewModel : ObservableObject
             Page.ScanGames => "Ui_Nav_ScanGames",
             Page.Backups => "Ui_Nav_Backups",
             Page.Activity => "Ui_Nav_Activity",
+            Page.Automation => "Ui_Nav_Automation",
             Page.Settings => "Ui_Nav_Settings",
             Page.ImportExport => "Ui_Nav_ImportExport",
             _ => "Ui_Nav_Dashboard",
@@ -169,6 +173,7 @@ public partial class MainViewModel : ObservableObject
     public BackupManagerViewModel Backups { get; }
     public SettingsViewModel Settings { get; }
     public ActivityViewModel Activity { get; }
+    public AutomationViewModel Automation { get; }
 
     private void OpenHealthIssue(HealthIssue issue)
     {
@@ -216,7 +221,7 @@ public partial class MainViewModel : ObservableObject
                 await _refreshLock.WaitAsync().ConfigureAwait(true);
                 try
                 {
-                    foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated, Duplicates, HddSuggestion, Statistics, Health, ScanGames, Backups, Settings, Activity })
+                    foreach (IRefreshable vm in new IRefreshable[] { Dashboard, GameList, Storage, Excluded, Eliminated, Duplicates, HddSuggestion, Statistics, Health, ScanGames, Backups, Settings, Activity, Automation })
                     {
                         await SafeRefresh(vm);
                     }
@@ -317,6 +322,7 @@ public partial class MainViewModel : ObservableObject
             Page.Backups => Backups,
             Page.Settings => Settings,
             Page.Activity => Activity,
+            Page.Automation => Automation,
             _ => Dashboard,
         };
 
@@ -374,6 +380,12 @@ public partial class MainViewModel : ObservableObject
     {
         LanguageLabel = GetLanguageLabel(_localization.CurrentLanguage);
         UpdateNavigationTexts();
+    }
+
+    [RelayCommand]
+    private void DetachGameList()
+    {
+        new Views.DetachedGameListWindow(GameList).Show();
     }
 
     [RelayCommand]
