@@ -59,6 +59,61 @@
                 <Button Content="{DynamicResource Ui_Detail_AddProfile}" Style="{StaticResource MaterialDesignOutlinedButton}"
                         Command="{Binding AddProfileCommand}" HorizontalAlignment="Left" Margin="0,0,0,14" />
 
+                <TextBlock Text="{DynamicResource Ui_Detail_Saves}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
+                <ItemsControl ItemsSource="{Binding SaveGames}" Margin="0,0,0,6">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:SaveRow}">
+                            <Border Background="{StaticResource GimDeksCard}" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                <Grid>
+                                    <TextBlock Text="{Binding Entry.Path}" TextWrapping="Wrap" Grid.Column="0" />
+                                    <Button Content="{DynamicResource Ui_Button_Delete}" Style="{StaticResource MaterialDesignFlatButton}"
+                                            Command="{Binding DataContext.DeleteSaveCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" HorizontalAlignment="Right" Padding="8,2" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Grid Margin="0,0,0,12">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBox Text="{Binding NewSavePath, UpdateSourceTrigger=PropertyChanged}"
+                             materialDesign:HintAssist.Hint="{DynamicResource Ui_Detail_SaveHint}" />
+                    <Button Grid.Column="1" Content="{DynamicResource Ui_Detail_AddSave}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                            Command="{Binding AddSaveCommand}" Margin="8,0,0,0" />
+                </Grid>
+
+                <TextBlock Text="{DynamicResource Ui_Detail_Mods}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
+                <ItemsControl ItemsSource="{Binding Mods}" Margin="0,0,0,6">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:ModRow}">
+                            <Border Background="{StaticResource GimDeksCard}" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding Entry.Nama}" FontWeight="SemiBold" />
+                                        <TextBlock Text="{Binding Entry.Path}" FontSize="10" Opacity="0.6" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Content="{DynamicResource Ui_Auto_Toggle}" Style="{StaticResource MaterialDesignFlatButton}"
+                                            Command="{Binding DataContext.ToggleModCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" Padding="8,2" />
+                                    <Button Grid.Column="2" Content="{DynamicResource Ui_Button_Delete}" Style="{StaticResource MaterialDesignFlatButton}"
+                                            Command="{Binding DataContext.DeleteModCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" Padding="8,2" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Grid Margin="0,0,0,14">
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="120" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBox Text="{Binding NewModName, UpdateSourceTrigger=PropertyChanged}"
+                             materialDesign:HintAssist.Hint="{DynamicResource Ui_Detail_ModName}" Margin="0,0,8,0" />
+                    <TextBox Grid.Column="1" Text="{Binding NewModPath, UpdateSourceTrigger=PropertyChanged}"
+                             materialDesign:HintAssist.Hint="{DynamicResource Ui_Detail_ModPath}" Margin="0,0,8,0" />
+                    <Button Grid.Column="2" Content="{DynamicResource Ui_Detail_AddMod}" Style="{StaticResource MaterialDesignOutlinedButton}"
+                            Command="{Binding AddModCommand}" />
+                </Grid>
+
                 <TextBlock Text="{DynamicResource Ui_Detail_Gallery}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,8" />
                 <Image Source="{Binding SelectedImagePath}" Height="180" Stretch="Uniform" />
                 <ItemsControl ItemsSource="{Binding Images}" Margin="0,6,0,14">

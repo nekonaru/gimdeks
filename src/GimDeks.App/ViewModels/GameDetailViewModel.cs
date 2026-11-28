@@ -29,6 +29,16 @@ public sealed class SessionView
     public string StartText => Session.Mulai.Length >= 16 ? Session.Mulai[..16].Replace('T', ' ') : Session.Mulai;
 }
 
+public sealed class SaveRow
+{
+    public required SaveGameEntry Entry { get; init; }
+}
+
+public sealed class ModRow
+{
+    public required ModEntry Entry { get; init; }
+}
+
 public sealed class LaunchProfileRow
 {
     public required LaunchProfile Profile { get; init; }
@@ -49,9 +59,11 @@ public partial class GameDetailViewModel : ObservableObject
     private readonly IPlaySessionRepository _sessions;
     private readonly Services.SessionTrackerService _tracker;
     private readonly ILaunchProfileRepository _profiles;
+    private readonly ISaveGameRepository _saves;
+    private readonly IModRepository _mods;
 
     public GameDetailViewModel(Game game, IGameRepository games, IGameNoteRepository notes,
-        IGameImageRepository images, IPlaySessionRepository sessions, Services.SessionTrackerService tracker, ILaunchProfileRepository profiles)
+        IGameImageRepository images, IPlaySessionRepository sessions, Services.SessionTrackerService tracker, ILaunchProfileRepository profiles, ISaveGameRepository saves, IModRepository mods)
     {
         Game = game;
         _games = games;
@@ -60,6 +72,8 @@ public partial class GameDetailViewModel : ObservableObject
         _sessions = sessions;
         _tracker = tracker;
         _profiles = profiles;
+        _saves = saves;
+        _mods = mods;
     }
 
     public Game Game { get; }
@@ -67,6 +81,8 @@ public partial class GameDetailViewModel : ObservableObject
     public ObservableCollection<SessionView> Sessions { get; } = new();
     public ObservableCollection<ImageItem> Images { get; } = new();
     public ObservableCollection<LaunchProfileRow> Profiles { get; } = new();
+    public ObservableCollection<SaveRow> SaveGames { get; } = new();
+    public ObservableCollection<ModRow> Mods { get; } = new();
 
     [ObservableProperty]
     private string _selectedImagePath = "";
@@ -116,6 +132,18 @@ public partial class GameDetailViewModel : ObservableObject
             {
                 Profiles.Add(new LaunchProfileRow { Profile = profile });
             }
+
+            SaveGames.Clear();
+            foreach (var save in await _saves.GetByGameAsync(Game.Id))
+            {
+                SaveGames.Add(new SaveRow { Entry = save });
+            }
+
+            Mods.Clear();
+            foreach (var mod in await _mods.GetByGameAsync(Game.Id))
+            {
+                Mods.Add(new ModRow { Entry = mod });
+            }
         }
         finally
         {
@@ -145,6 +173,64 @@ public partial class GameDetailViewModel : ObservableObject
             return;
         }
         await _notes.DeleteAsync(note.Note.Id);
+        await LoadAsync();
+    }
+
+    [ObservableProperty]
+    private string _newSavePath = "";
+
+    [ObservableProperty]
+    private string _newModName = "";
+
+    [ObservableProperty]
+    private string _newModPath = "";
+
+    [RelayCommand]
+    private async Task AddSaveAsync()
+    {
+        if (string.IsNullOrWhiteSpace(NewSavePath))
+        {
+            return;
+        }
+        await _saves.AddAsync(Game.Id, NewSavePath.Trim());
+        NewSavePath = "";
+        await LoadAsync();
+    }
+
+    [RelayCommand]
+    private async Task DeleteSaveAsync(SaveRow? row)
+    {
+        if (row is null) return;
+        await _saves.DeleteAsync(row.Entry.Id);
+        await LoadAsync();
+    }
+
+    [RelayCommand]
+    private async Task AddModAsync()
+    {
+        if (string.IsNullOrWhiteSpace(NewModName) || string.IsNullOrWhiteSpace(NewModPath))
+        {
+            return;
+        }
+        await _mods.AddAsync(Game.Id, NewModName.Trim(), NewModPath.Trim());
+        NewModName = "";
+        NewModPath = "";
+        await LoadAsync();
+    }
+
+    [RelayCommand]
+    private async Task ToggleModAsync(ModRow? row)
+    {
+        if (row is null) return;
+        await _mods.SetActiveAsync(row.Entry.Id, !row.Entry.Aktif);
+        await LoadAsync();
+    }
+
+    [RelayCommand]
+    private async Task DeleteModAsync(ModRow? row)
+    {
+        if (row is null) return;
+        await _mods.DeleteAsync(row.Entry.Id);
         await LoadAsync();
     }
 

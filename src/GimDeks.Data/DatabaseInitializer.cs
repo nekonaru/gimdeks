@@ -186,6 +186,39 @@ public sealed class DatabaseInitializer
           PRIMARY KEY (game_id, field_id)
         );
         """,
+
+        // 8: automation rules, save folders and mods
+        """
+        CREATE TABLE aturan_otomatis (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          nama TEXT NOT NULL,
+          field TEXT NOT NULL,
+          operator TEXT NOT NULL,
+          nilai TEXT NOT NULL,
+          aksi TEXT NOT NULL,
+          argumen TEXT,
+          aktif INTEGER NOT NULL DEFAULT 1,
+          urutan INTEGER NOT NULL DEFAULT 0
+        );
+
+        CREATE TABLE save_game (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          game_id INTEGER NOT NULL REFERENCES game(id) ON DELETE CASCADE,
+          path TEXT NOT NULL,
+          dibuat_pada TEXT NOT NULL DEFAULT (datetime('now'))
+        );
+        CREATE INDEX ix_save_game_game ON save_game(game_id);
+
+        CREATE TABLE mod_game (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          game_id INTEGER NOT NULL REFERENCES game(id) ON DELETE CASCADE,
+          nama TEXT NOT NULL,
+          path TEXT NOT NULL,
+          aktif INTEGER NOT NULL DEFAULT 0,
+          catatan TEXT
+        );
+        CREATE INDEX ix_mod_game_game ON mod_game(game_id);
+        """,
     };
 
     private readonly SqliteConnectionFactory _factory;

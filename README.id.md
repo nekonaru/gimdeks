@@ -79,6 +79,11 @@ GimDeks mengelola koleksi game di banyak drive (HDD eksternal, HDD laptop, dan S
 | --- | --- |
 | **Dashboard** | Satu kartu per storage: jumlah game, total GB, sisa ruang, progress bar, dan lencana peringatan saat melebihi batas. |
 | **Daftar Game** | Tabel yang bisa diurutkan, dicari, dan difilter (status, storage, rentang ukuran) dengan virtualisasi untuk ribuan game. |
+| **Aturan otomatis** | Tentukan kondisi dan aksi yang memperbarui field game lokal kapan saja. |
+| **Manajer save dan mod** | Catat folder save dan mod per game dari jendela detail. |
+| **Grafik kapasitas** | Bar di Dashboard menampilkan kapasitas terpakai per storage. |
+| **Daftar game terpisah** | Ctrl+Shift+D membuka daftar di jendela kedua untuk dua monitor. |
+| **Pencarian fuzzy** | Fragmen pendek menemukan game berdasarkan urutan huruf. |
 | **Jendela Main Cepat** | Ctrl+M membuka peluncur favorit always-on-top dengan pilihan acak sendiri. |
 | **Laporan HTML** | Ekspor laporan koleksi yang bisa dicetak dari Statistik. |
 | **Log aktivitas** | Setiap perubahan dicatat dengan waktu dan detail di halaman Sistem. |

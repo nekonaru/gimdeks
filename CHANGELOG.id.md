@@ -4,6 +4,22 @@ Semua perubahan penting proyek ini didokumentasikan di sini. Formatnya berdasark
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), dan proyek ini mengikuti
 [Semantic Versioning](https://semver.org/).
 
+## v3.3.0
+
+Otomatisasi, add-on lokal, dan penyempurnaan navigasi serta pencarian terakhir.
+
+## Fitur baru
+
+- **Aturan otomatis.** Tentukan kondisi pada status, nama, ukuran, favorit, rating, atau path executable, lalu aksi seperti mengubah status, favorit, prioritas, atau rating. Halaman Sistem mengelola aturan dan menjalankannya kapan saja.
+- **Manajer save dan mod.** Jendela detail game kini mencatat folder save dan mod lokal dengan tombol aktif. Path tetap di komputer ini.
+- **Grafik kapasitas.** Dashboard menggambar progress bar per storage dari data yang sama dengan kartu.
+- **Daftar game terpisah.** Ctrl+Shift+D membuka daftar game di jendela kedua untuk pengaturan dua monitor.
+- **Pencarian fuzzy.** Pencarian juga mencocokkan nama game berdasarkan urutan huruf, sehingga fragmen pendek tetap menemukan game.
+
+## Peningkatan
+
+- **Skema versi 8.** Menambah tabel untuk aturan otomatis, folder save, dan mod dengan backup upgrade otomatis yang sudah ada.
+
 ## v3.2.0
 
 Jendela main cepat dan ekspor laporan untuk menutup peta jalan visual.
